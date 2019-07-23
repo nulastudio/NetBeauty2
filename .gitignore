@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+__MACOSX
+
+# vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Rr]elease/
+
+# sublime
+*.sublime-workspace
+
+# packages
+vendor/

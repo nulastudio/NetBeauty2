@@ -1,0 +1,18 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch",
+			"type": "go",
+			"request": "launch",
+			"mode": "auto",
+            "program": "${workspaceFolder}/src/main/beauty.go",
+            "env": {},
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "./test/",
+                "libraries",
+            ]
+		}
+	]
+}
