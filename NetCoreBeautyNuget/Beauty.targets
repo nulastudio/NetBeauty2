@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">True</IsWindows>
+    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">True</IsLinux>
+    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">True</IsOSX>
+    <RuntimeOS Condition="$(IsWindows) == 'True'">win-x64</RuntimeOS>
+    <RuntimeOS Condition="$(IsLinux) == 'True'">linux-x64</RuntimeOS>
+    <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
+    <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
+    <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
+    <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir)"</BeautyDir>
+    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
+  </PropertyGroup>
+
+  <Target Name="NetCoreBeauty" AfterTargets="Publish">
+    <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir)" />
+  </Target>
+</Project>

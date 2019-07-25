@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)/../../targets/Beauty.targets" />
+</Project>

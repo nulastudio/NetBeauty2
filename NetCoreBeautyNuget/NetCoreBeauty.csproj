@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>nulastudio.NetCoreBeauty</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NuspecFile>NetCoreBeauty.nuspec</NuspecFile>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>nulastudio.NetCoreBeauty</id>
+    <description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</description>    
+    <version>1.0.0</version>
+    <authors>LiesAuer</authors>
+  </metadata>
+  <files>
+    <file src="_._" target="lib/netstandard2.0/" />
+    <file src="NetCoreBeauty.targets" target="build/netstandard2.0/nulastudio.NetCoreBeauty.targets" />
+
+    <file src="Beauty.targets" target="targets/" />
+    <file src="../tools/**/*" target="tools/" />
+  </files>
+</package>
