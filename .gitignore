@@ -13,6 +13,7 @@ __MACOSX
 [Bb]in/
 [Oo]bj/
 [Rr]elease/
+tools/
 
 # sublime
 *.sublime-workspace
