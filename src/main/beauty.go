@@ -27,6 +27,8 @@ func main() {
 		if len(os.Args) >= 3 {
 			libsDir = os.Args[2]
 		}
+		beautyDir = strings.Trim(beautyDir, "\"")
+		libsDir = strings.Trim(libsDir, "\"")
 		beautyDir, _ = filepath.Abs(beautyDir)
 	}
 

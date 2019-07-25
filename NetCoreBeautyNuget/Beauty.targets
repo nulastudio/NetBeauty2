@@ -8,11 +8,11 @@
     <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
-    <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir)"</BeautyDir>
+    <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir).HERE/.."</BeautyDir>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
   </PropertyGroup>
 
-  <Target Name="NetCoreBeauty" AfterTargets="Publish">
+  <Target Name="NetCoreBeauty" AfterTargets="Publish" Condition="$(DisableBeauty) != 'True'">
     <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir)" />
   </Target>
 </Project>

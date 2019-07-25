@@ -3,11 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
     <BeautyLibsDir>libraries</BeautyLibsDir>
+    <!-- set to True if you want to disable -->
+    <DisableBeauty>False</DisableBeauty>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.0" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
