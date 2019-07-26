@@ -25,10 +25,10 @@ you `*.csproj` should be similar like this
     <BeautyLibsDir>libraries</BeautyLibsDir>
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.1" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.2" />
   </ItemGroup>
 
 </Project>
