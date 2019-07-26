@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>nulastudio.NetCoreBeauty</id>
-    <description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</description>    
-    <version>1.0.1</version>
+    <description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</description>
+    <version>1.0.2</version>
     <authors>LiesAuer</authors>
     <owners>nulastudio</owners>
     <projectUrl>https://github.com/nulastudio/NetCoreBeauty</projectUrl>

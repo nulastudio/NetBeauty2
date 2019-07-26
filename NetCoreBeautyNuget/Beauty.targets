@@ -10,9 +10,10 @@
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
     <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir).HERE/.."</BeautyDir>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
+    <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
   </PropertyGroup>
 
-  <Target Name="NetCoreBeauty" AfterTargets="Publish" Condition="$(DisableBeauty) != 'True'">
+  <Target Name="NetCoreBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True'">
     <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir)" />
   </Target>
 </Project>
