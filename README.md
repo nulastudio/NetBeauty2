@@ -10,11 +10,11 @@ Move a .NET Core app runtime components and dependencies into a sub-directory an
 ![after_beauty](after_beauty.png)
 
 ## How to use?
-1. Add Nuget reference into you .NET Core project.
+1. Add Nuget reference into your .NET Core project.
 ```
 dotnet add package nulastudio.NetCoreBeauty
 ```
-you `*.csproj` should be similar like this
+your `*.csproj` should be similar like this
 ```
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -35,7 +35,7 @@ you `*.csproj` should be similar like this
 ```
 when you run `dotnet publish` , everything is done automatically.
 
-2. Use the binary application if you project has already be published.
+2. Use the binary application if your project has already be published.
 ```
 Usage:
 ncbeauty <beautyDir> [<LibsDir>]
