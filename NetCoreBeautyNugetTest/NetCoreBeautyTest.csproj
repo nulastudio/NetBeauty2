@@ -2,16 +2,20 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
     <BeautyLibsDir>libraries</BeautyLibsDir>
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
+    <!-- set to True if you want to disable -->
+    <DisablePatch>True</DisablePatch>
+    <!-- set to a repo mirror if you have troble in connecting github -->
+    <PatchCDN>https://github-like.com/someone/HostFXRPatcherMirror</PatchCDN>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.2" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.3" />
   </ItemGroup>
 
 </Project>

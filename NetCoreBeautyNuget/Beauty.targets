@@ -11,9 +11,10 @@
     <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir).HERE/.."</BeautyDir>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
+    <DisablePatch Condition="$(DisablePatch) == ''">False</DisablePatch>
   </PropertyGroup>
 
-  <Target Name="NetCoreBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True'">
-    <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir)" />
+  <Target Name="NetCoreBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True' And $(RuntimeIdentifier) != ''">
+    <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir) $(DisablePatch) $(PatchCDN)" />
   </Target>
 </Project>

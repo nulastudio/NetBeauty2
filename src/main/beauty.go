@@ -1,11 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/bitly/go-simplejson"
@@ -14,6 +17,8 @@ import (
 var workingDir, _ = os.Getwd()
 var beautyDir = ""
 var libsDir = "libs"
+var disablePatch = false
+var gitcdn = "https://github.com/nulastudio/HostFXRPatcher"
 
 func main() {
 	// arguments check
@@ -30,15 +35,26 @@ func main() {
 		beautyDir = strings.Trim(beautyDir, "\"")
 		libsDir = strings.Trim(libsDir, "\"")
 		beautyDir, _ = filepath.Abs(beautyDir)
+		if len(os.Args) >= 4 {
+			disablePatch = os.Args[3] == "True"
+		}
+		if len(os.Args) >= 5 {
+			gitcdn = os.Args[4]
+		}
 	}
 
+	fmt.Println("running ncbeauty...")
+
 	// fix runtimeconfig.json
+	fmt.Println("fixing runtimeconfig.json...")
 	runtimeConfigs, _ := filepath.Glob(beautyDir + "/*runtimeconfig*.json")
 	for _, runtimeConfig := range runtimeConfigs {
 		fixRuntimeConfig(runtimeConfig, libsDir)
 	}
+	fmt.Println("runtimeconfig.json fixed")
 
 	// fix deps.json
+	fmt.Println("fixing deps.json...")
 	dependencies, _ := filepath.Glob(beautyDir + "/*deps.json")
 	for _, deps := range dependencies {
 		deps = strings.ReplaceAll(deps, "\\", "/")
@@ -82,11 +98,13 @@ func main() {
 			}
 		}
 	}
+	fmt.Println("deps.json fixed")
+	fmt.Println("ncbeauty done. Enjoy it!")
 }
 
 func help() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty <beautyDir> [<LibsDir>]")
+	fmt.Println("ncbeauty <beautyDir> [<LibsDir>] [<disablePatch=True|False>] [<gitcdn>]")
 }
 
 func pathExists(path string) bool {
@@ -125,11 +143,22 @@ func fixDependencies(deps string, mainProgram string) []string {
 	jsonBytes, _ := ioutil.ReadFile(deps)
 	json, _ := simplejson.NewJson(jsonBytes)
 	files := []string{}
+	rid := ""
+	fxrVersion := ""
+	fxrName := ""
 
 	// targets
 	targets, _ := json.Get("targets").Map()
 	for _, target := range targets {
-		for _, depsObj := range target.(map[string]interface{}) {
+		for targetName, depsObj := range target.(map[string]interface{}) {
+			// 解析出fxr信息
+			if strings.HasPrefix(targetName, "runtime") && strings.Contains(targetName, "Microsoft.NETCore.DotNetHostResolver") {
+				regex, _ := regexp.Compile("^runtime\\.([\\w-]+)\\.Microsoft\\.NETCore\\.DotNetHostResolver\\/([\\d\\.]+)$")
+				matches := regex.FindStringSubmatch(targetName)
+				rid = matches[1]
+				fxrVersion = matches[2]
+				fmt.Printf("fxr %s.%s detected\n", rid, fxrVersion)
+			}
 			if depsObj != nil {
 				// runtime
 				runtimes := depsObj.(map[string]interface{})["runtime"]
@@ -165,6 +194,9 @@ func fixDependencies(deps string, mainProgram string) []string {
 						fileName := components[len(components)-1]
 						files = append(files, fileName)
 						newNatives["./"+fileName] = make(map[string]interface{})
+						if strings.Contains(fileName, "hostfxr") {
+							fxrName = fileName
+						}
 					}
 					depsObj.(map[string]interface{})["native"] = newNatives
 				}
@@ -208,6 +240,57 @@ func fixDependencies(deps string, mainProgram string) []string {
 
 	jsonBytes, _ = json.EncodePretty()
 	ioutil.WriteFile(deps, jsonBytes, 0666)
+
+	// patch
+	if disablePatch {
+		fmt.Println("hostfxr patch has been disable, skipped.")
+		return files
+	}
+	fmt.Println("patching hostfxr...")
+	// TODO: match the right rid
+	fmt.Printf("downloading patched hostfxr: %s.%s\n", rid, fxrVersion)
+	fxrURL := fmt.Sprintf("%s/raw/master/artifacts/v%s/%s.Release/%s", gitcdn, fxrVersion, rid, fxrName)
+	response, err := http.Get(fxrURL)
+	var fxrData []byte
+	if err == nil {
+		if response.StatusCode != 200 {
+			err = errors.New(response.Status)
+		} else {
+			fxrData, err = ioutil.ReadAll(response.Body)
+		}
+	}
+	if err != nil {
+		fmt.Println("download patch failed due to:")
+		// ensure download
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	absFxrName := path.Join(beautyDir, fxrName)
+	absFxrBakName := absFxrName + ".bak"
+	fmt.Printf("backuping fxr to %s\n", absFxrBakName)
+	if pathExists(absFxrBakName) {
+		fmt.Println("fxr backup found, skipped.")
+	} else {
+		err := os.Rename(absFxrName, absFxrBakName)
+		if err != nil {
+			fmt.Println("backup failed.")
+			fmt.Println(err)
+			return files
+		}
+	}
+	f, err := os.Create(absFxrName)
+	if err != nil {
+		fmt.Printf("open %s failed\n", absFxrName)
+		fmt.Println(err)
+		return files
+	}
+	bytes, err := f.Write(fxrData)
+	if err != nil || bytes == 0 {
+		fmt.Printf("write %s failed\n", absFxrName)
+		fmt.Println(err)
+		return files
+	}
+	fmt.Println("patch succeed")
 
 	return files
 }
