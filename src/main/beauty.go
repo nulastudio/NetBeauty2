@@ -164,7 +164,7 @@ func fixDependencies(deps string, mainProgram string) []string {
 				runtimes := depsObj.(map[string]interface{})["runtime"]
 				if runtimes != nil {
 					newRuntimes := make(map[string]interface{})
-					for k, _ := range runtimes.(map[string]interface{}) {
+					for k := range runtimes.(map[string]interface{}) {
 						components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 						fileName := components[len(components)-1]
 						files = append(files, fileName)
@@ -177,7 +177,7 @@ func fixDependencies(deps string, mainProgram string) []string {
 				// runtimeTargets := depsObj.(map[string]interface{})["runtimeTargets"]
 				// if runtimeTargets != nil {
 				// 	newRuntimeTargets := make(map[string]interface{})
-				// 	for k, _ := range runtimeTargets.(map[string]interface{}) {
+				// 	for k := range runtimeTargets.(map[string]interface{}) {
 				// 		components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 				// 		fileName := components[len(components)-1]
 				// 		files = append(files, fileName)
@@ -189,7 +189,7 @@ func fixDependencies(deps string, mainProgram string) []string {
 				natives := depsObj.(map[string]interface{})["native"]
 				if natives != nil {
 					newNatives := make(map[string]interface{})
-					for k, _ := range natives.(map[string]interface{}) {
+					for k := range natives.(map[string]interface{}) {
 						components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 						fileName := components[len(components)-1]
 						files = append(files, fileName)
@@ -204,7 +204,7 @@ func fixDependencies(deps string, mainProgram string) []string {
 				compiles := depsObj.(map[string]interface{})["compile"]
 				if compiles != nil {
 					newCompiles := make(map[string]interface{})
-					for k, _ := range compiles.(map[string]interface{}) {
+					for k := range compiles.(map[string]interface{}) {
 						components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 						fileName := components[len(components)-1]
 						files = append(files, fileName)
@@ -216,7 +216,7 @@ func fixDependencies(deps string, mainProgram string) []string {
 				resources := depsObj.(map[string]interface{})["resources"]
 				if resources != nil {
 					newResources := make(map[string]interface{})
-					for k, _ := range resources.(map[string]interface{}) {
+					for k := range resources.(map[string]interface{}) {
 						components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 						fileName := components[len(components)-2] + "/" + components[len(components)-1]
 						files = append(files, fileName)
