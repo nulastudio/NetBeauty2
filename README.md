@@ -49,3 +49,9 @@ for example
 ```
 ncbeauty /path/to/publishDir
 ```
+
+## Mirror
+if you have troble in connecting github, use this mirror
+```
+https://gitee.com/liesauer/HostFXRPatcher
+```
