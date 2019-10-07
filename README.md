@@ -15,7 +15,7 @@ Move a .NET Core app runtime components and dependencies into a sub-directory an
 dotnet add package nulastudio.NetCoreBeauty
 ```
 your `*.csproj` should be similar like this
-```
+```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
