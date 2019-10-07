@@ -19,6 +19,8 @@ var beautyDir = ""
 var libsDir = "libs"
 var disablePatch = false
 var gitcdn = "https://github.com/nulastudio/HostFXRPatcher"
+var runtimeCompatibilityJSON *simplejson.Json
+var runtimeSupportedJSON *simplejson.Json
 
 func main() {
 	// arguments check
@@ -100,6 +102,10 @@ func main() {
 	}
 	fmt.Println("deps.json fixed")
 	fmt.Println("ncbeauty done. Enjoy it!")
+}
+
+func readAsset(name string) ([]byte, error) {
+	return Asset(strings.TrimPrefix(name, "/"))
 }
 
 func help() {
@@ -247,7 +253,20 @@ func fixDependencies(deps string, mainProgram string) []string {
 		return files
 	}
 	fmt.Println("patching hostfxr...")
-	// TODO: match the right rid
+
+	runtimeJSONBytes, _ := readAsset("/assets/runtime.compatibility.json")
+	runtimeCompatibilityJSON, _ = simplejson.NewJson(runtimeJSONBytes)
+	runtimeJSONBytes, _ = readAsset("/assets/runtime.supported.json")
+	runtimeSupportedJSON, _ = simplejson.NewJson(runtimeJSONBytes)
+	crid := findCompatibleRID(rid)
+	if crid == "" {
+		fmt.Printf("cannot find a compatible rid for %s\n", rid)
+		os.Exit(1)
+	}
+	if rid != crid {
+		fmt.Printf("using compatible rid %s for %s\n", crid, rid)
+		rid = crid
+	}
 	fmt.Printf("downloading patched hostfxr: %s.%s\n", rid, fxrVersion)
 	fxrURL := fmt.Sprintf("%s/raw/master/artifacts/v%s/%s.Release/%s", gitcdn, fxrVersion, rid, fxrName)
 	response, err := http.Get(fxrURL)
@@ -293,4 +312,17 @@ func fixDependencies(deps string, mainProgram string) []string {
 	fmt.Println("patch succeed")
 
 	return files
+}
+
+func findCompatibleRID(rid string) string {
+	crids, _ := runtimeCompatibilityJSON.Get(rid).StringArray()
+	srids, _ := runtimeSupportedJSON.StringArray()
+	for _, crid := range crids {
+		for _, srid := range srids {
+			if crid == srid {
+				return srid
+			}
+		}
+	}
+	return ""
 }
