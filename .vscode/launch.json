@@ -10,9 +10,21 @@
             "env": {},
             "cwd": "${workspaceFolder}",
             "args": [
-                "./test/",
-                "libraries",
-            ]
+				"--gitcdn",
+				"https://github.com/nulastudio/HostFXRPatcher",
+				// "https://gitee.com/liesauer/HostFXRPatcher",
+				"--loglevel=Info",
+				"--nopatch=False",
+				"./test/",
+				"runtimes",
+			],
+			"dlvLoadConfig": {
+				"followPointers": true,
+				"maxVariableRecurse": 1,
+				"maxStringLen": 1024,
+				"maxArrayValues": 1000,
+				"maxStructFields": -1
+			}
 		}
 	]
 }

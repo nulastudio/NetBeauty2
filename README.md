@@ -22,18 +22,20 @@ your `*.csproj` should be similar like this
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
-    <BeautyLibsDir>libraries</BeautyLibsDir>
+    <BeautyLibsDir>runtimes</BeautyLibsDir>
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- set to True if you want to disable -->
     <DisablePatch>False</DisablePatch>
+    <!-- valid values: Error|Detail|Log -->
+    <BeautyLogLevel>Error</BeautyLogLevel>
     <!-- set to a repo mirror if you have troble in connecting github -->
-    <PatchCDN>https://github-like.com/someone/HostFXRPatcherMirror</PatchCDN>
+    <!-- <GitCDN>https://github-like.com/someone/HostFXRPatcherMirror</GitCDN> -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.0.4" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.0" />
   </ItemGroup>
 
 </Project>
@@ -43,7 +45,7 @@ when you run `dotnet publish` , everything is done automatically.
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty <beautyDir> [<LibsDir>]
+ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Log>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
 ```
 for example
 ```

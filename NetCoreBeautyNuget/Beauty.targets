@@ -9,12 +9,15 @@
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
     <BeautyDir>"$(MSBuildProjectDirectory)/$(PublishDir).HERE/.."</BeautyDir>
-    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
+    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">runtimes</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
-    <DisablePatch Condition="$(DisablePatch) == ''">False</DisablePatch>
+    <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
+    <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
+    <DisablePatch Condition="$(DisablePatch) == 'True'">--nopatch</DisablePatch>
+    <DisablePatch Condition="$(DisablePatch) != 'True'"></DisablePatch>
   </PropertyGroup>
 
   <Target Name="NetCoreBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True' And $(RuntimeIdentifier) != ''">
-    <Exec Command="$(BeautyBin) $(BeautyDir) $(BeautyLibsDir) $(DisablePatch) $(PatchCDN)" />
+    <Exec Command="$(BeautyBin) $(GitCDN) $(BeautyLogLevel) $(DisablePatch) $(BeautyDir) $(BeautyLibsDir)" />
   </Target>
 </Project>
