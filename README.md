@@ -35,12 +35,12 @@ your `*.csproj` should be similar like this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.1" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.2" />
   </ItemGroup>
 
 </Project>
 ```
-when you run `dotnet publish` , everything is done automatically.
+when you run `dotnet publish -r` (only works with `SCD` mode), everything is done automatically.
 
 2. Use the binary application if your project has already be published.
 ```
@@ -51,6 +51,12 @@ for example
 ```
 ncbeauty /path/to/publishDir
 ```
+
+3. Install .NETCore Global Tool
+```
+dotnet tool install --global nulastudio.ncbeauty
+```
+then use it just like binary distribution.
 
 ## Mirror
 if you have troble in connecting github, use this mirror

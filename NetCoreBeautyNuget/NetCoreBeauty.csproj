@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <PackageOutputPath>.nupkg</PackageOutputPath>
     <NuspecFile>NetCoreBeauty.nuspec</NuspecFile>
   </PropertyGroup>
 

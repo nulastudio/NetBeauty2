@@ -14,6 +14,7 @@ __MACOSX
 [Oo]bj/
 [Rr]elease/
 tools/
+.nupkg/
 
 # sublime
 *.sublime-workspace

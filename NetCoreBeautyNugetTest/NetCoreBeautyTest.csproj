@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.1" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.2" />
   </ItemGroup>
 
 </Project>
