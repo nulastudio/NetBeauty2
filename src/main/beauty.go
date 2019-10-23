@@ -121,7 +121,7 @@ func initCLI() {
 	flag.StringVar(&gitcdn, "gitcdn", "https://github.com/nulastudio/HostFXRPatcher", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
 RECOMMEND https://gitee.com/liesauer/HostFXRPatcher for mainland china users.
 `)
-	flag.StringVar(&loglevel, "loglevel", "Error", `log level. valid values: Error/Detail/Log
+	flag.StringVar(&loglevel, "loglevel", "Error", `log level. valid values: Error/Detail/Info
 Error: Log errors only.
 Detail: Log useful infos.
 Info: Log everything.
@@ -169,7 +169,7 @@ hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Log>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
+	fmt.Println("ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
 	flag.PrintDefaults()
 }
 

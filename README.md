@@ -28,7 +28,7 @@ your `*.csproj` should be similar like this
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- set to True if you want to disable -->
     <DisablePatch>False</DisablePatch>
-    <!-- valid values: Error|Detail|Log -->
+    <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Error</BeautyLogLevel>
     <!-- set to a repo mirror if you have troble in connecting github -->
     <!-- <GitCDN>https://github-like.com/someone/HostFXRPatcherMirror</GitCDN> -->
@@ -45,7 +45,7 @@ when you run `dotnet publish` , everything is done automatically.
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Log>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
+ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
 ```
 for example
 ```
