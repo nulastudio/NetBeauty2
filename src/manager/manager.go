@@ -26,7 +26,7 @@ var Logger = log.DefaultLogger
 
 var timeout = 60 * time.Second
 
-var localPath = os.TempDir() + "/NetCoreBeauty"
+var localPath = filepath.Clean(os.TempDir()) + "/NetCoreBeauty"
 var localArtifactsPath = localPath + "/artifacts"
 var artifactsVersionTXT = "/ArtifactsVersion.txt"
 var artifactsVersionJSON = "/ArtifactsVersion.json"
@@ -124,7 +124,7 @@ func readLocalArtifactsVersionJSON() map[string]interface{} {
 }
 
 func updateLocalArtifactsVersionJSON(data map[string]interface{}) bool {
-	if !util.EnsureDirExists(localArtifactsPath, 0666) {
+	if !util.EnsureDirExists(localArtifactsPath, 0777) {
 		log.LogError(fmt.Errorf(pathNotWriteableErr, localArtifactsPath), false)
 		return false
 	}
@@ -172,7 +172,7 @@ func getLocalRuntimeSupportedVersion() string {
 
 // WriteLocalArtifactsVersion 更新本地补丁版本
 func WriteLocalArtifactsVersion(fxrVersion string, rid string, version string) bool {
-	if !util.EnsureDirExists(localArtifactsPath, 0666) {
+	if !util.EnsureDirExists(localArtifactsPath, 0777) {
 		log.LogError(fmt.Errorf(pathNotWriteableErr, localArtifactsPath), false)
 		return false
 	}
@@ -277,8 +277,8 @@ func DownloadFile(url string, des string) bool {
 		} else {
 			des = strings.ReplaceAll(des, "\\", "/")
 			path := path.Dir(des)
-			if !util.EnsureDirExists(path, 0666) {
-				log.LogError(errors.New(pathNotWriteableErr+path), false)
+			if !util.EnsureDirExists(path, 0777) {
+				log.LogError(fmt.Errorf(pathNotWriteableErr, path), false)
 			} else {
 				f, err := os.Create(des)
 				defer f.Close()

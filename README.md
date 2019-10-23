@@ -35,7 +35,7 @@ your `*.csproj` should be similar like this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.0" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

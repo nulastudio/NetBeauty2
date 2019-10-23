@@ -34,6 +34,8 @@ var beautyDir string
 var libsDir = "runtimes"
 
 func main() {
+	Umask()
+
 	initCLI()
 
 	// 设置CDN

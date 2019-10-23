@@ -31,7 +31,7 @@ func CopyFile(src string, des string) (written int64, err error) {
 	perm := fi.Mode()
 
 	dir := filepath.Dir(des)
-	if !EnsureDirExists(dir, perm) {
+	if !EnsureDirExists(dir, 0777) {
 		return 0, errors.New("cannot create path: " + dir)
 	}
 
