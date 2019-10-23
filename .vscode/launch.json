@@ -1,30 +1,30 @@
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Launch",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
             "program": "${workspaceFolder}/src/main/beauty.go",
             "env": {},
             "cwd": "${workspaceFolder}",
             "args": [
-				"--gitcdn",
-				"https://github.com/nulastudio/HostFXRPatcher",
-				// "https://gitee.com/liesauer/HostFXRPatcher",
-				"--loglevel=Info",
-				"--nopatch=False",
-				"./test/",
-				"runtimes",
-			],
-			"dlvLoadConfig": {
-				"followPointers": true,
-				"maxVariableRecurse": 1,
-				"maxStringLen": 1024,
-				"maxArrayValues": 1000,
-				"maxStructFields": -1
-			}
-		}
-	]
+                "--gitcdn",
+                "https://github.com/nulastudio/HostFXRPatcher",
+                // "https://gitee.com/liesauer/HostFXRPatcher",
+                "--loglevel=Info",
+                "--nopatch=False",
+                "./test/",
+                "runtimes",
+            ],
+            "dlvLoadConfig": {
+                "followPointers": true,
+                "maxVariableRecurse": 1,
+                "maxStringLen": 1024,
+                "maxArrayValues": 1000,
+                "maxStructFields": -1
+            }
+        }
+    ]
 }
