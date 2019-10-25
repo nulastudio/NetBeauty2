@@ -240,10 +240,10 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 				moved++
 			}
 
-			// NOTE: 需要移动附带的pdb、xml文件吗？
-			// NOTE: pdb、xml文件是跟随程序还是跟随依赖dll？
+			// NOTE: pdb跟随程序集、xml按照用户习惯做法跟随程序根目录
+			// TODO: 提供一个选项，自由选择xml：跟随主程序、跟随程序集、跟随两者
 			fileName := strings.TrimSuffix(path.Base(depsFile), path.Ext(depsFile))
-			extFiles := []string{".pdb", ".xml"}
+			extFiles := []string{".pdb" /*, ".xml"*/}
 			for _, extFile := range extFiles {
 				oldFile := path.Join(oldPath, fileName+extFile)
 				newFile := path.Join(newPath, fileName+extFile)
