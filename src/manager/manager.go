@@ -430,11 +430,26 @@ func FixDeps(deps string) ([]string, string, string) {
 	for _, target := range targets {
 		for targetName, depsObj := range target.(map[string]interface{}) {
 			// 解析出fxr信息
-			if strings.HasPrefix(targetName, "runtime") && strings.Contains(targetName, "Microsoft.NETCore.DotNetHostResolver") {
-				regex, _ := regexp.Compile("^runtime\\.([\\w-]+)\\.Microsoft\\.NETCore\\.DotNetHostResolver\\/([\\d\\.]+)$")
+			if strings.HasPrefix(targetName, "runtime") &&
+				(strings.Contains(targetName, "Microsoft.NETCore.DotNetHostResolver") ||
+					strings.Contains(targetName, "Microsoft.NETCore.App.Runtime")) {
+				// 2.x
+				regex, _ := regexp.Compile("^runtime\\.([\\w\\-]+)\\.Microsoft\\.NETCore\\.DotNetHostResolver\\/([\\w\\-\\.]+)$")
 				matches := regex.FindStringSubmatch(targetName)
-				rid = matches[1]
-				fxrVersion = matches[2]
+				if len(matches) == 0 {
+					// 3.0.x
+					regex, _ = regexp.Compile("^runtimepack\\.runtime\\.([\\w\\-]+)\\.Microsoft\\.NETCore\\.DotNetHostResolver\\/([\\w\\-\\.]+)$")
+					matches = regex.FindStringSubmatch(targetName)
+					if len(matches) == 0 {
+						// 3.1.x
+						regex, _ = regexp.Compile("^runtimepack\\.Microsoft\\.NETCore\\.App\\.Runtime\\.([\\w\\-]+)\\/([\\w\\-\\.]+)$")
+						matches = regex.FindStringSubmatch(targetName)
+					}
+				}
+				if len(matches) == 3 {
+					rid = matches[1]
+					fxrVersion = matches[2]
+				}
 				log.LogInfo(fmt.Sprintf("fxr v%s/%s detected in %s", fxrVersion, rid, deps))
 			}
 			if depsObj != nil {

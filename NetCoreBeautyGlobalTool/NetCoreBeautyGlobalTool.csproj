@@ -9,7 +9,7 @@
     <ToolCommandName>ncbeauty</ToolCommandName>
     <PackageOutputPath>.nupkg</PackageOutputPath>
 
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
 
     <Authors>LiesAuer</Authors>
     <Description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</Description>
