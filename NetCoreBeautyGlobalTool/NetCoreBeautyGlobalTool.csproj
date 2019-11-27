@@ -15,6 +15,8 @@
     <Description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/nulastudio/NetCoreBeauty</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/nulastudio/NetCoreBeauty</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
