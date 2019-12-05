@@ -8,9 +8,7 @@
     <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
-    <RootDir>$([System.IO.Directory]::GetParent('$(MSBuildProjectDirectory)').FullName)</RootDir>
-    <RelatedDir>$(PublishDir.Replace('$(RootDir)','.'))</RelatedDir>
-    <BeautyDir>"$(RootDir)/$(RelatedDir).HERE/.."</BeautyDir>
+    <BeautyDir>"$([System.IO.Path]::GetFullPath('$(PublishDir)')).HERE/.."</BeautyDir>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">runtimes</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
