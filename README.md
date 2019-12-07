@@ -4,7 +4,7 @@
 Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.
 
 ## Limitation
-Only works with [Self-contained deployments mode](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)
+Only works with [Self-contained deployments mode](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd)
 
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
 
