@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-      <BeautyDir>%(PublishDir.FullPath)</BeautyDir>
+      <BeautyDir>"%(PublishDir.FullPath)/.HERE/.."</BeautyDir>
     </PropertyGroup>
 
     <Exec Command="$(BeautyBin) $(GitCDN) $(BeautyLogLevel) $(DisablePatch) $(BeautyDir) $(BeautyLibsDir)" />
