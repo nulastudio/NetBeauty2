@@ -8,7 +8,6 @@
     <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
-    <BeautyDir>"$([System.IO.Path]::GetFullPath('$(PublishDir)')).HERE/.."</BeautyDir>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">runtimes</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
@@ -18,6 +17,14 @@
   </PropertyGroup>
 
   <Target Name="NetCoreBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True' And $(RuntimeIdentifier) != ''">
+    <ItemGroup>
+      <PublishDir Include="$(PublishDir)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <BeautyDir>%(PublishDir.FullPath)</BeautyDir>
+    </PropertyGroup>
+
     <Exec Command="$(BeautyBin) $(GitCDN) $(BeautyLogLevel) $(DisablePatch) $(BeautyDir) $(BeautyLibsDir)" />
   </Target>
 </Project>
