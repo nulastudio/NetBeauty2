@@ -30,13 +30,14 @@ your `*.csproj` should be similar like this
     <BeautyLibsDir>runtimes</BeautyLibsDir>
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <ForceBeauty>False</ForceBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- set to True if you want to disable -->
     <DisablePatch>False</DisablePatch>
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Error</BeautyLogLevel>
     <!-- set to a repo mirror if you have troble in connecting github -->
-    <!-- <GitCDN>https://github-like.com/someone/HostFXRPatcherMirror</GitCDN> -->
+    <!-- <GitCDN>https://gitee.com/liesauer/HostFXRPatcher</GitCDN> -->
   </PropertyGroup>
 
   <ItemGroup>

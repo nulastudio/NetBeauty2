@@ -29,6 +29,7 @@ var runtimeSupportedJSON *simplejson.Json
 
 var gitcdn string
 var nopatch bool
+var force bool
 var loglevel string
 var beautyDir string
 var libsDir = "runtimes"
@@ -55,8 +56,11 @@ func main() {
 
 	// 检查是否已beauty
 	if util.PathExists(beautyCheck) {
-		log.LogDetail("already beauty. Enjoy it!")
-		return
+		if !force {
+			log.LogDetail("already beauty. Enjoy it!")
+			return
+		}
+		log.LogDetail("already beauty but you are in force mode, continuing...")
 	}
 
 	// 必须检查
@@ -129,6 +133,7 @@ Info: Log everything.
 	flag.BoolVar(&nopatch, "nopatch", false, `disable hostfxr patch.
 DO NOT DISABLE!!!
 hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
+	flag.BoolVar(&force, "force", false, `disable beauty checking and force beauty again.`)
 
 	flag.Parse()
 
@@ -169,7 +174,7 @@ hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
+	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
 	flag.PrintDefaults()
 }
 
@@ -197,7 +202,7 @@ func patch(fxrVersion string, rid string) bool {
 	absFxrBakName := absFxrName + ".bak"
 	log.LogInfo(fmt.Sprintf("backuping fxr to %s\n", absFxrBakName))
 
-	if util.PathExists(absFxrBakName) {
+	if util.PathExists(absFxrBakName) && !force {
 		log.LogDetail("fxr backup found, skipped")
 	} else {
 		if _, err := util.CopyFile(absFxrName, absFxrBakName); err != nil {
@@ -223,7 +228,7 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 			strings.Contains(depsFile, "apphost") ||
 			strings.Contains(depsFile, "hostfxr") ||
 			strings.Contains(depsFile, "hostpolicy") {
-			// 将其加一，不然每次看到日志的文件移动数少3会造成疑惑
+			// NOTE: 计数加一，不然每次看到日志的文件移动数少3会造成疑惑
 			moved++
 			continue
 		}
@@ -240,10 +245,10 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 				moved++
 			}
 
-			// NOTE: pdb跟随程序集、xml按照用户习惯做法跟随程序根目录
+			// NOTE: pdb、xml跟随程序集
 			// TODO: 提供一个选项，自由选择xml：跟随主程序、跟随程序集、跟随两者
 			fileName := strings.TrimSuffix(path.Base(depsFile), path.Ext(depsFile))
-			extFiles := []string{".pdb" /*, ".xml"*/}
+			extFiles := []string{".pdb", ".xml"}
 			for _, extFile := range extFiles {
 				oldFile := path.Join(oldPath, fileName+extFile)
 				newFile := path.Join(newPath, fileName+extFile)
