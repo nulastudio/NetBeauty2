@@ -51,7 +51,7 @@ when you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
+ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
 ```
 for example
 ```
