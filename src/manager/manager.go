@@ -95,14 +95,14 @@ func GetHostFXRNameByRID(rid string) string {
 	return "libhostfxr.so"
 }
 
-func readJSON(path string) *simplejson.Json {
+func readJSON(path string, errlog bool) *simplejson.Json {
 	bytes, err := ioutil.ReadFile(artifactsVersionPath)
-	if err != nil {
+	if err != nil && errlog {
 		log.LogInfo(fmt.Sprintf("read json failed: %s : %s", path, err.Error()))
 		return nil
 	}
 	json, err := simplejson.NewJson(bytes)
-	if err != nil {
+	if err != nil && errlog {
 		log.LogDetail(fmt.Sprintf("parse json failed: %s : %s", path, err.Error()))
 		return nil
 	}
@@ -110,7 +110,7 @@ func readJSON(path string) *simplejson.Json {
 }
 
 func readLocalArtifactsVersionJSON() map[string]interface{} {
-	json := readJSON(artifactsVersionPath)
+	json := readJSON(artifactsVersionPath, false)
 	if json == nil {
 		return nil
 	}
@@ -248,8 +248,8 @@ func CheckRunConfigJSON() {
 
 // FindCompatibleRID 匹配线上所支持的RID
 func FindCompatibleRID(rid string) string {
-	runtimeCompatibilityJSON := readJSON(runtimeCompatibilityJSONPath())
-	runtimeSupportedJSON := readJSON(runtimeSupportedJSONPath())
+	runtimeCompatibilityJSON := readJSON(runtimeCompatibilityJSONPath(), true)
+	runtimeSupportedJSON := readJSON(runtimeSupportedJSONPath(), true)
 	if runtimeCompatibilityJSON == nil || runtimeSupportedJSON == nil {
 		return rid
 	}
