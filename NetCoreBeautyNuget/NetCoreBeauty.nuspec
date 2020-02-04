@@ -3,7 +3,7 @@
   <metadata>
     <id>nulastudio.NetCoreBeauty</id>
     <description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</description>
-    <version>1.1.8</version>
+    <version>1.2.0</version>
     <authors>LiesAuer</authors>
     <owners>nulastudio</owners>
     <projectUrl>https://github.com/nulastudio/NetCoreBeauty</projectUrl>

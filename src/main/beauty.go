@@ -190,10 +190,12 @@ func patch(fxrVersion string, rid string) bool {
 	log.LogDetail(fmt.Sprintf("using compatible rid %s for %s", crid, rid))
 	rid = crid
 
-	if manager.GetLocalArtifactsVersion(fxrVersion, rid) == "" {
+	localVersion := manager.GetLocalArtifactsVersion(fxrVersion, rid)
+	onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
+	if localVersion != onlineVersion {
 		log.LogDetail(fmt.Sprintf("downloading patched hostfxr: %s/%s", fxrVersion, rid))
 
-		if !manager.DownloadArtifact(fxrVersion, rid) || !manager.WriteLocalArtifactsVersion(fxrVersion, rid, manager.GetOnlineArtifactsVersion()) {
+		if !manager.DownloadArtifact(fxrVersion, rid) || !manager.WriteLocalArtifactsVersion(fxrVersion, rid, onlineVersion) {
 			log.LogPanic(errors.New("download patch failed"), 1)
 		}
 	}

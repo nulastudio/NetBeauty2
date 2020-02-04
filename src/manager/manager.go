@@ -30,7 +30,10 @@ var localPath = filepath.Clean(os.TempDir()) + "/NetCoreBeauty"
 var localArtifactsPath = localPath + "/artifacts"
 var artifactsVersionTXT = "/ArtifactsVersion.txt"
 var artifactsVersionJSON = "/ArtifactsVersion.json"
+var onlineArtifactsVersionJSON = "/OnlineArtifactsVersion.json"
+var artifactsVersionOldPath = localArtifactsPath + artifactsVersionTXT
 var artifactsVersionPath = localArtifactsPath + artifactsVersionJSON
+var onlineArtifactsVersionPath = localArtifactsPath + onlineArtifactsVersionJSON
 
 var runtimeCompatibilityJSONName = "runtime.compatibility.json"
 var runtimeSupportedJSONName = "runtime.supported.json"
@@ -39,7 +42,7 @@ var pathNotWriteableErr = "cannot create path or path is not writeable: %s"
 var getLocalArtifactsVersionErr = "get local artifacts version failed: %s"
 var encodeJSONErr = "cannot encode json: %s"
 
-var onlineVersionCache string = ""
+var onlineVersionCache *simplejson.Json = nil
 
 func formatError(format string, err error) string {
 	return fmt.Sprintf(format, err)
@@ -53,8 +56,12 @@ func artifactsOnlinePath() string {
 	return onlinePath() + "/artifacts"
 }
 
-func artifactsVersionURL() string {
+func artifactsVersionOldURL() string {
 	return artifactsOnlinePath() + artifactsVersionTXT
+}
+
+func artifactsVersionURL() string {
+	return artifactsOnlinePath() + artifactsVersionJSON
 }
 
 func runtimeJSONPath(specific string) string {
@@ -96,7 +103,7 @@ func GetHostFXRNameByRID(rid string) string {
 }
 
 func readJSON(path string, errlog bool) *simplejson.Json {
-	bytes, err := ioutil.ReadFile(artifactsVersionPath)
+	bytes, err := ioutil.ReadFile(path)
 	if err != nil && errlog {
 		log.LogInfo(fmt.Sprintf("read json failed: %s : %s", path, err.Error()))
 		return nil
@@ -146,6 +153,10 @@ func updateLocalArtifactsVersionJSON(data map[string]interface{}) bool {
 	return err == nil
 }
 
+func verid(version string, rid string) string {
+	return version + "/" + rid
+}
+
 // GetLocalArtifactsVersion 获取本地补丁版本
 func GetLocalArtifactsVersion(version string, rid string) string {
 	localVersions := readLocalArtifactsVersionJSON()
@@ -170,6 +181,14 @@ func getLocalRuntimeSupportedVersion() string {
 	return GetLocalArtifactsVersion("runtime", "supported")
 }
 
+func getOnlineRuntimeCompatibilityVersion() string {
+	return GetOnlineArtifactsVersion("runtime", "compatibility")
+}
+
+func getOnlineRuntimeSupportedVersion() string {
+	return GetOnlineArtifactsVersion("runtime", "supported")
+}
+
 // WriteLocalArtifactsVersion 更新本地补丁版本
 func WriteLocalArtifactsVersion(fxrVersion string, rid string, version string) bool {
 	if !util.EnsureDirExists(localArtifactsPath, 0777) {
@@ -182,7 +201,7 @@ func WriteLocalArtifactsVersion(fxrVersion string, rid string, version string) b
 	} else {
 		json = make(map[string]interface{})
 	}
-	key := fxrVersion + "/" + rid
+	key := verid(fxrVersion, rid)
 	if version == "" {
 		delete(json, key)
 	} else {
@@ -192,22 +211,68 @@ func WriteLocalArtifactsVersion(fxrVersion string, rid string, version string) b
 }
 
 // GetOnlineArtifactsVersion 获取线上补丁版本
-func GetOnlineArtifactsVersion() string {
-	if onlineVersionCache != "" {
-		return onlineVersionCache
+func GetOnlineArtifactsVersion(version string, rid string) string {
+	// 如果缓存存在则尝试读取，如果缓存找不到就直接返回（缓存必然是最新的）
+	var readCache = func() string {
+		if onlineVersionCache != nil {
+			json, success := onlineVersionCache.CheckGet(verid(version, rid))
+			if success {
+				return json.MustString("")
+			}
+		}
+		return ""
 	}
+	if onlineVersionCache != nil {
+		return readCache()
+	}
+
+	var latest = false
+
+	http.DefaultClient.Timeout = 5 * time.Second
+	if response, err := http.Get(artifactsVersionOldURL()); err == nil && response.StatusCode == 200 {
+		defer response.Body.Close()
+		if bytes, err := ioutil.ReadAll(response.Body); err == nil {
+			onlineVersion := string(bytes)
+			// 读入本地版本号
+			oldVersion := ""
+			if oldVerBytes, err := ioutil.ReadFile(artifactsVersionOldPath); err == nil {
+				oldVersion = string(oldVerBytes)
+			}
+
+			// 判断版本号
+			latest = oldVersion == onlineVersion
+
+			if !latest {
+				// 写入本地版本号
+				if err := ioutil.WriteFile(artifactsVersionOldPath, bytes, 0666); err != nil {
+					log.LogError(err, false)
+				}
+			}
+		}
+	}
+
+	// 加载本地缓存版本库
+	if latest && util.PathExists(onlineArtifactsVersionPath) {
+		onlineVersionCache = readJSON(onlineArtifactsVersionPath, true)
+		return readCache()
+	}
+
+	// 如果本地不是最新的就获取网上最新的版本号
 	// 获取版本超时短一点可减少网络环境差所造成的影响
 	http.DefaultClient.Timeout = 10 * time.Second
 	if response, err := http.Get(artifactsVersionURL()); err == nil && response.StatusCode == 200 {
 		defer response.Body.Close()
 		if bytes, err := ioutil.ReadAll(response.Body); err == nil {
-			onlineVersionCache = string(bytes)
-			return onlineVersionCache
+			onlineVersionCache, _ = simplejson.NewJson(bytes)
+			// 写入本地缓存
+			if err := ioutil.WriteFile(onlineArtifactsVersionPath, bytes, 0666); err != nil {
+				log.LogError(err, false)
+			}
+			return readCache()
 		}
 	}
-	// 获取失败就清除缓存吧
-	onlineVersionCache = ""
-	return onlineVersionCache
+
+	return readCache()
 }
 
 // IsLocalArtifactExists 判断本地是否存在某个版本的补丁
@@ -218,30 +283,35 @@ func IsLocalArtifactExists(version string, rid string) bool {
 // CheckRunConfigJSON 检查本地runtimeConfig，自动下载最新（强制性）
 func CheckRunConfigJSON() {
 	log.LogInfo("checking runtime.*.json version...")
-	onlineVersion := GetOnlineArtifactsVersion()
-	if onlineVersion == "" {
-		log.LogDetail("checking runtime.*.json version failed")
+	onlineCVersion := getOnlineRuntimeCompatibilityVersion()
+	onlineSVersion := getOnlineRuntimeSupportedVersion()
+	if onlineCVersion == "" {
+		log.LogDetail("fetch online runtime compatibility version failed")
+		return
+	}
+	if onlineSVersion == "" {
+		log.LogDetail("fetch online runtime supported version failed")
 		return
 	}
 	localCVersion := getLocalRuntimeCompatibilityVersion()
 	localSVersion := getLocalRuntimeSupportedVersion()
-	var mapping = map[string]string{
-		runtimeCompatibilityJSONName: localCVersion,
-		runtimeSupportedJSONName:     localSVersion,
+	var mapping = map[string][2]string{
+		runtimeCompatibilityJSONName: [2]string{localCVersion, onlineCVersion},
+		runtimeSupportedJSONName:     [2]string{localSVersion, onlineSVersion},
 	}
-	for name, version := range mapping {
-		if version != onlineVersion {
-			log.LogDetail(fmt.Sprintf("updating %s...", name))
-			url := runtimeJSONURL(name)
-			path := runtimeJSONPath(name)
-			specific := strings.TrimSuffix(strings.TrimPrefix(name, "runtime."), ".json")
-			if !DownloadFile(url, path) || !WriteLocalArtifactsVersion("runtime", specific, onlineVersion) {
-				log.LogDetail(fmt.Sprintf("update %s failed", name))
-			} else {
-				log.LogInfo(fmt.Sprintf("update %s succeeded", name))
-			}
-		} else {
+	for name, vers := range mapping {
+		if vers[0] == vers[1] {
 			log.LogInfo(fmt.Sprintf("%s no need to update", name))
+			continue
+		}
+		log.LogDetail(fmt.Sprintf("updating %s...", name))
+		url := runtimeJSONURL(name)
+		path := runtimeJSONPath(name)
+		specific := strings.TrimSuffix(strings.TrimPrefix(name, "runtime."), ".json")
+		if !DownloadFile(url, path) || !WriteLocalArtifactsVersion("runtime", specific, vers[1]) {
+			log.LogDetail(fmt.Sprintf("update %s failed", name))
+		} else {
+			log.LogInfo(fmt.Sprintf("update %s succeeded", name))
 		}
 	}
 }
@@ -320,7 +390,7 @@ func DeleteArtifact(version string, rid string) bool {
 
 // UpdateArtifact 更新指定版本、RID的补丁
 func UpdateArtifact(version string, rid string) bool {
-	onlineVersion := GetOnlineArtifactsVersion()
+	onlineVersion := GetOnlineArtifactsVersion(version, rid)
 	// 为了避免残留过时缓存，强制删除再下载
 	return DeleteArtifact(version, rid) &&
 		DownloadArtifact(version, rid) &&
