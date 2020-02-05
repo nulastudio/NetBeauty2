@@ -42,14 +42,6 @@ func main() {
 	// 设置CDN
 	manager.GitCDN = gitcdn
 
-	// 设置LogLevel
-	log.DefaultLogger.LogLevel = map[string]log.LogLevel{
-		errorLevel:  log.Error,
-		detailLevel: log.Detail,
-		infoLevel:   log.Info,
-	}[loglevel]
-	manager.Logger.LogLevel = log.DefaultLogger.LogLevel
-
 	log.LogInfo("running ncbeauty...")
 
 	beautyCheck := path.Join(beautyDir, "NetCoreBeauty")
@@ -122,7 +114,7 @@ func initCLI() {
 	flag.CommandLine = flag.NewFlagSet("ncbeauty", flag.ContinueOnError)
 	flag.CommandLine.Usage = usage
 	flag.CommandLine.SetOutput(os.Stdout)
-	flag.StringVar(&gitcdn, "gitcdn", "https://github.com/nulastudio/HostFXRPatcher", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
+	flag.StringVar(&gitcdn, "gitcdn", "", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
 RECOMMEND https://gitee.com/liesauer/HostFXRPatcher for mainland china users.
 `)
 	flag.StringVar(&loglevel, "loglevel", "Error", `log level. valid values: Error/Detail/Info
@@ -152,30 +144,96 @@ hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 		usage()
 		os.Exit(0)
 	}
-	beautyDir = args[0]
-
-	if len(args) >= 2 {
-		libsDir = flag.Arg(1)
-	}
-
-	beautyDir = strings.Trim(beautyDir, `"`)
-	libsDir = strings.Trim(libsDir, `"`)
-	absDir, err := filepath.Abs(beautyDir)
-	if err != nil {
-		log.LogPanic(fmt.Errorf("invalid beautyDir: %s", err.Error()), 1)
-	}
-	beautyDir = absDir
 
 	// logLevel检查
 	if loglevel != errorLevel && loglevel != detailLevel && loglevel != infoLevel {
 		loglevel = errorLevel
 	}
+
+	// 设置LogLevel
+	log.DefaultLogger.LogLevel = map[string]log.LogLevel{
+		errorLevel:  log.Error,
+		detailLevel: log.Detail,
+		infoLevel:   log.Info,
+	}[loglevel]
+	manager.Logger.LogLevel = log.DefaultLogger.LogLevel
+
+	switch args[0] {
+	case "setcdn":
+		checkArgumentsCount(2, argv)
+		if manager.SetCDN(strings.Trim(args[1], `"`)) {
+			fmt.Println("set default git cdn successfully")
+		} else {
+			fmt.Println("set default git cdn failed")
+		}
+		exit()
+	case "getcdn":
+		checkArgumentsCount(1, argv)
+		cdn := manager.GetCDN()
+		if cdn == "" {
+			fmt.Println("default git cdn has not been set yet")
+		} else {
+			fmt.Printf("current default git cdn: %s\n", cdn)
+		}
+		exit()
+	case "delcdn":
+		checkArgumentsCount(1, argv)
+		cdn := manager.GetCDN()
+		if cdn == "" {
+			fmt.Println("default git cdn has not been set yet")
+		} else {
+			manager.DelCDN()
+			fmt.Printf("current default git cdn has been deleted, it was: [%s] before\n", cdn)
+		}
+		exit()
+	default:
+		if gitcdn == "" {
+			cdn := manager.GetCDN()
+			if cdn == "" {
+				gitcdn = "https://github.com/nulastudio/HostFXRPatcher"
+			} else {
+				gitcdn = cdn
+			}
+		}
+
+		beautyDir = args[0]
+
+		if len(args) >= 2 {
+			libsDir = flag.Arg(1)
+		}
+
+		beautyDir = strings.Trim(beautyDir, `"`)
+		libsDir = strings.Trim(libsDir, `"`)
+		absDir, err := filepath.Abs(beautyDir)
+		if err != nil {
+			log.LogPanic(fmt.Errorf("invalid beautyDir: %s", err.Error()), 1)
+		}
+		beautyDir = absDir
+	}
+}
+
+func checkArgumentsCount(excepted int, got int) bool {
+	if excepted == got {
+		return true
+	}
+	log.LogPanic(fmt.Errorf("Too few or many arguments, expected %d, got %d", excepted, got), 1)
+	return false
 }
 
 func usage() {
 	fmt.Println("Usage:")
 	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
 	flag.PrintDefaults()
+	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>")
+	fmt.Println("  set current default git cdn, can be override by --gitcdn.")
+	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] getcdn")
+	fmt.Println("  print current default git cdn.")
+	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] delcdn")
+	fmt.Println("  remove current default git cdn, after removed, use --gitcdn to specify.")
+}
+
+func exit() {
+	os.Exit(0)
 }
 
 func patch(fxrVersion string, rid string) bool {

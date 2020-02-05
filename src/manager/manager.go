@@ -29,9 +29,11 @@ var timeout = 60 * time.Second
 var localPath = filepath.Clean(os.TempDir()) + "/NetCoreBeauty"
 var localArtifactsPath = localPath + "/artifacts"
 var artifactsVersionTXT = "/ArtifactsVersion.txt"
+var gitCDNTXT = "/git.cdn"
 var artifactsVersionJSON = "/ArtifactsVersion.json"
 var onlineArtifactsVersionJSON = "/OnlineArtifactsVersion.json"
 var artifactsVersionOldPath = localArtifactsPath + artifactsVersionTXT
+var gitCDNPath = localPath + gitCDNTXT
 var artifactsVersionPath = localArtifactsPath + artifactsVersionJSON
 var onlineArtifactsVersionPath = localArtifactsPath + onlineArtifactsVersionJSON
 
@@ -570,4 +572,30 @@ func FixDeps(deps string) ([]string, string, string) {
 	}
 
 	return files, "v" + fxrVersion, rid
+}
+
+// SetCDN 设置默认CDN
+func SetCDN(cdn string) bool {
+	if err := ioutil.WriteFile(gitCDNPath, []byte(cdn), 0666); err != nil {
+		log.LogError(err, false)
+		return false
+	}
+	return true
+}
+
+// GetCDN 获取默认CDN
+func GetCDN() string {
+	if gitcdn, err := ioutil.ReadFile(gitCDNPath); err == nil {
+		return string(gitcdn)
+	}
+	return ""
+}
+
+// DelCDN 删除默认CDN
+func DelCDN() bool {
+	if err := os.Remove(gitCDNPath); err != nil {
+		log.LogError(err, false)
+		return false
+	}
+	return true
 }

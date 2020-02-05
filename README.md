@@ -52,6 +52,9 @@ when you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 ```
 Usage:
 ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
+ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
+ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
+ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
 ```
 for example
 ```
@@ -68,4 +71,16 @@ then use it just like binary distribution.
 if you have troble in connecting github, use this mirror
 ```
 https://gitee.com/liesauer/HostFXRPatcher
+```
+
+## Default Git CDN
+`ncbeauty` [1.2.1](https://github.com/nulastudio/NetCoreBeauty/releases/tag/v1.2.1)  supports setting default Git CDN now, you don't need `--gitcdn` all the time if you are using binary distribution. but how ever default git cdn can be override by `--gitcdn`.
+Usage:
+```
+ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
+  set current default git cdn, can be override by --gitcdn.
+ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
+  print current default git cdn.
+ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
+  remove current default git cdn, after removed, use --gitcdn to specify.
 ```
