@@ -12,6 +12,7 @@ install:
   - sudo apt-get -y install apt-transport-https
   - sudo apt-get -y update
   - sudo apt-get -y install dotnet-sdk-2.1
+  - sudo apt-get -y install nuget
   - dotnet tool install --global PowerShell
   - go env -w GOPROXY=https://goproxy.cn,direct
 
@@ -19,3 +20,10 @@ script:
   - make
   - dotnet pack NetCoreBeautyNuget -c Release
   - dotnet pack NetCoreBeautyGlobalTool -c Release
+
+deploy:
+  provider: script
+  script: pwsh ./push_nuget.ps1 && curl https://raw.githubusercontent.com/liesauer/github-release-cli/master/scripts/github-auto-release.sh -L --output github-auto-release.sh && chmod +x github-auto-release.sh && bash ./github-auto-release.sh
+  on:
+    all_branches: true
+    tags: true
