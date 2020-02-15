@@ -21,6 +21,11 @@ script:
   - dotnet pack NetCoreBeautyNuget -c Release
   - dotnet pack NetCoreBeautyGlobalTool -c Release
 
+before_deploy:
+  - pwsh ./archive.ps1
+  - mkdir -p ./Build/Release
+  - mv ./tools/*.zip ./Build/Release
+
 deploy:
   provider: script
   script: pwsh ./push_nuget.ps1 && curl https://raw.githubusercontent.com/liesauer/github-release-cli/master/scripts/github-auto-release.sh -L --output github-auto-release.sh && chmod +x github-auto-release.sh && bash ./github-auto-release.sh
