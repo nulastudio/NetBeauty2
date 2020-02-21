@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-      <BeautyDir>"%(PublishDir.FullPath)"</BeautyDir>
+      <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
     <Exec Command="$(BeautyBin) $(GitCDN) $(BeautyLogLevel) $(DisablePatch) $(ForceBeauty) $(BeautyDir) $(BeautyLibsDir)" />
