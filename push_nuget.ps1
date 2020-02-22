@@ -7,10 +7,14 @@ $vars | ForEach-Object {
     }
 }
 
+nuget source Add -Name "NuGet" -Source https://api.nuget.org/v3/index.json
+nuget source Add -Name "GitHub" -Source $env:GITHUB_SOURCE -UserName $env:GITHUB_USERNAME -Password $env:GITHUB_ACCESS_TOKEN
+nuget setApiKey $env:NUGET_API_KEY -Source "NuGet"
 
-dir ./*/.nupkg/*.nupkg | ForEach-Object {
-    $package = $_.FullName
-    nuget push $package $env:NUGET_API_KEY -Source https://api.nuget.org/v3/index.json
-    nuget source Add -Name "GitHub" -Source $env:GITHUB_SOURCE -UserName $env:GITHUB_USERNAME -Password $env:GITHUB_ACCESS_TOKEN
-    nuget push -Source "GitHub" $package
+$pwd = Split-Path -Parent $MyInvocation.MyCommand.Definition
+
+dir "$pwd/*/.nupkg/*.nupkg" | ForEach-Object {
+    $package = $_ -Replace $pwd, ""
+    nuget push "$package" -Source "NuGet"
+    nuget push "$package" -Source "GitHub"
 }

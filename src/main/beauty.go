@@ -37,6 +37,8 @@ var libsDir = "runtimes"
 func main() {
 	Umask()
 
+	manager.EnsureLocalPath()
+
 	initCLI()
 
 	// 设置CDN

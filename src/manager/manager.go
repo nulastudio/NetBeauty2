@@ -46,6 +46,11 @@ var encodeJSONErr = "cannot encode json: %s"
 
 var onlineVersionCache *simplejson.Json = nil
 
+// EnsureLocalPath 确保本地目录存在
+func EnsureLocalPath() bool {
+	return util.EnsureDirExists(localArtifactsPath, 0777)
+}
+
 func formatError(format string, err error) string {
 	return fmt.Sprintf(format, err)
 }
