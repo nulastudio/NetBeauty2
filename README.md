@@ -3,16 +3,45 @@
 ## What is it?
 Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.
 
+### After Beauty
+![after_beauty](after_beauty.png)
+
+### Before Beauty
+![before_beauty](before_beauty.png)
+
+## Why And Why Not?
+1. WHY NOT [Single-file Publish](https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#single-file-executables)?
+
+   First, you cannot use it in `.Net Core 2.x` obviously. Second, single-file app will extract everything into temporary directory including apphost, it means that portable app is impossible if you are using `Assembly.GetEntryAssembly().Location` to storage datas.
+
+2. WHY NOT [Fody/Costura](https://github.com/Fody/Costura)?
+
+   [Fody/Costura](https://github.com/Fody/Costura) is fantastic project. But there are some reasons that why i don't want to use it. First, it modifies IL code which will have chances to break you app. Second, you need to change lots of things in order to make assemblies become `embedded resources`, and in some cases, this will break you app. Actually, it broke one of my apps with no reason once. Third, it changes something and complicated you entire project and you cannot know what exactly be changed, it makes weird BUGs and makes you mad. It made me mad once and i am not going to use it anymore. I don't like the feeling that there's no clue at all.
+
+3. WHY NOT [Warp](https://github.com/dgiagio/warp)?
+
+   Like `Single-file Publish`, it does not extract datas into `APP_BASE`, it extracts into `%APPDATA%`, portable app is impossible either. 
+In addition, `Warp` cannot set the icon or assembly informations and it won't extract and reuse those infos from the original app.
+
+4. WHY NOT [ILMerge](https://github.com/dotnet/ILMerge)?
+
+   It merges multiple assemblies into a single assembly. So it need to modify your assemblies, and it is not easy to use either. But you still can re-sign all your assemblies so it won't lose strong name.
+
+5. WHY NOT [AppHostPatcher](https://github.com/0xd4d/dnSpy/tree/master/Build/AppHostPatcher)?
+
+   Same goal with `ncbeauty`, but has a little problem. Datas are storaged inside `APP_BASE/sub-dir`, not storage into `APP_BASE` directly, that is because `apphost`'s main assembly has been moved into `APP_BASE/sub-dir`, the actual `APP_BASE` has changed to `APP_BASE/sub-dir`.
+
+6. WHY [NetCoreBeauty](https://github.com/nulastudio/NetCoreBeauty)?
+
+   Simple and single goal, simple and single function. It does nothing to your project and assemblies, it only organizes your app's directory, so you need to do nothing but reference the NuGet package.
+
+## How?
+Theoretically, loading assemblies from a subdirectory should be native supported([see `additionalProbingPaths` setting under `runtimeOptions`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson)), but setting `additionalProbingPaths` in `.runtimeconfig.json` has a serious problem, the host does not resolve relative path from `APP_BASE` but current working directory, therefore we cannot execute the app outside the `APP_BASE`, it means that the only way to run the app is via command `cd APP_BASE & ./executable`, double-click to run is impossible. So i create [HostFXRPatcher](https://github.com/nulastudio/HostFXRPatcher) and fix this problem(just let you gays know, there are several related but difference issues out there, `NetCoreBeauty` does lots of tricks to make it happen), then rebuild the corehost. When publish, `ncbeauty` will try to download the specific patched hostfxr(that is why `ncbeauty` only works with [self-contained deployments mode](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd)) and modify `.runtimeconfig.json` and `.deps.json`. It is tough to achieve, but `ncbeauty` has made it, that's the point. Why not PR? Because this fix breaks lots of things, merge is not going to happen in a short time. `.NET` community already plan to fix in `.NET 5`.
+
 ## Limitation
 Only works with [Self-contained deployments mode](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd)
 
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
-
-## Before Beauty
-![before_beauty](before_beauty.png)
-
-## After Beauty
-![after_beauty](after_beauty.png)
 
 ## How to use?
 1. Add Nuget reference into your .NET Core project.
