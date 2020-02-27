@@ -286,7 +286,7 @@ func patch(fxrVersion string, rid string) bool {
 func moveDeps(depsFiles []string, mainProgram string) int {
 	moved := 0
 	for _, depsFile := range depsFiles {
-		if strings.Contains(depsFile, mainProgram) ||
+		if strings.Join([]string{mainProgram, "dll"}, ".") == depsFile ||
 			strings.Contains(depsFile, "apphost") ||
 			strings.Contains(depsFile, "hostfxr") ||
 			strings.Contains(depsFile, "hostpolicy") {
