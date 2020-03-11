@@ -1,4 +1,4 @@
-OUTPUT=build/tools
+OUTPUT=Build/tools
 BINARY_WIN_X86=win-x86/ncbeauty.exe
 BINARY_WIN_X64=win-x64/ncbeauty.exe
 BINARY_LINUX_X64=linux-x64/ncbeauty

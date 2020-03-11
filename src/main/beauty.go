@@ -32,7 +32,7 @@ var nopatch bool
 var force bool
 var loglevel string
 var beautyDir string
-var libsDir = "runtimes"
+var libsDir = "libraries"
 
 func main() {
 	Umask()

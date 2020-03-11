@@ -15,19 +15,16 @@ install:
   - sudo apt-get -y update
   - sudo apt-get -y install dotnet-sdk-2.1
   - sudo apt-get -y install nuget
-  - dotnet tool install --global PowerShell
+  - dotnet tool install --global PowerShell --version 6.2.4
   - export PATH=~/.dotnet/tools:${PATH}
   - go env -w GOPROXY=https://goproxy.cn,direct
 
 script:
-  - make
-  - dotnet pack NetCoreBeautyNuget -c Release
-  - dotnet pack NetCoreBeautyGlobalTool -c Release
+  - pwsh ./Build/build.ps1
 
 before_deploy:
-  - pwsh ./archive.ps1
   - mkdir -p ./Build/Release
-  - mv ./tools/*.zip ./Build/Release
+  - mv ./Build/archive/*.zip ./Build/Release
 
 deploy:
   provider: script
