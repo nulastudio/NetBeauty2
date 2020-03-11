@@ -376,7 +376,7 @@ func DownloadArtifact(version string, rid string) bool {
 	return DownloadFile(artifactURL, artifactFile)
 }
 
-// DeleteArtifact 下载指定版本、RID的补丁
+// DeleteArtifact 删除指定版本、RID的补丁
 func DeleteArtifact(version string, rid string) bool {
 	artifactFile := artifactFile(version, rid)
 	ret := WriteLocalArtifactsVersion(version, rid, "")
