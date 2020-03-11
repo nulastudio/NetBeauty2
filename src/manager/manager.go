@@ -326,20 +326,14 @@ func CheckRunConfigJSON() {
 // FindCompatibleRID 匹配线上所支持的RID
 func FindCompatibleRID(rid string) string {
 	runtimeCompatibilityJSON := readJSON(runtimeCompatibilityJSONPath(), true)
-	runtimeSupportedJSON := readJSON(runtimeSupportedJSONPath(), true)
-	if runtimeCompatibilityJSON == nil || runtimeSupportedJSON == nil {
-		return rid
+	if runtimeCompatibilityJSON == nil {
+		return ""
 	}
 	crids, _ := runtimeCompatibilityJSON.Get(rid).StringArray()
-	srids, _ := runtimeSupportedJSON.StringArray()
-	for _, crid := range crids {
-		for _, srid := range srids {
-			if crid == srid {
-				return srid
-			}
-		}
+	if crids == nil || len(crids) == 0 {
+		return ""
 	}
-	return rid
+	return crids[0]
 }
 
 // DownloadFile 下载文件

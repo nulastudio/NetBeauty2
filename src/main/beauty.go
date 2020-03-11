@@ -287,7 +287,6 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 	moved := 0
 	for _, depsFile := range depsFiles {
 		if strings.Join([]string{mainProgram, "dll"}, ".") == depsFile ||
-			strings.Contains(depsFile, "apphost") ||
 			strings.Contains(depsFile, "hostfxr") ||
 			strings.Contains(depsFile, "hostpolicy") {
 			// NOTE: 计数加一，不然每次看到日志的文件移动数少3会造成疑惑
