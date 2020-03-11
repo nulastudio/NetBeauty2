@@ -43,6 +43,13 @@ Only works with [Self-contained deployments mode](https://docs.microsoft.com/en-
 
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
 
+## Supported OS
+OS      | Architectures
+--------|--------------
+Windows | x64, x86
+Linux   | x64
+MacOS   | x64
+
 ## How to use?
 1. Add Nuget reference into your .NET Core project.
 ```
