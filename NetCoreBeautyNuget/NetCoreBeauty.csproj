@@ -1,13 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Common/Common.props" />
 
   <PropertyGroup>
     <AssemblyName>nulastudio.NetCoreBeauty</AssemblyName>
+    <PackageId>nulastudio.NetCoreBeauty</PackageId>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PackageOutputPath>.nupkg</PackageOutputPath>
-    <NuspecFile>NetCoreBeauty.nuspec</NuspecFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <None Include="NetCoreBeauty.targets" Pack="True" PackagePath="build/netstandard2.0/nulastudio.NetCoreBeauty.targets" />
+    <None Include="_._" Pack="True" PackagePath="lib/netstandard2.0/" />
+    <None Include="Beauty.targets" Pack="True" PackagePath="targets/" />
+    <None Include="../build/tools/**/*" Pack="True" PackagePath="tools/" />
+  </ItemGroup>
 
 </Project>

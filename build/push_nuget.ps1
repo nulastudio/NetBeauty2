@@ -13,7 +13,7 @@ nuget setApiKey $env:NUGET_API_KEY -Source "NuGet"
 
 $pwd = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-dir "$pwd/*/.nupkg/*.nupkg" | ForEach-Object {
+dir "$pwd/nupkg/*.nupkg" | ForEach-Object {
     $package = $_ -Replace $pwd, ""
     nuget push "$package" -Source "NuGet"
     nuget push "$package" -Source "GitHub"

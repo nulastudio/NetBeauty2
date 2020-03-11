@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Common/Common.props" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,20 +8,10 @@
     <PackageId>nulastudio.ncbeauty</PackageId>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>ncbeauty</ToolCommandName>
-    <PackageOutputPath>.nupkg</PackageOutputPath>
-
-    <Version>1.2.4</Version>
-
-    <Authors>LiesAuer</Authors>
-    <Description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/nulastudio/NetCoreBeauty</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/nulastudio/NetCoreBeauty</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../tools/**/*" Pack="True" PackagePath="tools/ncbeauty/" />
+    <None Include="../build/tools/**/*" Pack="True" PackagePath="tools/ncbeauty/" />
   </ItemGroup>
 
 </Project>
