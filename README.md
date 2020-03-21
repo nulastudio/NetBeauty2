@@ -125,8 +125,11 @@ ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
 ## Git Tree
 Use `--gittree` to specify a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
 default is master, means that you always use the latest artifacts.
+
 NOTE: please provide as longer commit hash as you can, otherwise it may can not be determined as a valid unique commit hash.
+
 NOTE: PLEASE DO NOT USE ANY COMMIT THAT OLDER THEN `995a9774a75975510b352c1935e232c9e2d5b190`
+
 examples:
 ```
 master
