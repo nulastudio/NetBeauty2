@@ -74,6 +74,7 @@ your `*.csproj` should be similar like this
     <BeautyLogLevel>Error</BeautyLogLevel>
     <!-- set to a repo mirror if you have troble in connecting github -->
     <!-- <GitCDN>https://gitee.com/liesauer/HostFXRPatcher</GitCDN> -->
+    <!-- <GitTree>master</GitTree> -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -87,7 +88,7 @@ when you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
+ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
 ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
 ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
 ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
@@ -110,7 +111,7 @@ https://gitee.com/liesauer/HostFXRPatcher
 ```
 
 ## Default Git CDN
-`ncbeauty` [1.2.1](https://github.com/nulastudio/NetCoreBeauty/releases/tag/v1.2.1)  supports setting default Git CDN now, you don't need `--gitcdn` all the time if you are using binary distribution. but how ever default git cdn can be override by `--gitcdn`.
+`ncbeauty` [1.2.1](https://github.com/nulastudio/NetCoreBeauty/releases/tag/v1.2.1) supports setting default Git CDN now, you don't need `--gitcdn` all the time if you are using binary distribution. but how ever default git cdn can be override by `--gitcdn`.
 Usage:
 ```
 ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
@@ -119,4 +120,18 @@ ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
   print current default git cdn.
 ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
   remove current default git cdn, after removed, use --gitcdn to specify.
+```
+
+## Git Tree
+Use `--gittree` to specify a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
+default is master, means that you always use the latest artifacts.
+NOTE: please provide as longer commit hash as you can, otherwise it may can not be determined as a valid unique commit hash.
+NOTE: PLEASE DO NOT USE ANY COMMIT THAT OLDER THEN `995a9774a75975510b352c1935e232c9e2d5b190`
+examples:
+```
+master
+feature/xxx
+995a977
+995a9774a7
+995a9774a75975510b352c1935e232c9e2d5b190
 ```

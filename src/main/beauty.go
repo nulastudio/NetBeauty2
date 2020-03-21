@@ -28,6 +28,7 @@ var runtimeCompatibilityJSON *simplejson.Json
 var runtimeSupportedJSON *simplejson.Json
 
 var gitcdn string
+var gittree string = ""
 var nopatch bool
 var force bool
 var loglevel string
@@ -43,6 +44,9 @@ func main() {
 
 	// 设置CDN
 	manager.GitCDN = gitcdn
+	if gittree != "" {
+		manager.GitTree = gittree
+	}
 
 	log.LogInfo("running ncbeauty...")
 
@@ -118,6 +122,10 @@ func initCLI() {
 	flag.CommandLine.SetOutput(os.Stdout)
 	flag.StringVar(&gitcdn, "gitcdn", "", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
 RECOMMEND https://gitee.com/liesauer/HostFXRPatcher for mainland china users.
+`)
+	flag.StringVar(&gittree, "gittree", "", `specify to a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
+default is master, means that you always use the latest artifacts.
+NOTE: please provide as longer commit hash as you can, otherwise it may can not be determined as a valid unique commit hash.
 `)
 	flag.StringVar(&loglevel, "loglevel", "Error", `log level. valid values: Error/Detail/Info
 Error: Log errors only.
@@ -224,7 +232,7 @@ func checkArgumentsCount(excepted int, got int) bool {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
+	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
 	flag.PrintDefaults()
 	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>")
 	fmt.Println("  set current default git cdn, can be override by --gitcdn.")

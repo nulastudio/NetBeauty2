@@ -11,6 +11,7 @@
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">runtimes</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
+    <GitTree Condition="$(GitTree) != ''">--gittree $(GitTree)</GitTree>
     <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
     <DisablePatch Condition="$(DisablePatch) != 'True'"></DisablePatch>
     <DisablePatch Condition="$(DisablePatch) == 'True'">--nopatch</DisablePatch>
@@ -27,6 +28,6 @@
       <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(GitCDN) $(BeautyLogLevel) $(DisablePatch) $(ForceBeauty) $(BeautyDir) $(BeautyLibsDir)" />
+    <Exec Command="$(BeautyBin) $(GitCDN) $(GitTree) $(BeautyLogLevel) $(DisablePatch) $(ForceBeauty) $(BeautyDir) $(BeautyLibsDir)" />
   </Target>
 </Project>

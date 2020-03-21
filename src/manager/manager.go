@@ -21,6 +21,9 @@ import (
 // GitCDN git仓库镜像（默认为github）
 var GitCDN = "https://github.com/nulastudio/HostFXRPatcher"
 
+// GitTree git仓库分支（默认为master），支持任意有效分支名、任意长度commit hash（最高40位，为了保证commit hash唯一性，请尽可能提供更长的commit hash，否则将可能无法被识别）
+var GitTree = "master"
+
 // Logger 日志记录器
 var Logger = log.DefaultLogger
 
@@ -56,7 +59,7 @@ func formatError(format string, err error) string {
 }
 
 func onlinePath() string {
-	return GitCDN + "/raw/master"
+	return GitCDN + "/raw/" + GitTree
 }
 
 func artifactsOnlinePath() string {
