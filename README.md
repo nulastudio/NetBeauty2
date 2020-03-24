@@ -50,6 +50,9 @@ Windows | x64, x86
 Linux   | x64
 MacOS   | x64
 
+## Change Log
+see [Change LOG.md](CHANGELOG.md)
+
 ## How to use?
 1. Add Nuget reference into your .NET Core project.
 ```
