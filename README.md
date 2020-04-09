@@ -66,7 +66,7 @@ your `*.csproj` should be similar like this
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
-    <BeautyLibsDir>runtimes</BeautyLibsDir>
+    <BeautyLibsDir>libraries</BeautyLibsDir>
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <ForceBeauty>False</ForceBeauty>

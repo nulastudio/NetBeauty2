@@ -8,7 +8,7 @@
     <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
-    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">runtimes</BeautyLibsDir>
+    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
     <GitTree Condition="$(GitTree) != ''">--gittree $(GitTree)</GitTree>
