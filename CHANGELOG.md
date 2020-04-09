@@ -1,5 +1,14 @@
 ## Change Log
 
+### v1.2.7
+#### 新增
+1. `BeautyExcludes`选项
+
+#### 修复
+1. 修复默认`libsDir`没有正确更改为`libraries`的问题
+2. Fix #7
+
+
 ### v1.2.6
 #### 新增
 1. `--gittree`以及`GitTree`选项
