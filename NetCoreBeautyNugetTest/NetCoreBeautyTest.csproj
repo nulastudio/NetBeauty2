@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
     <BeautyLibsDir>libraries</BeautyLibsDir>
+    <!-- dlls that you don't want to be moved or can not be moved -->
+    <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <ForceBeauty>True</ForceBeauty>
@@ -19,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.6" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.7" />
   </ItemGroup>
 
 </Project>

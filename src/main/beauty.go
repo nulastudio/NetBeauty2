@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	log "github.com/nulastudio/NetCoreBeauty/src/log"
@@ -34,6 +35,7 @@ var force bool
 var loglevel string
 var beautyDir string
 var libsDir = "libraries"
+var excludes = ""
 
 func main() {
 	Umask()
@@ -212,8 +214,13 @@ hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 			libsDir = flag.Arg(1)
 		}
 
+		if len(args) >= 3 {
+			excludes = flag.Arg(2)
+		}
+
 		beautyDir = strings.Trim(beautyDir, `"`)
 		libsDir = strings.Trim(libsDir, `"`)
+		excludes = strings.Trim(excludes, `"`)
 		absDir, err := filepath.Abs(beautyDir)
 		if err != nil {
 			log.LogPanic(fmt.Errorf("invalid beautyDir: %s", err.Error()), 1)
@@ -232,7 +239,7 @@ func checkArgumentsCount(excepted int, got int) bool {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]")
+	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>] [<excludes>=dll1.dll;lib*;...]")
 	flag.PrintDefaults()
 	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>")
 	fmt.Println("  set current default git cdn, can be override by --gitcdn.")
@@ -292,11 +299,26 @@ func patch(fxrVersion string, rid string) bool {
 }
 
 func moveDeps(depsFiles []string, mainProgram string) int {
+	excludeFiles := strings.Split(excludes, ";")
+	var shouldExclude = func(file string) bool {
+		exclude := false
+		for _, excludePattern := range excludeFiles {
+			if regex, err := regexp.Compile(strings.ReplaceAll(excludePattern, "*", ".*")); err == nil {
+				exclude = regex.MatchString(file)
+				if exclude {
+					break
+				}
+			}
+		}
+
+		return exclude
+	}
 	moved := 0
 	for _, depsFile := range depsFiles {
 		if strings.Join([]string{mainProgram, "dll"}, ".") == depsFile ||
 			strings.Contains(depsFile, "hostfxr") ||
-			strings.Contains(depsFile, "hostpolicy") {
+			strings.Contains(depsFile, "hostpolicy") ||
+			shouldExclude(depsFile) {
 			// NOTE: 计数加一，不然每次看到日志的文件移动数少3会造成疑惑
 			moved++
 			continue

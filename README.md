@@ -67,6 +67,8 @@ your `*.csproj` should be similar like this
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
     <BeautyLibsDir>libraries</BeautyLibsDir>
+    <!-- dlls that you don't want to be moved or can not be moved -->
+    <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <ForceBeauty>False</ForceBeauty>
@@ -91,7 +93,7 @@ when you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>]
+ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>] [<excludes>=dll1.dll;lib*;...]
 ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
 ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
 ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
