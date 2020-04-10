@@ -239,13 +239,20 @@ func checkArgumentsCount(excepted int, got int) bool {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>] [<excludes>=dll1.dll;lib*;...]")
+	fmt.Println("ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("")
+	fmt.Println("Arguments")
+	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")
+	fmt.Println("")
+	fmt.Println("Options")
 	flag.PrintDefaults()
-	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>")
+	fmt.Println("")
+	fmt.Println("Setting GitCDN")
+	fmt.Println("ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>")
 	fmt.Println("  set current default git cdn, can be override by --gitcdn.")
-	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] getcdn")
+	fmt.Println("ncbeauty [--loglevel=(Error|Detail|Info)] getcdn")
 	fmt.Println("  print current default git cdn.")
-	fmt.Println("ncbeauty [--<loglevel=Error|Detail|Info>] delcdn")
+	fmt.Println("ncbeauty [--loglevel=(Error|Detail|Info)] delcdn")
 	fmt.Println("  remove current default git cdn, after removed, use --gitcdn to specify.")
 }
 

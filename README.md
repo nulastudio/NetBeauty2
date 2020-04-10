@@ -93,14 +93,16 @@ when you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 2. Use the binary application if your project has already be published.
 ```
 Usage:
-ncbeauty [--<force=True|False>] [--<gitcdn>] [--<gittree>] [--<loglevel=Error|Detail|Info>] [--<nopatch=True|False>] <beautyDir> [<libsDir>] [<excludes>=dll1.dll;lib*;...]
-ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
-ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
-ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
+ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] <beautyDir> [<libsDir> [<excludes>]]
+
+Setting GitCDN:
+ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>
+ncbeauty [--loglevel=(Error|Detail|Info)] getcdn
+ncbeauty [--loglevel=(Error|Detail|Info)] delcdn
 ```
 for example
 ```
-ncbeauty /path/to/publishDir
+ncbeauty /path/to/publishDir libraries "dll1.dll;lib*;..."
 ```
 
 3. Install .NETCore Global Tool
@@ -119,11 +121,11 @@ https://gitee.com/liesauer/HostFXRPatcher
 `ncbeauty` [1.2.1](https://github.com/nulastudio/NetCoreBeauty/releases/tag/v1.2.1) supports setting default Git CDN now, you don't need `--gitcdn` all the time if you are using binary distribution. but how ever default git cdn can be override by `--gitcdn`.
 Usage:
 ```
-ncbeauty [--<loglevel=Error|Detail|Info>] setcdn <gitcdn>
+ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>
   set current default git cdn, can be override by --gitcdn.
-ncbeauty [--<loglevel=Error|Detail|Info>] getcdn
+ncbeauty [--loglevel=(Error|Detail|Info)] getcdn
   print current default git cdn.
-ncbeauty [--<loglevel=Error|Detail|Info>] delcdn
+ncbeauty [--loglevel=(Error|Detail|Info)] delcdn
   remove current default git cdn, after removed, use --gitcdn to specify.
 ```
 
