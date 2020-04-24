@@ -1,5 +1,10 @@
 ## Change Log
 
+### v1.2.8
+#### 修复
+1. 修复没有指定`excludes`时所有文件都被忽略的问题
+2. Fix #8
+
 ### v1.2.7
 #### 新增
 1. `BeautyExcludes`选项

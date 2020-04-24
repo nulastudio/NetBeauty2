@@ -310,6 +310,9 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 	var shouldExclude = func(file string) bool {
 		exclude := false
 		for _, excludePattern := range excludeFiles {
+			if excludePattern == "" {
+				continue
+			}
 			if regex, err := regexp.Compile(strings.ReplaceAll(excludePattern, "*", ".*")); err == nil {
 				exclude = regex.MatchString(file)
 				if exclude {
