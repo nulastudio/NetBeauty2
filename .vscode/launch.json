@@ -6,7 +6,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/src/main/beauty.go",
+            "program": "${workspaceFolder}/src/main",
             "env": {},
             "cwd": "${workspaceFolder}",
             "args": [
