@@ -495,6 +495,24 @@ func FixDeps(deps string) ([]string, string, string) {
 		return nil, "", ""
 	}
 
+	dir := filepath.Dir(deps)
+	resources := map[string][]string{}
+	if sdir, err := util.ReadAllDir(dir); err == nil {
+		for _, d := range sdir {
+			if files, err := util.ReadAllFile(filepath.Join(dir, d)); err == nil {
+				for _, file := range files {
+					if strings.HasSuffix(file, ".resources.dll") {
+						assembly := strings.TrimSuffix(file, ".resources.dll")
+						if _, ok := resources[assembly]; !ok {
+							resources[assembly] = make([]string, 0)
+						}
+						resources[assembly] = append(resources[assembly], d)
+					}
+				}
+			}
+		}
+	}
+
 	files := []string{}
 	rid := ""
 	fxrVersion := ""
@@ -535,16 +553,44 @@ func FixDeps(deps string) ([]string, string, string) {
 					"compile":   1,
 					"resources": 2,
 				}
+				assemblies := make([]string, 0)
 				for cname, segments := range components {
 					component := depsObj.(map[string]interface{})[cname]
+					if component == nil && cname == "resources" {
+						component = make(map[string]interface{})
+					}
 					if component != nil {
 						newComponent := make(map[string]interface{})
 						for k := range component.(map[string]interface{}) {
 							components := strings.Split(strings.ReplaceAll(k, "\\", "/"), "/")
 							length := len(components)
 							fileName := strings.Join(components[length-segments:], "/")
+							assembly := strings.TrimSuffix(fileName, ".dll")
 							files = append(files, fileName)
-							newComponent["./"+fileName] = make(map[string]interface{})
+							if cname == "runtime" {
+								assemblies = append(assemblies, assembly)
+							}
+							// resources不清空
+							if cname == "resources" {
+								newComponent["./"+fileName] = component.(map[string]interface{})[k]
+							} else {
+								newComponent["./"+fileName] = make(map[string]interface{})
+							}
+						}
+						if cname == "resources" {
+							for _, assembly := range assemblies {
+								if cultures, ok := resources[assembly]; ok {
+									for _, culture := range cultures {
+										k := "./" + culture + "/" + assembly + ".resources.dll"
+										if _, ok := newComponent[k]; !ok {
+											v := make(map[string]interface{})
+											v["locale"] = culture
+											newComponent[k] = v
+											files = append(files, strings.TrimPrefix(k, "./"))
+										}
+									}
+								}
+							}
 						}
 						depsObj.(map[string]interface{})[cname] = newComponent
 					}

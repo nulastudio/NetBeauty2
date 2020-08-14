@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -42,4 +43,32 @@ func CopyFile(src string, des string) (written int64, err error) {
 	defer desFile.Close()
 
 	return io.Copy(desFile, srcFile)
+}
+
+func ReadAllDir(dir string) (paths []string, err error) {
+	fd, err := ioutil.ReadDir(dir)
+	paths = make([]string, 0)
+	if err != nil {
+		return paths, err
+	}
+	for _, fi := range fd {
+		if fi.IsDir() {
+			paths = append(paths, fi.Name())
+		}
+	}
+	return paths, nil
+}
+
+func ReadAllFile(dir string) (paths []string, err error) {
+	fd, err := ioutil.ReadDir(dir)
+	paths = make([]string, 0)
+	if err != nil {
+		return paths, err
+	}
+	for _, fi := range fd {
+		if !fi.IsDir() {
+			paths = append(paths, fi.Name())
+		}
+	}
+	return paths, nil
 }
