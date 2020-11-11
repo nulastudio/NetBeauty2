@@ -43,11 +43,14 @@ Only works with [Self-contained deployments mode](https://docs.microsoft.com/en-
 
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
 
+## Patched-Runtime Versions
+`2.x` `3.x`, no `5.x` yet.
+
 ## Supported OS
 OS      | Architectures
 --------|--------------
 Windows | x64, x86
-Linux   | x64
+Linux   | x64, arm, arm64
 MacOS   | x64
 
 ## Change Log
