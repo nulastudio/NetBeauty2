@@ -39,7 +39,7 @@ In addition, `Warp` cannot set the icon or assembly information, and it won't us
 Theoretically, loading assemblies from a subdirectory should be natively supported ([see `additionalProbingPaths` setting under `runtimeOptions`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson)), but setting `additionalProbingPaths` in `.runtimeconfig.json` has a serious problem. The host does not resolve the relative path from `APP_BASE`, but the current working directory, therefore, we cannot execute the app outside of `APP_BASE`. This means that the only way to run the app is via a terminal with `cd APP_BASE & ./executable`. Running from the file explorer would fail. [HostFXRPatcher](https://github.com/nulastudio/HostFXRPatcher) fixes this problem by rebuilding the corehost. When publishing, `ncbeauty` will try to download the specific patched hostfxr and modify `.runtimeconfig.json` and `.deps.json`. That is why `ncbeauty` only works with [self-contained deployments mode](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd). Why not PR? Because this fix breaks lots of things, so a merge is not going to happen in a short time. `.NET` community already plan to fix in `.NET 5`.
 
 ## Limitation
-Only works with [Self-contained deployments mode](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd)
+Only works with [Self-Contained Deployments mode(SCD)](https://docs.microsoft.com/en-us/dotnet/core/deploying/#self-contained-deployments-scd)
 
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
 
