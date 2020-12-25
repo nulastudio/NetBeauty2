@@ -44,7 +44,7 @@ Only works with [Self-Contained Deployments mode(SCD)](https://docs.microsoft.co
 目前仅适用于[独立部署发布模式](https://docs.microsoft.com/zh-cn/dotnet/core/deploying/#self-contained-deployments-scd)的程序
 
 ## Patched-Runtime Versions
-`2.x` `3.x`, no `5.x` yet.
+`2.x` `3.x` `5.x-win`, no `5.x-linux` `5.x-osx` yet.
 
 ## Supported OS
 OS      | Architectures
