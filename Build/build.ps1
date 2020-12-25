@@ -6,13 +6,23 @@ $nupkgdir = "${builddir}/nupkg"
 $archivedir = "${builddir}/archive"
 
 # 清理
-rm -rf $tooldir
-rm -rf $nupkgdir
-rm -rf $archivedir
+if (Test-Path -Path $tooldir) {
+    Remove-Item -Recurse -Force $tooldir
+}
+if (Test-Path -Path $nupkgdir) {
+    Remove-Item -Recurse -Force $nupkgdir
+}
+if (Test-Path -Path $archivedir) {
+    Remove-Item -Recurse -Force $archivedir
+}
 
 # 编译ncbeauty
 cd $rootdir
-make
+if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+    pwsh "${builddir}/make.ps1"
+} else {
+    make
+}
 
 # 编译NetCoreBeautyNuget
 cd "${rootdir}/NetCoreBeautyNuget"
