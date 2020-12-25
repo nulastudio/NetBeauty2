@@ -31,6 +31,7 @@ var runtimeSupportedJSON *simplejson.Json
 var gitcdn string
 var gittree string = ""
 var nopatch bool
+var noflag bool
 var force bool
 var loglevel string
 var beautyDir string
@@ -111,8 +112,10 @@ func main() {
 	}
 
 	// 写入beauty标记
-	if err := ioutil.WriteFile(beautyCheck, nil, 0666); err != nil {
-		log.LogPanic(fmt.Errorf("beauty sign failed: %s", err.Error()), 1)
+	if !noflag {
+		if err := ioutil.WriteFile(beautyCheck, nil, 0666); err != nil {
+			log.LogPanic(fmt.Errorf("beauty sign failed: %s", err.Error()), 1)
+		}
 	}
 
 	log.LogDetail("ncbeauty done. Enjoy it!")
@@ -138,6 +141,7 @@ Info: Log everything.
 DO NOT DISABLE!!!
 hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 	flag.BoolVar(&force, "force", false, `disable beauty checking and force beauty again.`)
+	flag.BoolVar(&noflag, "noflag", false, `do not generate NetCoreBeauty flag file.`)
 
 	flag.Parse()
 

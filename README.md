@@ -74,6 +74,9 @@ Your `*.csproj` should be similar to this
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to True if you don't want to generate NetCoreBeauty flag file -->
+    <!-- do not beauty twice since there is no flag file to determine if beauty already -->
+    <NoBeautyFlag>False</NoBeautyFlag>
     <ForceBeauty>False</ForceBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- set to True if you want to disable -->
@@ -86,7 +89,7 @@ Your `*.csproj` should be similar to this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.1" />
   </ItemGroup>
 
 </Project>
@@ -96,7 +99,7 @@ When you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] <beautyDir> [<libsDir> [<excludes>]]
+ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] <beautyDir> [<libsDir> [<excludes>]]
 
 Setting GitCDN:
 ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>

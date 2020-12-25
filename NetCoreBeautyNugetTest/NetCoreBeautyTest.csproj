@@ -9,6 +9,9 @@
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to True if you don't want to generate NetCoreBeauty flag file -->
+    <!-- do not beauty twice since there is no NetCoreBeauty flag file to determine if beauty already -->
+    <NoBeautyFlag>False</NoBeautyFlag>
     <ForceBeauty>True</ForceBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- set to True if you want to disable -->
@@ -21,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.1" />
   </ItemGroup>
 
 </Project>
