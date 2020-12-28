@@ -434,6 +434,23 @@ func FindDepsJSON(dir string) []string {
 	return files
 }
 
+func GetAllFiles(dir string, recursive bool) []string {
+	dir = filepath.Clean(dir)
+	rd, _ := ioutil.ReadDir(dir)
+	files := make([]string, 0)
+	for _, fi := range rd {
+		absName := dir + "/" + fi.Name()
+		if fi.IsDir() {
+			if recursive {
+				files = append(files, GetAllFiles(absName, recursive)...)
+			}
+		} else {
+			files = append(files, absName)
+		}
+	}
+	return files
+}
+
 // FixRuntimeConfig 添加additionalProbingPaths
 func FixRuntimeConfig(runtimeConfigFile string, libsDir string) bool {
 	jsonBytes, err := ioutil.ReadFile(runtimeConfigFile)

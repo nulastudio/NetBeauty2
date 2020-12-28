@@ -37,6 +37,7 @@ var loglevel string
 var beautyDir string
 var libsDir = "libraries"
 var excludes = ""
+var hiddens = ""
 
 func main() {
 	Umask()
@@ -142,6 +143,7 @@ DO NOT DISABLE!!!
 hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 	flag.BoolVar(&force, "force", false, `disable beauty checking and force beauty again.`)
 	flag.BoolVar(&noflag, "noflag", false, `do not generate NetCoreBeauty flag file.`)
+	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
 
 	flag.Parse()
 
@@ -225,6 +227,7 @@ hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 		beautyDir = strings.Trim(beautyDir, `"`)
 		libsDir = strings.Trim(libsDir, `"`)
 		excludes = strings.Trim(excludes, `"`)
+		hiddens = strings.Trim(hiddens, `"`)
 		absDir, err := filepath.Abs(beautyDir)
 		if err != nil {
 			log.LogPanic(fmt.Errorf("invalid beautyDir: %s", err.Error()), 1)
@@ -243,7 +246,7 @@ func checkArgumentsCount(excepted int, got int) bool {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] [--hiddens=hiddenFiles] <beautyDir> [<libsDir> [<excludes>]]")
 	fmt.Println("")
 	fmt.Println("Arguments")
 	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")
@@ -311,28 +314,28 @@ func patch(fxrVersion string, rid string) bool {
 
 func moveDeps(depsFiles []string, mainProgram string) int {
 	excludeFiles := strings.Split(excludes, ";")
-	var shouldExclude = func(file string) bool {
-		exclude := false
-		for _, excludePattern := range excludeFiles {
-			if excludePattern == "" {
+	var fileMatch = func(file string, sources []string) bool {
+		match := false
+		for _, pattern := range sources {
+			if pattern == "" {
 				continue
 			}
-			if regex, err := regexp.Compile(strings.ReplaceAll(excludePattern, "*", ".*")); err == nil {
-				exclude = regex.MatchString(file)
-				if exclude {
+			if regex, err := regexp.Compile(strings.ReplaceAll(pattern, "*", ".*")); err == nil {
+				match = regex.MatchString(file)
+				if match {
 					break
 				}
 			}
 		}
 
-		return exclude
+		return match
 	}
 	moved := 0
 	for _, depsFile := range depsFiles {
 		if strings.Join([]string{mainProgram, "dll"}, ".") == depsFile ||
 			strings.Contains(depsFile, "hostfxr") ||
 			strings.Contains(depsFile, "hostpolicy") ||
-			shouldExclude(depsFile) {
+			fileMatch(depsFile, excludeFiles) {
 			// NOTE: 计数加一，不然每次看到日志的文件移动数少3会造成疑惑
 			moved++
 			continue
@@ -367,5 +370,14 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 			}
 		}
 	}
+
+	hiddensFiles := strings.Split(hiddens, ";")
+	rootFiles := manager.GetAllFiles(beautyDir, false)
+	for _, rootFile := range rootFiles {
+		if fileMatch(rootFile, hiddensFiles) {
+			Hide(rootFile)
+		}
+	}
+
 	return moved
 }

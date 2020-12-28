@@ -6,6 +6,12 @@ NetCoreBeauty moves .NET Core app runtime components and dependencies into a sub
 ### After Beauty
 ![after_beauty](after_beauty.png)
 
+EVEN LESS!
+
+see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-published) option
+
+![after_beauty_with_hiddens](after_beauty_with_hiddens.png)
+
 ### Before Beauty
 ![before_beauty](before_beauty.png)
 
@@ -72,6 +78,8 @@ Your `*.csproj` should be similar to this
     <BeautyLibsDir>libraries</BeautyLibsDir>
     <!-- dlls that you don't want to be moved or can not be moved -->
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
+    <!-- dlls that end users never needed, so hide them -->
+    <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- set to True if you don't want to generate NetCoreBeauty flag file -->
@@ -89,7 +97,7 @@ Your `*.csproj` should be similar to this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.1" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.2" />
   </ItemGroup>
 
 </Project>
@@ -99,7 +107,7 @@ When you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] <beautyDir> [<libsDir> [<excludes>]]
+ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] [--hiddens=<hiddenFiles>] <beautyDir> [<libsDir> [<excludes>]]
 
 Setting GitCDN:
 ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>
@@ -108,7 +116,7 @@ ncbeauty [--loglevel=(Error|Detail|Info)] delcdn
 ```
 for example
 ```
-ncbeauty /path/to/publishDir libraries "dll1.dll;lib*;..."
+ncbeauty --hiddens "hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json" /path/to/publishDir libraries "dll1.dll;lib*;..."
 ```
 
 ### Install as a .NETCore Global Tool

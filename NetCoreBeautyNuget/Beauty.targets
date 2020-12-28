@@ -10,6 +10,7 @@
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/ncbeauty$(BeautyBinExt)"</BeautyBin>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
     <BeautyExcludes Condition="$(BeautyExcludes) != ''">"$(BeautyExcludes)"</BeautyExcludes>
+    <BeautyHiddens Condition="$(BeautyHiddens) != ''">--hiddens "$(BeautyHiddens)"</BeautyHiddens>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <GitCDN Condition="$(GitCDN) != ''">--gitcdn $(GitCDN)</GitCDN>
     <GitTree Condition="$(GitTree) != ''">--gittree $(GitTree)</GitTree>
@@ -31,6 +32,6 @@
       <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(GitCDN) $(GitTree) $(BeautyLogLevel) $(DisablePatch) $(ForceBeauty) $(NoBeautyFlag) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(GitCDN) $(GitTree) $(BeautyLogLevel) $(DisablePatch) $(ForceBeauty) $(NoBeautyFlag) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 </Project>

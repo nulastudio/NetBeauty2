@@ -1,5 +1,9 @@
 ## Change Log
 
+### v1.2.9.2
+#### 更新
+1. `--hiddens`以及`BeautyHiddens`选项
+
 ### v1.2.9.1
 #### 更新
 1. `--noflag`以及`NoBeautyFlag`选项
