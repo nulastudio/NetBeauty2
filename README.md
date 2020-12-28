@@ -6,7 +6,7 @@ NetCoreBeauty moves .NET Core app runtime components and dependencies into a sub
 ### After Beauty
 ![after_beauty](after_beauty.png)
 
-EVEN LESS!
+**EVEN LESS!**
 
 see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-published) option
 
