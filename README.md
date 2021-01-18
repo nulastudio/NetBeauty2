@@ -120,7 +120,7 @@ ncbeauty --hiddens "hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json" /path/
 ```
 
 
-**`--hiddens` option only works under Windows!**
+**`--hiddens` option just hiding the files, not moving them, and only works under Windows!**
 
 
 ### Install as a .NETCore Global Tool
