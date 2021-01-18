@@ -119,6 +119,10 @@ for example
 ncbeauty --hiddens "hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json" /path/to/publishDir libraries "dll1.dll;lib*;..."
 ```
 
+
+**`--hiddens` option only works under Windows!**
+
+
 ### Install as a .NETCore Global Tool
 ```
 dotnet tool install --global nulastudio.ncbeauty
