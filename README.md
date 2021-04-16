@@ -1,5 +1,8 @@
 # NetCoreBeauty
 
+## 👇👇👇中国大陆用户务必要看
+👉👉👉[**GitCDN的使用**](#mirror)👈👈👈
+
 ## What is it?
 NetCoreBeauty moves .NET Core app runtime components and dependencies into a sub-directory to make it beautiful.
 
@@ -130,7 +133,16 @@ dotnet tool install --global nulastudio.ncbeauty
 then use it just like binary distribution.
 
 ## Mirror
+**中国大陆用户请看这里！！！**
+
+**中国大陆用户请看这里！！！**
+
+**中国大陆用户请看这里！！！**
+
+**请务必开启GitCDN**
+
 If you have trouble connecting to github, use this mirror
+
 ```
 https://gitee.com/liesauer/HostFXRPatcher
 ```
