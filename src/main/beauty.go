@@ -24,6 +24,11 @@ const (
 	infoLevel   string = "Info"   // log everything
 )
 
+type depsFileDetail struct {
+	deps string
+	main string
+}
+
 var workingDir, _ = os.Getwd()
 var runtimeCompatibilityJSON *simplejson.Json
 var runtimeSupportedJSON *simplejson.Json
@@ -68,48 +73,93 @@ func main() {
 	// 必须检查
 	manager.CheckRunConfigJSON()
 
+	needFixRuntimeConfigs := false
+
 	// fix runtimeconfig.json
 	runtimeConfigs := manager.FindRuntimeConfigJSON(beautyDir)
 	if len(runtimeConfigs) != 0 {
-		for _, runtimeConfig := range runtimeConfigs {
-			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
-			manager.FixRuntimeConfig(runtimeConfig, libsDir)
-			log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
-		}
+		needFixRuntimeConfigs = true
 	} else {
 		log.LogDetail(fmt.Sprintf("no runtimeconfig.json found in %s", beautyDir))
 		log.LogDetail("skipping")
 		os.Exit(0)
 	}
 
+	fxrVersion, rid := "", ""
+
+	checkedDependencies := []depsFileDetail{}
+
 	// fix deps.json
 	dependencies := manager.FindDepsJSON(beautyDir)
 	if len(dependencies) != 0 {
+		// precheck
 		for _, deps := range dependencies {
-			log.LogDetail(fmt.Sprintf("fixing %s", deps))
 			deps = strings.ReplaceAll(deps, "\\", "/")
 			mainProgram := strings.Replace(path.Base(deps), ".deps.json", "", -1)
-			depsFiles, fxrVersion, rid := manager.FixDeps(deps)
-			// patch
-			if nopatch {
-				fmt.Println("hostfxr patch has been disable, skipped")
-			} else if fxrVersion != "" && rid != "" {
-				patch(fxrVersion, rid)
+
+			cfxrVersion, crid := manager.FindFXRVersion(deps)
+			if cfxrVersion == "" || crid == "" {
+				log.LogError(fmt.Errorf("incomplete fxr info [%s/%s] found in deps.json: %s", cfxrVersion, crid, deps), false)
 			} else {
-				log.LogError(errors.New("incomplete fxr info, skipping patch"), false)
+				log.LogInfo(fmt.Sprintf("fxr %s/%s detected in %s", cfxrVersion, crid, deps))
+
+				if fxrVersion == "" || rid == "" {
+					fxrVersion, rid = cfxrVersion, crid
+				} else if cfxrVersion != fxrVersion || crid != rid {
+					log.LogError(fmt.Errorf("first found fxr info is [%s/%s], different fxr info [%s/%s] found in deps.json: %s", fxrVersion, rid, cfxrVersion, crid, deps), true)
+				}
 			}
-			if len(depsFiles) == 0 {
-				continue
-			}
-			log.LogDetail(fmt.Sprintf("%s fixed", deps))
-			log.LogInfo("moving runtime...")
-			moved := moveDeps(depsFiles, mainProgram)
-			log.LogDetail(fmt.Sprintf("%d of %d runtime files moved", moved, len(depsFiles)))
+
+			checkedDependencies = append(checkedDependencies, depsFileDetail{
+				deps: deps,
+				main: mainProgram,
+			})
 		}
 	} else {
 		log.LogDetail(fmt.Sprintf("no deps.json found in %s", beautyDir))
 		log.LogDetail("skipping")
 		os.Exit(0)
+	}
+
+	// real fix
+
+	onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
+	if !nopatch && onlineVersion == "" {
+		log.LogError(fmt.Errorf("Artifact does not exist. %s/%s", fxrVersion, rid), true)
+	}
+
+	// patch
+	if nopatch {
+		fmt.Println("hostfxr patch has been disable, skipped")
+	} else if fxrVersion != "" && rid != "" {
+		patch(fxrVersion, rid)
+	} else {
+		log.LogError(errors.New("no fxr info found"), true)
+	}
+
+	if needFixRuntimeConfigs {
+		for _, runtimeConfig := range runtimeConfigs {
+			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
+			manager.FixRuntimeConfig(runtimeConfig, libsDir)
+			log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
+		}
+	}
+
+	for _, deps := range checkedDependencies {
+		depsFiles := manager.FixDeps(deps.deps)
+
+		if len(depsFiles) == 0 {
+			continue
+		}
+
+		log.LogDetail(fmt.Sprintf("%s fixed", deps.deps))
+		log.LogInfo("moving runtime...")
+		realCount, moved := moveDeps(depsFiles, deps.main)
+		if realCount != 0 {
+			log.LogDetail(fmt.Sprintf("%d of %d runtime files moved", moved, realCount))
+		} else {
+			log.LogDetail("no runtime files need to be moved")
+		}
 	}
 
 	// 写入beauty标记
@@ -291,10 +341,10 @@ func patch(fxrVersion string, rid string) bool {
 
 	absFxrName := path.Join(beautyDir, fxrName)
 	absFxrBakName := absFxrName + ".bak"
-	log.LogInfo(fmt.Sprintf("backuping fxr to %s\n", absFxrBakName))
+	log.LogInfo(fmt.Sprintf("backuping fxr to %s", absFxrBakName))
 
 	if util.PathExists(absFxrBakName) && !force {
-		log.LogDetail("fxr backup found, skipped")
+		log.LogDetail("fxr backup already exists, skipped")
 	} else {
 		if _, err := util.CopyFile(absFxrName, absFxrBakName); err != nil {
 			log.LogError(fmt.Errorf("backup failed: %s", err.Error()), false)
@@ -312,7 +362,7 @@ func patch(fxrVersion string, rid string) bool {
 	return success
 }
 
-func moveDeps(depsFiles []string, mainProgram string) int {
+func moveDeps(depsFiles []string, mainProgram string) (int, int) {
 	excludeFiles := strings.Split(excludes, ";")
 	var fileMatch = func(file string, sources []string) bool {
 		match := false
@@ -330,44 +380,51 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 
 		return match
 	}
-	moved := 0
+
+	realCount, moved := 0, 0
+
 	for _, depsFile := range depsFiles {
+		absDepsFile := path.Join(beautyDir, depsFile)
+		if !util.PathExists(absDepsFile) {
+			continue
+		}
+
+		realCount++
+
 		if strings.Join([]string{mainProgram, "dll"}, ".") == depsFile ||
 			strings.Contains(depsFile, "hostfxr") ||
 			strings.Contains(depsFile, "hostpolicy") ||
 			fileMatch(depsFile, excludeFiles) {
-			// NOTE: 计数加一，不然每次看到日志的文件移动数少3会造成疑惑
-			moved++
+			// NOTE: 这几个文件都不用移动的，所以真实文件移动数量要-1
+			realCount--
 			continue
 		}
 
-		absDepsFile := path.Join(beautyDir, depsFile)
 		absDesFile := path.Join(beautyDir, libsDir, depsFile)
 		oldPath := path.Dir(absDepsFile)
 		newPath := path.Dir(absDesFile)
-		if util.PathExists(absDepsFile) {
-			if !util.EnsureDirExists(newPath, 0777) {
-				log.LogError(fmt.Errorf("%s is not writeable", newPath), false)
-			}
-			if err := os.Rename(absDepsFile, absDesFile); err == nil {
-				moved++
-			}
 
-			// NOTE: pdb、xml跟随程序集
-			// TODO: 提供一个选项，自由选择xml：跟随主程序、跟随程序集、跟随两者
-			fileName := strings.TrimSuffix(path.Base(depsFile), path.Ext(depsFile))
-			extFiles := []string{".pdb", ".xml"}
-			for _, extFile := range extFiles {
-				oldFile := path.Join(oldPath, fileName+extFile)
-				newFile := path.Join(newPath, fileName+extFile)
-				if util.PathExists(oldFile) {
-					os.Rename(oldFile, newFile)
-				}
+		if !util.EnsureDirExists(newPath, 0777) {
+			log.LogError(fmt.Errorf("%s is not writeable", newPath), false)
+		}
+		if err := os.Rename(absDepsFile, absDesFile); err == nil {
+			moved++
+		}
+
+		// NOTE: pdb、xml跟随程序集
+		// TODO: 提供一个选项，自由选择xml：跟随主程序、跟随程序集、跟随两者
+		fileName := strings.TrimSuffix(path.Base(depsFile), path.Ext(depsFile))
+		extFiles := []string{".pdb", ".xml"}
+		for _, extFile := range extFiles {
+			oldFile := path.Join(oldPath, fileName+extFile)
+			newFile := path.Join(newPath, fileName+extFile)
+			if util.PathExists(oldFile) {
+				os.Rename(oldFile, newFile)
 			}
-			dir, _ := ioutil.ReadDir(oldPath)
-			if len(dir) == 0 {
-				os.Remove(oldPath)
-			}
+		}
+		dir, _ := ioutil.ReadDir(oldPath)
+		if len(dir) == 0 {
+			os.Remove(oldPath)
 		}
 	}
 
@@ -379,5 +436,5 @@ func moveDeps(depsFiles []string, mainProgram string) int {
 		}
 	}
 
-	return moved
+	return realCount, moved
 }

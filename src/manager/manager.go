@@ -306,8 +306,8 @@ func CheckRunConfigJSON() {
 	localCVersion := getLocalRuntimeCompatibilityVersion()
 	localSVersion := getLocalRuntimeSupportedVersion()
 	var mapping = map[string][2]string{
-		runtimeCompatibilityJSONName: [2]string{localCVersion, onlineCVersion},
-		runtimeSupportedJSONName:     [2]string{localSVersion, onlineSVersion},
+		runtimeCompatibilityJSONName: {localCVersion, onlineCVersion},
+		runtimeSupportedJSONName:     {localSVersion, onlineSVersion},
 	}
 	for name, vers := range mapping {
 		if vers[0] == vers[1] {
@@ -498,46 +498,24 @@ func FixRuntimeConfig(runtimeConfigFile string, libsDir string) bool {
 	return err == nil
 }
 
-// FixDeps 修改deps.json
-func FixDeps(deps string) ([]string, string, string) {
+// FindFXRVersion 从deps.json中提取出FXR Version
+func FindFXRVersion(deps string) (string, string) {
+	fxrVersion, rid := "", ""
+
 	jsonBytes, err := ioutil.ReadFile(deps)
 	if err != nil {
-		log.LogError(fmt.Errorf("can not open deps.json: %s : %s", deps, err.Error()), false)
-		return nil, "", ""
+		return "", ""
 	}
 
 	json, err := simplejson.NewJson(jsonBytes)
 	if err != nil {
-		log.LogError(fmt.Errorf("invalid deps.json: %s : %s", deps, err.Error()), false)
-		return nil, "", ""
+		return "", ""
 	}
-
-	dir := filepath.Dir(deps)
-	resources := map[string][]string{}
-	if sdir, err := util.ReadAllDir(dir); err == nil {
-		for _, d := range sdir {
-			if files, err := util.ReadAllFile(filepath.Join(dir, d)); err == nil {
-				for _, file := range files {
-					if strings.HasSuffix(file, ".resources.dll") {
-						assembly := strings.TrimSuffix(file, ".resources.dll")
-						if _, ok := resources[assembly]; !ok {
-							resources[assembly] = make([]string, 0)
-						}
-						resources[assembly] = append(resources[assembly], d)
-					}
-				}
-			}
-		}
-	}
-
-	files := []string{}
-	rid := ""
-	fxrVersion := ""
 
 	// targets
 	targets, _ := json.Get("targets").Map()
 	for _, target := range targets {
-		for targetName, depsObj := range target.(map[string]interface{}) {
+		for targetName := range target.(map[string]interface{}) {
 			// 解析出fxr信息
 			if strings.HasPrefix(targetName, "runtime") &&
 				(strings.Contains(targetName, "Microsoft.NETCore.DotNetHostResolver") ||
@@ -559,8 +537,51 @@ func FixDeps(deps string) ([]string, string, string) {
 					rid = matches[1]
 					fxrVersion = matches[2]
 				}
-				log.LogInfo(fmt.Sprintf("fxr v%s/%s detected in %s", fxrVersion, rid, deps))
 			}
+		}
+	}
+
+	return "v" + fxrVersion, rid
+}
+
+// FixDeps 修改deps.json
+func FixDeps(deps string) []string {
+	jsonBytes, err := ioutil.ReadFile(deps)
+	if err != nil {
+		log.LogError(fmt.Errorf("can not open deps.json: %s : %s", deps, err.Error()), false)
+		return nil
+	}
+
+	json, err := simplejson.NewJson(jsonBytes)
+	if err != nil {
+		log.LogError(fmt.Errorf("invalid deps.json: %s : %s", deps, err.Error()), false)
+		return nil
+	}
+
+	dir := filepath.Dir(deps)
+	resources := map[string][]string{}
+	if sdir, err := util.ReadAllDir(dir); err == nil {
+		for _, d := range sdir {
+			if files, err := util.ReadAllFile(filepath.Join(dir, d)); err == nil {
+				for _, file := range files {
+					if strings.HasSuffix(file, ".resources.dll") {
+						assembly := strings.TrimSuffix(file, ".resources.dll")
+						if _, ok := resources[assembly]; !ok {
+							resources[assembly] = make([]string, 0)
+						}
+						resources[assembly] = append(resources[assembly], d)
+					}
+				}
+			}
+		}
+	}
+
+	files := []string{}
+
+	// targets
+	targets, _ := json.Get("targets").Map()
+	for _, target := range targets {
+		for _, depsObj := range target.(map[string]interface{}) {
 			if depsObj != nil {
 				components := map[string]int{
 					// NOTE: runtimeTargets未确认是否需要处理
@@ -629,14 +650,10 @@ func FixDeps(deps string) ([]string, string, string) {
 	jsonBytes, _ = json.EncodePretty()
 	if err := ioutil.WriteFile(deps, jsonBytes, 0666); err != nil {
 		log.LogError(fmt.Errorf("fix deps.json failed: %s : %s", deps, err.Error()), false)
-		return nil, "", ""
+		return nil
 	}
 
-	if fxrVersion == "" || rid == "" {
-		log.LogError(fmt.Errorf("incomplete fxr info [%s/%s] found in deps.json: %s", fxrVersion, rid, deps), false)
-	}
-
-	return files, "v" + fxrVersion, rid
+	return files
 }
 
 // SetCDN 设置默认CDN
