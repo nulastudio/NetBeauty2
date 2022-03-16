@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
+    <BeautyLibsDir>libraries</BeautyLibsDir>
+    <!-- dlls that you don't want to be moved or can not be moved -->
+    <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
+    <!-- dlls that end users never needed, so hide them -->
+    <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
+    <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
+    <!-- valid values: Error|Detail|Info -->
+    <BeautyLogLevel>Info</BeautyLogLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.1" />
+  </ItemGroup>
+
+</Project>

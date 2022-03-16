@@ -16,23 +16,23 @@ if (Test-Path -Path $archivedir) {
     Remove-Item -Recurse -Force $archivedir
 }
 
-# 编译ncbeauty
-cd $rootdir
+# 编译nbeauty
+cd "${rootdir}/NetBeauty"
 if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
-    pwsh "${builddir}/make.ps1"
+    pwsh "make.ps1"
 } else {
     make
 }
 
-# 编译NetCoreBeautyNuget
-cd "${rootdir}/NetCoreBeautyNuget"
+# 编译NetBeautyNuget
+cd "${rootdir}/NetBeautyNuget"
 dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
-# 编译NetCoreBeautyGlobalTool
-cd "${rootdir}/NetCoreBeautyGlobalTool"
+# 编译NetBeautyGlobalTool
+cd "${rootdir}/NetBeautyGlobalTool"
 dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
-# 打包ncbeauty
+# 打包nbeauty
 mkdir ${archivedir}
 "win-x86", "win-x64", "linux-x64", "osx-x64" | ForEach-Object -Process {
     $rid = $_

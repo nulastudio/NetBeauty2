@@ -1,0 +1,29 @@
+<Project>
+  <PropertyGroup>
+    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">True</IsWindows>
+    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">True</IsLinux>
+    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">True</IsOSX>
+    <RuntimeOS Condition="$(IsWindows) == 'True'">win-x86</RuntimeOS>
+    <RuntimeOS Condition="$(IsLinux) == 'True'">linux-x64</RuntimeOS>
+    <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
+    <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
+    <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/nbeauty2$(BeautyBinExt)"</BeautyBin>
+    <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
+    <BeautyExcludes Condition="$(BeautyExcludes) != ''">"$(BeautyExcludes)"</BeautyExcludes>
+    <BeautyHiddens Condition="$(BeautyHiddens) != ''">--hiddens "$(BeautyHiddens)"</BeautyHiddens>
+    <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
+    <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
+  </PropertyGroup>
+
+  <Target Name="NetBeauty" AfterTargets="$(BeautyAfterTasks)">
+    <ItemGroup>
+      <PublishDir Include="$(PublishDir)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
+    </PropertyGroup>
+
+    <Exec Command="$(BeautyBin) $(BeautyLogLevel) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+  </Target>
+</Project>

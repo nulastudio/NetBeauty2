@@ -2,14 +2,14 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <PackageOutputPath>.nupkg</PackageOutputPath>
-        <Version>1.2.9.3</Version>
+        <Version>2.0.0.0-beta.1</Version>
 
         <Company>nulastudio</Company>
         <Authors>LiesAuer</Authors>
-        <Description>Move a .NET Core app runtime components and dependencies into a sub-directory and make it beauty.</Description>
+        <Description>Move a .NET Framework/.NET Core app runtime components and dependencies into a sub-directory and make it beauty.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/nulastudio/NetCoreBeauty</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/nulastudio/NetBeauty2</PackageProjectUrl>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/nulastudio/NetCoreBeauty</RepositoryUrl>
+        <RepositoryUrl>https://github.com/nulastudio/NetBeauty2</RepositoryUrl>
     </PropertyGroup>
 </Project>

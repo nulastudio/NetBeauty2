@@ -8,7 +8,7 @@
             "label": "pack",
             "command": "pwsh",
             "args": [
-                "${workspaceFolder}/build/build.ps1"
+                "${workspaceFolder}/Build/build.ps1"
             ],
             "problemMatcher": []
         }

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Common/Common.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+
+    <PackageId>nulastudio.nbeauty</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>nbeauty2</ToolCommandName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../Build/tools/**/*" Pack="True" PackagePath="tools/nbeauty2/" />
+  </ItemGroup>
+
+</Project>
