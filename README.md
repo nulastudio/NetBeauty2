@@ -19,7 +19,7 @@ see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-p
 |  | [NetBeauty 2](https://github.com/nulastudio/NetBeauty2) | [NetCoreBeauty](https://github.com/nulastudio/NetBeauty2/tree/v1) |
 | ---- | ---- | ---- |
 | Supported Framework | `.Net Framework`(not completed yet)<br/>`.Net Core 3.0+` | `.Net Core 2.0+` |
-| Supported Deployment Model | ALL | Self-contained deployment (`SCD`) |
+| Supported Deployment Model | Framework-dependent deployment (`FDD`)<br/>Self-contained deployment (`SCD`)<br/>Framework-dependent executables (`FDE`) | Self-contained deployment (`SCD`) |
 | Supported System | All | `win-x64` `win-x86`<br/>`linux-x64` `linux-arm` `linux-arm64`<br/>`osx-x64` |
 | Need Patched HostFXR | No | Yes |
 | Minimum Structure | ~20 Files | ~8 Files |
