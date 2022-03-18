@@ -24,6 +24,7 @@ see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-p
 | Need Patched HostFXR | No | Yes |
 | Minimum Structure | ~20 Files | ~8 Files |
 | How It Works | [`STARTUP_HOOKS`](https://github.com/dotnet/runtime/blob/main/docs/design/features/host-startup-hook.md)<br/>[`AssemblyLoadContext.Resolving`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolving?view=netcore-3.0)<br/>[`AssemblyLoadContext.ResolvingUnmanagedDll`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolvingunmanageddll?view=netcore-3.0) | [`patched libhostfxr`](https://github.com/nulastudio/HostFXRPatcher)<br/>[`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson) |
+| Shared Runtime | Coming Soon | Possible If Using `patched libhostfxr` Alone |
 
 ## How to use?
 ### Add Nuget reference into your .NET Core project.
