@@ -55,7 +55,7 @@ Your `*.csproj` should be similar to this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.2" />
   </ItemGroup>
 
 </Project>
