@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetBeautyTest", "NetBeautyTest\NetBeautyTest\NetBeautyTest.csproj", "{932C8DC7-1EB0-439B-B7AA-BE719712DA82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFTest", "NetBeautyTest\WPFTest\WPFTest.csproj", "{932C8DC7-1EB0-439B-B7AA-BE719712DA82}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SumDLL", "NetBeautyTest\SumDLL\SumDLL.vcxproj", "{E1AEAE7F-D867-4700-9A5E-17F2D07BF4F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nbloader", "nbloader\nbloader.csproj", "{C0CE654E-5977-4BD7-8B57-E387AFA4A2C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetBeauty", "NetBeautyNuget\NetBeauty.csproj", "{9349BA9D-380E-4A17-ADF0-8808F389056B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetBeautyNuget", "NetBeautyNuget\NetBeautyNuget.csproj", "{9349BA9D-380E-4A17-ADF0-8808F389056B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetBeautyGlobalTool", "NetBeautyGlobalTool\NetBeautyGlobalTool.csproj", "{F8C39C73-EB84-4306-8D81-40315A349824}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XamlControlsGallery", "NetBeautyTest\AvaloniaTest\XamlControlsGallery\XamlControlsGallery.csproj", "{68454AE8-1873-485B-A1CF-3FD3F12AC333}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaTest", "NetBeautyTest\AvaloniaTest\AvaloniaTest\AvaloniaTest.csproj", "{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,30 @@ Global
 		{F8C39C73-EB84-4306-8D81-40315A349824}.Release|x64.Build.0 = Release|Any CPU
 		{F8C39C73-EB84-4306-8D81-40315A349824}.Release|x86.ActiveCfg = Release|Any CPU
 		{F8C39C73-EB84-4306-8D81-40315A349824}.Release|x86.Build.0 = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|x64.Build.0 = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Debug|x86.Build.0 = Debug|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|x64.ActiveCfg = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|x64.Build.0 = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|x86.ActiveCfg = Release|Any CPU
+		{68454AE8-1873-485B-A1CF-3FD3F12AC333}.Release|x86.Build.0 = Release|Any CPU
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|x64.ActiveCfg = Debug|x64
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|x64.Build.0 = Debug|x64
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|x86.ActiveCfg = Debug|x86
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Debug|x86.Build.0 = Debug|x86
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|x64.ActiveCfg = Release|x64
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|x64.Build.0 = Release|x64
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|x86.ActiveCfg = Release|x86
+		{AA8C2E0A-2A7A-4C9C-972D-DC16B8554EA1}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

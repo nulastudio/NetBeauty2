@@ -1,0 +1,67 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:XamlControlsGallery.ViewModels;assembly=XamlControlsGallery"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1350" d:DesignHeight="700"
+        xmlns:pages="clr-namespace:XamlControlsGallery.Pages;assembly=XamlControlsGallery"
+        x:Class="XamlControlsGallery.Views.MainView"         
+        FontSize="14"
+        Foreground="{StaticResource SystemBaseHighColor}">
+
+  <Panel>
+    <DockPanel HorizontalAlignment="Stretch">
+      <ExperimentalAcrylicBorder DockPanel.Dock="Left" Width="240">
+        <ExperimentalAcrylicBorder.Material>
+          <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.85" TintOpacity="1" />
+        </ExperimentalAcrylicBorder.Material>
+        <AutoCompleteBox HorizontalAlignment="Stretch" Margin="20 40 20 0" Watermark="Search" Items="{Binding SearchItems}" />
+      </ExperimentalAcrylicBorder>
+      <ExperimentalAcrylicBorder IsHitTestVisible="False">
+        <ExperimentalAcrylicBorder.Material>
+          <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.85" TintOpacity="1" />
+        </ExperimentalAcrylicBorder.Material>
+        <TextBlock Text="{Binding #TabControl.SelectedItem.Header}" Margin="40 20" FontSize="32" FontWeight="Light" />
+      </ExperimentalAcrylicBorder>
+    </DockPanel>          
+       
+    <TabControl x:Name="TabControl" Classes="sidebar" Margin="0 40 0 20">
+      <TabItem Header="Overview">
+        <pages:OverviewPage />
+      </TabItem>
+      <TabItem Header="Basic Input">
+        
+      </TabItem>
+      <TabItem Header="Collections">
+
+      </TabItem>
+      <TabItem Header="Date and Time">
+        <pages:DateTimePage />
+      </TabItem>
+      <TabItem Header="Layout">
+        <pages:LayoutPage />
+      </TabItem>
+      <TabItem Header="Media">
+        <pages:MediaPage />
+      </TabItem>
+      <TabItem Header="Menus">
+        <pages:MenusPage />
+      </TabItem>
+      <TabItem Header="Navigation">
+
+      </TabItem>
+      <TabItem Header="Scrolling">
+
+      </TabItem>
+      <TabItem Header="Status and Info">
+
+      </TabItem>
+      <TabItem Header="Styles">
+
+      </TabItem>
+      <TabItem Header="Text">
+
+      </TabItem>
+    </TabControl>    
+  </Panel>
+</UserControl>

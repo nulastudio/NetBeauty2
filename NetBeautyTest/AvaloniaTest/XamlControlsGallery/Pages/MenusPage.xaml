@@ -1,0 +1,40 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="XamlControlsGallery.Pages.MenusPage">
+  <Panel Margin="{StaticResource PageMargin}" MinWidth="100" MinHeight="100">
+    <Menu VerticalAlignment="Top" HorizontalAlignment="Left">
+      <MenuItem Header="File">
+        <MenuItem Header="New" InputGesture="CTRL + N" />
+        <MenuItem Header="Open" />
+        <Separator />
+        <MenuItem Header="Exit" InputGesture="Alt + F4" />
+      </MenuItem>
+      <MenuItem Header="Edit">
+        <MenuItem Header="Cut" InputGesture="CTRL + X" />
+        <MenuItem Header="Copy" InputGesture="CTRL + C" />        
+        <MenuItem Header="Paste" InputGesture="CTRL + V" />
+      </MenuItem>
+      <MenuItem Header="Options">
+        <MenuItem Header="Compact Mode Enabled">
+          <MenuItem.Icon>
+            <Viewbox Width="16" VerticalAlignment="Center">
+              <Path Fill="White" Margin="0 -2 0 0" Data="M1024 1408q79 0 149 -30t122.5 -82.5t82.5 -122.5t30 -149q0 -80 -30 -149.5t-82.5 -122t-122.5 -82.5t-149 -30q-80 0 -149.5 30t-122 82.5t-82.5 122t-30 149.5q0 79 30 149t82.5 122.5t122 82.5t149.5 30z" />
+            </Viewbox>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Menu with _Submenu">
+          <MenuItem Header="Submenu _1"/>
+          <MenuItem Header="Submenu _2"/>
+        </MenuItem>
+        <MenuItem Header="Menu Item with _Icon" InputGesture="Ctrl+Shift+B">
+          <MenuItem.Icon>
+            <Image Source="/Assets/avalonia-logo.ico"/>
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+    </Menu>    
+  </Panel>
+</UserControl>

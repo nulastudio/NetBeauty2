@@ -15,7 +15,7 @@
     <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
   </PropertyGroup>
 
-  <Target Name="NetBeauty" AfterTargets="$(BeautyAfterTasks)">
+  <Target Name="NetBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True'">
     <ItemGroup>
       <PublishDir Include="$(PublishDir)" />
     </ItemGroup>

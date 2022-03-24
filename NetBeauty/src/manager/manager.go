@@ -207,12 +207,13 @@ func FixDeps(deps string, entry string) []Deps {
 			fileName == "System.Runtime.InteropServices.dll" ||
 			fileName == "System.Runtime.Loader.dll" ||
 			fileName == "System.IO.FileSystem.dll" ||
-			strings.Contains(fileName, "clrjit") ||
-			strings.Contains(fileName, "coreclr") ||
+			strings.Contains(fileName, "libSystem.Native") ||
+			strings.Contains(fileName, "clrjit.") ||
+			strings.Contains(fileName, "coreclr.") ||
 			strings.Contains(fileName, "mscordaccore") || // for adebugging
 			strings.Contains(fileName, "mscordbi") || // for adebugging
-			strings.Contains(fileName, "hostfxr") ||
-			strings.Contains(fileName, "hostpolicy") {
+			strings.Contains(fileName, "hostfxr.") ||
+			strings.Contains(fileName, "hostpolicy.") {
 			return true
 		}
 

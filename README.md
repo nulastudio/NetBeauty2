@@ -47,6 +47,8 @@ Your `*.csproj` should be similar to this
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- dlls that end users never needed, so hide them -->
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
+    <!-- set to True if you want to disable -->
+    <DisableBeauty>False</DisableBeauty>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>

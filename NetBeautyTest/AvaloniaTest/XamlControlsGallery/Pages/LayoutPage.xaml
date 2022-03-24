@@ -1,0 +1,325 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:XamlControlsGallery.ViewModels"
+             x:DataType="vm:LayoutPageViewModel"
+             x:Class="XamlControlsGallery.Pages.LayoutPage">
+  <StackPanel HorizontalAlignment="Stretch" Margin="{StaticResource PageMargin}" Background="Transparent" Spacing="20">    
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+      <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Stretch"
+                Spacing="16">
+        <TextBlock FontSize="18">A Border around a TextBlock.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <Border Background="Green" BorderBrush="Yellow" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Center">
+              <TextBlock Text="Text inside a border"/>
+            </Border>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;Border Background="Green" BorderBrush="Yellow" BorderThickness="2"&gt;
+  &lt;TextBlock Text="Text inside a border" /&gt;
+&lt;/Border&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Stretch"
+                  Spacing="16"
+                  Grid.Row="1">
+        <TextBlock FontSize="18">A Canvas control.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <Canvas Width="120" Height="120" Background="Gray" HorizontalAlignment="Left">
+              <Canvas.Styles>
+                <Style Selector="Rectangle">
+                  <Setter Property="Width" Value="40"/>
+                  <Setter Property="Height" Value="40"/>
+                </Style>
+              </Canvas.Styles>
+              <Rectangle Fill="Red" Canvas.Left="0" Canvas.Top="0" />
+              <Rectangle Fill="Blue" Canvas.Left="20" Canvas.Top="20" />
+              <Rectangle Fill="Green" Canvas.Left="40" Canvas.Top="40" />
+              <Rectangle Fill="Yellow" Canvas.Left="60" Canvas.Top="60" />
+            </Canvas>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;Canvas Width="120" Height="120" Background="Gray"&gt;
+  &lt;Rectangle Fill="Red" Canvas.Left="0" Canvas.Top="0" /&gt;
+  &lt;Rectangle Fill="Blue" Canvas.Left="20" Canvas.Top="20" /&gt;
+  &lt;Rectangle Fill="Green" Canvas.Left="40" Canvas.Top="40" /&gt;
+  &lt;Rectangle Fill="Yellow" Canvas.Left="60" Canvas.Top="60" /&gt;
+&lt;/Canvas&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Stretch"
+                  Spacing="16"
+                  Grid.Row="2">
+        <TextBlock FontSize="18">A DockPanel control.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <DockPanel Width="240" Height="240" HorizontalAlignment="Left">
+              <Rectangle DockPanel.Dock="Top" Height="100" Fill="Green" />
+              <Rectangle DockPanel.Dock="Bottom" Height="60" Fill="Blue" />
+              <Rectangle DockPanel.Dock="Left" Width="40" Fill="Yellow" />
+              <Rectangle DockPanel.Dock="Right" Width="40" Fill="Red" />
+              <Rectangle Fill="Magenta"/>
+            </DockPanel>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;DockPanel Width="240" Height="240"&gt;
+  &lt;Rectangle DockPanel.Dock="Top" Height="100" Fill="Green" /&gt;
+  &lt;Rectangle DockPanel.Dock="Bottom" Height="60" Fill="Blue" /&gt;
+  &lt;Rectangle DockPanel.Dock="Left" Width="40" Fill="Yellow" /&gt;
+  &lt;Rectangle DockPanel.Dock="Right" Width="40" Fill="Red" /&gt;
+  &lt;Rectangle Fill="Magenta"/&gt;
+&lt;/DockPanel&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Stretch"
+                  Spacing="16"
+                  Grid.Row="3">
+        <TextBlock FontSize="18">A 3x3 Grid control.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <Grid Width="240" Height="240" Background="Gray" HorizontalAlignment="Left" ColumnDefinitions="40, Auto, *" RowDefinitions="40, Auto, *">
+              <Rectangle Fill="Red" Grid.Row="0" Grid.Column="0"/>
+              <Rectangle Fill="Blue" Grid.Row="1" Height="80"/>
+              <Rectangle Fill="Magenta" Grid.Row="2" Grid.ColumnSpan="3"/>
+              <Rectangle Fill="Green" Grid.Column="1" Width="80"/>
+              <Rectangle Fill="Yellow" Grid.Column="2" Grid.RowSpan="2"/>
+            </Grid>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;Grid Width="240" Height="240" Background="Gray" ColumnDefinitions="40, Auto, *" RowDefinitions="40, Auto, *"&gt;
+  &lt;Rectangle Fill="Red" Grid.Row="0" Grid.Column="0"/&gt;
+  &lt;Rectangle Fill="Blue" Grid.Row="1" Height="80"/&gt;
+  &lt;Rectangle Fill="Magenta" Grid.Row="2" Grid.ColumnSpan="3"/&gt;
+  &lt;Rectangle Fill="Green" Grid.Column="1" Width="80"/&gt;
+  &lt;Rectangle Fill="Yellow" Grid.Column="2" Grid.RowSpan="2"/&gt;
+&lt;/Grid&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Stretch"
+                  Spacing="16"
+                  Grid.Row="4">
+        <TextBlock FontSize="18">An ItemsRepeater control using vertical StackLayout.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <Border.Resources>
+              <converters:ColorToBrushConverter x:Key="BrushConverter" />
+            </Border.Resources>
+            <ScrollViewer Height="400" Width="400">
+              <ItemsRepeater Items="{CompiledBinding Items}">
+                <ItemsRepeater.Layout>
+                  <StackLayout Spacing="4" Orientation="Vertical"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ItemViewModel">
+                    <Border Background="{CompiledBinding Color, Converter={StaticResource BrushConverter}}" Width="80" Height="80">
+                      <TextBlock Text="{CompiledBinding Text}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                  </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
+            </ScrollViewer>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;ScrollViewer Height="400" Width="400"&gt;
+  &lt;ItemsRepeater Items="{CompiledBinding Items}"&gt;
+    &lt;ItemsRepeater.Layout&gt;
+      &lt;StackLayout Spacing="4" Orientation="Vertical"/&gt;
+    &lt;/ItemsRepeater.Layout&gt;
+    &lt;ItemsRepeater.ItemTemplate&gt;
+      &lt;DataTemplate&gt;
+        &lt;Border Background="{CompiledBinding Color, Converter={StaticResource BrushConverter}}" Width="80" Height="80"&gt;
+          &lt;TextBlock Text="{CompiledBinding Text}" VerticalAlignment="Center" HorizontalAlignment="Center"/&gt;
+        &lt;/Border&gt;
+      &lt;/DataTemplate&gt;
+    &lt;/ItemsRepeater.ItemTemplate&gt;
+  &lt;/ItemsRepeater&gt;
+&lt;/ScrollViewer&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <TextBlock FontSize="18">An ItemsRepeater control using horizontal UniformGridLayout.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <Border.Resources>
+              <converters:ColorToBrushConverter x:Key="BrushConverter" />
+            </Border.Resources>
+            <ScrollViewer Height="400" Width="400" HorizontalScrollBarVisibility="Disabled">
+              <ItemsRepeater Items="{CompiledBinding Items}">
+                <ItemsRepeater.Layout>
+                  <UniformGridLayout Orientation="Horizontal" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ItemViewModel">
+                    <Border Background="{CompiledBinding Color, Converter={StaticResource BrushConverter}}" Width="80" Height="80">
+                      <TextBlock Text="{CompiledBinding Text}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                  </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
+            </ScrollViewer>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+                  &lt;ScrollViewer Height="400" Width="400" HorizontalScrollBarVisibility="Disabled"&gt;
+  &lt;ItemsRepeater Items="{CompiledBinding Items}"&gt;
+    &lt;ItemsRepeater.Layout&gt;
+      &lt;UniformGridLayout Orientation="Horizontal" /&gt;
+    &lt;/ItemsRepeater.Layout&gt;
+    &lt;ItemsRepeater.ItemTemplate&gt;
+      &lt;DataTemplate&gt;
+        &lt;Border Background="{CompiledBinding Color, Converter={StaticResource BrushConverter}}" Width="80" Height="80"&gt;
+          &lt;TextBlock Text="{CompiledBinding Text}" VerticalAlignment="Center" HorizontalAlignment="Center"/&gt;
+        &lt;/Border&gt;
+      &lt;/DataTemplate&gt;
+    &lt;/ItemsRepeater.ItemTemplate&gt;
+  &lt;/ItemsRepeater&gt;
+&lt;/ScrollViewer&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Stretch"
+                  Spacing="16"
+                  Grid.Row="5">
+        <TextBlock FontSize="18">A horizontal StackPanel control.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <StackPanel.Styles>
+                <Style Selector="Rectangle">
+                  <Setter Property="Width" Value="40"/>
+                  <Setter Property="Height" Value="40"/>
+                </Style>
+              </StackPanel.Styles>
+              <Rectangle Fill="Red" />
+              <Rectangle Fill="Blue" />
+              <Rectangle Fill="Green" />
+              <Rectangle Fill="Yellow" />
+            </StackPanel>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;StackPanel Orientation="Horizontal" Spacing="8"&gt;
+  &lt;Rectangle Fill="Red" /&gt;
+  &lt;Rectangle Fill="Blue" /&gt;
+  &lt;Rectangle Fill="Green" /&gt;
+  &lt;Rectangle Fill="Yellow" /&gt;
+&lt;/StackPanel&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <TextBlock FontSize="18">A vertical StackPanel control.</TextBlock>
+        <StackPanel Orientation="Vertical">
+          <Border BorderBrush="{DynamicResource SystemControlHighlightBaseLowBrush}"
+                  BorderThickness="1" Padding="15">
+            <StackPanel HorizontalAlignment="Left" Orientation="Vertical" Spacing="8">
+              <StackPanel.Styles>
+                <Style Selector="Rectangle">
+                  <Setter Property="Width" Value="40"/>
+                  <Setter Property="Height" Value="40"/>
+                </Style>
+              </StackPanel.Styles>
+              <Rectangle Fill="Red" />
+              <Rectangle Fill="Blue" />
+              <Rectangle Fill="Green" />
+              <Rectangle Fill="Yellow" />
+            </StackPanel>
+          </Border>
+          <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Padding="15" Classes="code">
+              <TextBlock.Text>
+                <x:String>
+&lt;StackPanel Orientation="Vertical" Spacing="8"&gt;
+  &lt;Rectangle Fill="Red" /&gt;
+  &lt;Rectangle Fill="Blue" /&gt;
+  &lt;Rectangle Fill="Green" /&gt;
+  &lt;Rectangle Fill="Yellow" /&gt;
+&lt;/StackPanel&gt;
+                </x:String>
+              </TextBlock.Text>
+            </TextBlock>
+          </Panel>
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlHighlightBaseLowBrush}" BorderThickness="1" Margin="15" />
+      </StackPanel>
+
+    </Grid>    
+  </StackPanel>
+</UserControl>

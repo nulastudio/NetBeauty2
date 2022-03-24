@@ -1,0 +1,33 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:pages="clr-namespace:XamlControlsGallery.Pages;assembly=XamlControlsGallery"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="XamlControlsGallery.Pages.MediaPage">
+  <Grid Margin="{StaticResource PageMargin}" Background="Transparent">
+    <pages:OpenGlPageControl x:Name="GL"/>
+    <StackPanel Spacing="10">
+      <TextBlock Text="Embedded OpenGL" />
+      <TextBlock Text="{Binding #GL.Info}"/>
+    </StackPanel>
+    <Grid ColumnDefinitions="*,Auto" Margin="20 100 0 0">
+      <StackPanel Grid.Column="1" MinWidth="300">
+        <TextBlock>Yaw</TextBlock>
+        <Slider Value="{Binding Yaw, Mode=TwoWay, ElementName=GL}" Maximum="10"/>
+        <TextBlock>Pitch</TextBlock>
+        <Slider Value="{Binding Pitch, Mode=TwoWay, ElementName=GL}" Maximum="10"/>
+        <TextBlock>Roll</TextBlock>
+        <Slider Value="{Binding Roll, Mode=TwoWay, ElementName=GL}" Maximum="10"/>
+        <StackPanel Orientation="Horizontal">
+          <TextBlock FontWeight="Bold" Foreground="#C000C0">D</TextBlock>
+          <TextBlock FontWeight="Bold" Foreground="#00C090">I</TextBlock>
+          <TextBlock FontWeight="Bold" Foreground="#90C000">S</TextBlock>
+          <TextBlock FontWeight="Bold" Foreground="#C09000">C</TextBlock>
+          <TextBlock FontWeight="Bold" Foreground="#00C090">O</TextBlock>
+        </StackPanel>
+        <Slider Value="{Binding Disco, Mode=TwoWay, ElementName=GL}" Maximum="1"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

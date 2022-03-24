@@ -1,0 +1,207 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="XamlControlsGallery.Pages.OverviewPage">
+  <StackPanel Margin="{StaticResource PageMargin}" Background="Transparent"
+              Orientation="Horizontal"
+              Spacing="40">
+    <StackPanel.Styles>
+      <Style Selector="TextBlock.header">
+        <Setter Property="Margin" Value="0 30 0 20" />
+      </Style>
+    </StackPanel.Styles>
+    <StackPanel>
+      <TextBlock Classes="header" Margin="0 0 0 20"
+          Text="Buttons" />
+      <Button Content="Enabled button" />
+      <Button
+          Content="Disabled button"
+          IsEnabled="False"
+          Margin="0,15,0,0" />
+      <ToggleButton
+          Content="Toggle button"
+          IsChecked="True"
+          Margin="0,15,0,0" />
+
+      <TextBlock Text="Checkbox" Classes="header" />
+      <CheckBox Content="Unchecked" />
+      <CheckBox
+          Content="Checked"
+          IsChecked="True"
+          Margin="0,8,0,0" />
+      <CheckBox
+          Content="Third state"
+          IsChecked="{x:Null}"
+          IsThreeState="True"
+          Margin="0,8,0,0" />
+      <CheckBox
+          Content="Disabled"
+          IsChecked="True"
+          IsEnabled="False"
+          Margin="0,8,0,20" />
+
+      <TextBlock
+          Text="Radio button"
+          Classes="header" />
+      <RadioButton Content="Unchecked" />
+      <RadioButton
+          Content="Checked"
+          IsChecked="True"
+          Margin="0,8,0,0" />
+      <RadioButton
+          Content="Disabled"
+          GroupName="Disabled"
+          IsChecked="True"
+          IsEnabled="False"
+          Margin="0,8,0,0" />
+    </StackPanel>
+
+    <StackPanel Width="296">
+      <TextBlock
+          Text="Date picker" Classes="header" Margin="0 0 0 20" />
+
+      <DatePicker />
+
+      <TextBlock
+          Text="Time picker"
+          Classes="header" />
+
+      <TimePicker />
+
+      <TextBlock
+          Text="Calendar"
+          Classes="header" />
+      <Calendar />
+    </StackPanel>
+
+    <StackPanel Width="241">
+      <TextBlock
+          Text="Combo box" Margin="0 0 0 20" 
+          Classes="header" />
+      <ComboBox HorizontalAlignment="Stretch">
+        <ComboBoxItem>List item</ComboBoxItem>
+        <ComboBoxItem>List item</ComboBoxItem>
+        <ComboBoxItem>List item</ComboBoxItem>
+        <ComboBoxItem>List item</ComboBoxItem>
+      </ComboBox>
+      <ComboBox
+          HorizontalAlignment="Stretch"
+          IsEnabled="False"
+          Margin="0,17,0,0" />
+
+      <TextBlock
+          Text="List box"
+          Classes="header" />
+      <Grid>
+        <ListBox
+            SelectedIndex="0"
+            Margin="0,6">
+          <ListBoxItem Content="Linux" />
+          <ListBoxItem Content="Mac" />
+          <ListBoxItem Content="Windows" />
+        </ListBox>
+        <Border
+            BorderBrush="{DynamicResource SystemControlForegroundChromeHighBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            IsHitTestVisible="False" />
+      </Grid>
+
+      <Grid
+          Width="148"
+          HorizontalAlignment="Left"
+          Margin="0,31,0,0">
+        <ListBox
+            SelectedIndex="0"
+            Margin="0,6">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+              <Setter Property="Padding" Value="12,5,12,8" />
+            </Style>
+          </ListBox.Styles>
+          <ListBoxItem Content="Linux" />
+          <ListBoxItem Content="Mac" />
+          <ListBoxItem Content="Windows" />
+        </ListBox>
+        <Border
+            BorderBrush="{DynamicResource SystemControlForegroundChromeHighBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            IsHitTestVisible="False" />
+      </Grid>
+    </StackPanel>
+
+    <StackPanel Width="265">
+      <TextBlock
+          Text="Textbox" Margin="0 0 0 20"
+          Classes="header" />
+      <TextBox
+        Watermark="Placeholder text"   />
+      <TextBox
+          Watermark="Placeholder text"
+          IsEnabled="False"
+          Margin="0,17,0,0" />
+      <TextBox
+          Watermark="Placeholder text"
+          PasswordChar="*"
+          Margin="0,17,0,0" />
+
+      <TextBlock
+          Text="Numeric up down"
+          Classes="header" />
+      <NumericUpDown FormatString="C2" Increment="0.25" />
+
+      <TextBlock
+                Text="Toggle switch"
+                Classes="header" />
+      
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="12" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <ToggleSwitch
+            Grid.Row="0"
+            Grid.Column="0" />
+        <ToggleSwitch
+            Grid.Row="2"
+            Grid.Column="0"
+            IsChecked="True" />
+        <ToggleSwitch
+            Grid.Row="0"
+            Grid.Column="1"
+            OffContent="Disabled Off"
+            IsEnabled="False" />
+        <ToggleSwitch
+            Grid.Row="2"
+            Grid.Column="1"
+            OnContent="Disabled On"
+            IsChecked="True"
+            IsEnabled="False" />
+      </Grid>
+
+
+      <TextBlock
+          Text="Slider"
+          Classes="header" />
+      <Slider x:Name="Slider" Margin="0"
+          Value="50"
+          Maximum="100" />
+
+      <TextBlock
+          Text="Progress bar"
+          Classes="header" />
+
+      <ProgressBar Value="{Binding #Slider.Value}" />
+
+      <ProgressBar IsIndeterminate="True" Margin="0 40" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>
