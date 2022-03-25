@@ -181,7 +181,7 @@ func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string) bo
 }
 
 // FixDeps 分析deps.json中的依赖项
-func FixDeps(deps string, entry string) []Deps {
+func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 	var allDeps = make([]Deps, 0)
 	jsonBytes, err := ioutil.ReadFile(deps)
 	if err != nil {
@@ -198,20 +198,22 @@ func FixDeps(deps string, entry string) []Deps {
 	var shouldSkip = func(fileName string, entry string) bool {
 		if fileName == entry+".dll" ||
 			fileName == "nbloader.dll" ||
-			fileName == "PresentationFramework.dll" ||
-			fileName == "WindowsBase.dll" ||
-			fileName == "System.Xaml.dll" ||
-			fileName == "System.Private.CoreLib.dll" ||
-			fileName == "System.Runtime.dll" ||
-			fileName == "System.Runtime.Extensions.dll" ||
-			fileName == "System.Runtime.InteropServices.dll" ||
-			fileName == "System.Runtime.Loader.dll" ||
-			fileName == "System.IO.FileSystem.dll" ||
-			strings.Contains(fileName, "libSystem.Native") ||
+			fileName == "PresentationFramework.dll" || // for GUI
+			fileName == "WindowsBase.dll" || // for GUI
+			fileName == "System.Xaml.dll" || // for GUI
+			fileName == "System.Private.CoreLib.dll" || // for nbloader
+			fileName == "System.Runtime.dll" || // for nbloader
+			fileName == "System.Runtime.Extensions.dll" || // for nbloader
+			fileName == "System.Runtime.InteropServices.dll" || // for nbloader
+			fileName == "System.Runtime.Loader.dll" || // for nbloader
+			fileName == "System.IO.FileSystem.dll" || // for nbloader
+			strings.Contains(fileName, "libSystem.Native") || // for nbloader
+			strings.Contains(fileName, "aspnetcore") || // for ASP.NET Core
+			strings.Contains(fileName, "aspnetcorev2") || // for ASP.NET Core
+			(enableDebug && strings.Contains(fileName, "mscordaccore")) || // for debugging
+			(enableDebug && strings.Contains(fileName, "mscordbi")) || // for debugging
 			strings.Contains(fileName, "clrjit.") ||
 			strings.Contains(fileName, "coreclr.") ||
-			strings.Contains(fileName, "mscordaccore") || // for adebugging
-			strings.Contains(fileName, "mscordbi") || // for adebugging
 			strings.Contains(fileName, "hostfxr.") ||
 			strings.Contains(fileName, "hostpolicy.") {
 			return true

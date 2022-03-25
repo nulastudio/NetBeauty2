@@ -11,6 +11,8 @@
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
     <BeautyExcludes Condition="$(BeautyExcludes) != ''">"$(BeautyExcludes)"</BeautyExcludes>
     <BeautyHiddens Condition="$(BeautyHiddens) != ''">--hiddens "$(BeautyHiddens)"</BeautyHiddens>
+    <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) != 'True'"></BeautyEnableDebugging>
+    <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) == 'True'">--enabledebug</BeautyEnableDebugging>
     <BeautyAfterTasks>Publish;$(BeautyAfterTasks)</BeautyAfterTasks>
     <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
   </PropertyGroup>
@@ -24,6 +26,6 @@
       <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyLogLevel) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyLogLevel) $(BeautyEnableDebugging) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 </Project>

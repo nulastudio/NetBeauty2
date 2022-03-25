@@ -49,13 +49,15 @@ Your `*.csproj` should be similar to this
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
+    <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.2" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.3" />
   </ItemGroup>
 
 </Project>
@@ -65,7 +67,7 @@ When you run `dotnet publish`, everything is done automatically.
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-nbeauty2 [--loglevel=(Error|Detail|Info)] [--hiddens=<hiddenFiles>] <beautyDir> [<libsDir> [<excludes>]]
+nbeauty2 [--enabledebug] [--loglevel=(Error|Detail|Info)] [--hiddens=<hiddenFiles>] <beautyDir> [<libsDir> [<excludes>]]
 ```
 
 for example

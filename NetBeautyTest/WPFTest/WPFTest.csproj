@@ -68,13 +68,15 @@
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
+    <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.2" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.3" />
   </ItemGroup>
 
 </Project>

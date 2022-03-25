@@ -16,6 +16,14 @@ if (Test-Path -Path $archivedir) {
     Remove-Item -Recurse -Force $archivedir
 }
 
+# 清理NetBeauty Nuget缓存
+$cachedir = $(dotnet nuget locals global-packages -l).Replace("global-packages: ", "")
+$cachedir = "${cachedir}/nulastudio.netbeauty"
+
+if (Test-Path -Path $cachedir) {
+    Remove-Item -Recurse -Force $cachedir
+}
+
 # 编译nbeauty
 cd "${rootdir}/NetBeauty"
 if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {

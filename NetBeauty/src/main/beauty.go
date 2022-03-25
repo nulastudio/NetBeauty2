@@ -36,6 +36,7 @@ var beautyDir string
 var libsDir = "libraries"
 var excludes = ""
 var hiddens = ""
+var enableDebug = false
 
 func main() {
 	misc.Umask()
@@ -65,7 +66,7 @@ func main() {
 
 			success := manager.AddStartUpHookToDeps(deps.deps, startupHook)
 
-			allDeps := manager.FixDeps(deps.deps, deps.main)
+			allDeps := manager.FixDeps(deps.deps, deps.main, enableDebug)
 
 			_, _, curSubDirs := moveDeps(allDeps, deps.main)
 
@@ -129,6 +130,7 @@ Error: Log errors only.
 Detail: Log useful infos.
 Info: Log everything.
 `)
+	flag.BoolVar(&enableDebug, "enabledebug", false, `allow 3rd debuggers(like dnSpy) debugs the app`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
 
 	flag.Parse()
