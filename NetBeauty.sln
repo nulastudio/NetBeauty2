@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaTest", "NetBeautyTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppTest", "NetBeautyTest\WebAppTest\WebAppTest.csproj", "{531EFD44-F92D-460E-A336-1E49A112153D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChromelyTest", "NetBeautyTest\ChromelyTest\ChromelyTest.csproj", "{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,14 @@ Global
 		{531EFD44-F92D-460E-A336-1E49A112153D}.Release|x64.Build.0 = Release|Any CPU
 		{531EFD44-F92D-460E-A336-1E49A112153D}.Release|x86.ActiveCfg = Release|Any CPU
 		{531EFD44-F92D-460E-A336-1E49A112153D}.Release|x86.Build.0 = Release|Any CPU
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Debug|x64.ActiveCfg = Debug|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Debug|x64.Build.0 = Debug|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Debug|x86.ActiveCfg = Debug|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Release|Any CPU.ActiveCfg = Release|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Release|x64.ActiveCfg = Release|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Release|x64.Build.0 = Release|x64
+		{462B7F5E-BF98-4CF8-A78C-C6D2426B4C38}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
