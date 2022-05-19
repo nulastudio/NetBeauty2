@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -20,6 +21,15 @@ const (
 	Assembly
 	Native
 )
+
+type analyzedDeps struct {
+	Category   map[string]interface{}
+	ItemKey    string
+	Name       string
+	Path       string
+	SecondPath string
+	Type       DepsType
+}
 
 type Deps struct {
 	Name       string
@@ -51,7 +61,7 @@ func readJSON(path string, errlog bool) *simplejson.Json {
 
 // FindRuntimeConfigJSON 寻找指定目录下的*runtimeconfig*.json
 func FindRuntimeConfigJSON(dir string) []string {
-	files, err := filepath.Glob(path.Join(dir, "*runtimeconfig*.json"))
+	files, err := filepath.Glob(filepath.Join(dir, "*runtimeconfig*.json"))
 	if err != nil {
 		log.LogDetail(formatError("find runtimeconfig.json failed: %s", err))
 	}
@@ -139,7 +149,7 @@ func AddStartUpHookToRuntimeConfig(runtimeConfig string, hook string) bool {
 }
 
 // FixRuntimeConfig 添加libs到runtimeconfig.json
-func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string) bool {
+func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string, srmMapping map[string]string, sharedRuntimeMode bool) bool {
 	jsonBytes, err := ioutil.ReadFile(runtimeConfig)
 	if err != nil {
 		log.LogError(fmt.Errorf("can not read runtimeconfig.json: %s : %s", runtimeConfig, err.Error()), false)
@@ -171,6 +181,41 @@ func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string) bo
 		"NetBeautyLibsDir",
 	}, strings.Join(libsDirs, ";"))
 
+	if sharedRuntimeMode {
+		parts := strings.Split(strings.ReplaceAll(runtimeConfig, "\\", "/"), "/")
+		fileName := parts[len(parts)-1]
+		entry := strings.Split(fileName, ".runtimeconfig.")[0]
+		appID, _ := util.GetStringMD5(entry)
+
+		json.SetPath([]string{
+			"runtimeOptions",
+			"configProperties",
+			"NetBeautyAppID",
+		}, appID)
+
+		srmMappingArr := make([]string, 0)
+		for fileName, md5 := range srmMapping {
+			srmMappingArr = append(srmMappingArr, fileName+":"+md5)
+		}
+		srmMappingStr := strings.Join(srmMappingArr, "|")
+		json.SetPath([]string{
+			"runtimeOptions",
+			"configProperties",
+			"NetBeautySharedRuntimeMode",
+		}, "default")
+		json.SetPath([]string{
+			"runtimeOptions",
+			"configProperties",
+			"NetBeautySharedRuntimeMapping",
+		}, srmMappingStr)
+	} else {
+		json.SetPath([]string{
+			"runtimeOptions",
+			"configProperties",
+			"NetBeautySharedRuntimeMode",
+		}, "no")
+	}
+
 	jsonBytes, _ = json.EncodePretty()
 	if err := ioutil.WriteFile(runtimeConfig, jsonBytes, 0666); err != nil {
 		log.LogError(fmt.Errorf("add NetBeautyLibsDir to runtimeconfig.json failed: %s : %s", runtimeConfig, err.Error()), false)
@@ -182,7 +227,16 @@ func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string) bo
 
 // FixDeps 分析deps.json中的依赖项
 func FixDeps(deps string, entry string, enableDebug bool) []Deps {
+	var useWPF = false
+	var verifyWpfDllSet = false
+
+	var windowsBaseDll = "WindowsBase.dll"
+
+	var allAnalyzedDeps = make([]analyzedDeps, 0)
 	var allDeps = make([]Deps, 0)
+
+	dir := filepath.Dir(deps)
+
 	jsonBytes, err := ioutil.ReadFile(deps)
 	if err != nil {
 		log.LogError(fmt.Errorf("can not read deps.json: %s : %s", deps, err.Error()), false)
@@ -201,12 +255,15 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 			fileName == "PresentationFramework.dll" || // for GUI
 			fileName == "WindowsBase.dll" || // for GUI
 			fileName == "System.Xaml.dll" || // for GUI
+			fileName == "System.Collections.dll" || // for nbloader
+			fileName == "System.Memory.dll" || // for nbloader
 			fileName == "System.Private.CoreLib.dll" || // for nbloader
 			fileName == "System.Runtime.dll" || // for nbloader
 			fileName == "System.Runtime.Extensions.dll" || // for nbloader
 			fileName == "System.Runtime.InteropServices.dll" || // for nbloader
 			fileName == "System.Runtime.Loader.dll" || // for nbloader
 			fileName == "System.IO.FileSystem.dll" || // for nbloader
+			fileName == "System.IO.Packaging.dll" || // for nbloader
 			strings.Contains(fileName, "libSystem.Native") || // for nbloader
 			strings.Contains(fileName, "aspnetcore") || // for ASP.NET Core
 			strings.Contains(fileName, "aspnetcorev2") || // for ASP.NET Core
@@ -217,6 +274,18 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 			strings.Contains(fileName, "hostfxr.") ||
 			strings.Contains(fileName, "hostpolicy.") {
 			return true
+		}
+
+		if verifyWpfDllSet {
+			if fileName == "PresentationCore.dll" ||
+				strings.Contains(fileName, "PresentationNative_") ||
+				strings.Contains(fileName, "wpfgfx_") ||
+				strings.Contains(fileName, "vcruntime") ||
+				strings.Contains(fileName, "D3DCompiler_") ||
+				strings.Contains(fileName, "PenImc_") ||
+				strings.Contains(fileName, "PenImc2_") {
+				return true
+			}
 		}
 
 		return false
@@ -232,66 +301,99 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 			runtime := depsObj.(map[string]interface{})["runtime"]
 			if runtime != nil {
 				for filePath := range runtime.(map[string]interface{}) {
-					filePath = strings.ReplaceAll(filePath, "\\", "/")
-					parts := strings.Split(filePath, "/")
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
 					fileName := parts[len(parts)-1]
 
-					if shouldSkip(fileName, entry) {
-						continue
+					if fileName == windowsBaseDll {
+						useWPF = true
 					}
 
-					allDeps = append(allDeps, Deps{
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   runtime.(map[string]interface{}),
+						ItemKey:    filePath,
 						Name:       fileName,
 						Path:       fileName,
 						SecondPath: fileName,
 						Type:       Assembly,
 					})
-
-					delete(runtime.(map[string]interface{}), filePath)
 				}
 			}
 
 			resources := depsObj.(map[string]interface{})["resources"]
 			if resources != nil {
 				for filePath, locale := range resources.(map[string]interface{}) {
-					filePath = strings.ReplaceAll(filePath, "\\", "/")
-					parts := strings.Split(filePath, "/")
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
 					fileName := parts[len(parts)-1]
 					culture := locale.(map[string]interface{})["locale"].(string)
 
-					allDeps = append(allDeps, Deps{
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   resources.(map[string]interface{}),
+						ItemKey:    filePath,
 						Name:       fileName,
 						Path:       culture + "/" + fileName,
 						SecondPath: culture + "/" + fileName,
 						Type:       Resource,
 					})
-
-					delete(resources.(map[string]interface{}), filePath)
 				}
 			}
 
 			native := depsObj.(map[string]interface{})["native"]
 			if native != nil {
 				for filePath := range native.(map[string]interface{}) {
-					filePath = strings.ReplaceAll(filePath, "\\", "/")
-					parts := strings.Split(filePath, "/")
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
 					fileName := parts[len(parts)-1]
 
-					if shouldSkip(fileName, entry) {
-						continue
-					}
-
-					allDeps = append(allDeps, Deps{
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   native.(map[string]interface{}),
+						ItemKey:    filePath,
 						Name:       fileName,
 						Path:       fileName,
-						SecondPath: filePath,
+						SecondPath: filePath2,
 						Type:       Native,
 					})
-
-					delete(native.(map[string]interface{}), filePath)
 				}
 			}
 		}
+	}
+
+	windowsBaseDllPath := dir + "/" + windowsBaseDll
+
+	if useWPF && util.PathExists(windowsBaseDllPath) {
+		content, err := ioutil.ReadFile(windowsBaseDllPath)
+		if err != nil {
+			log.LogError(fmt.Errorf("read dll failed: %s : %s", windowsBaseDllPath, err.Error()), true)
+		}
+		verifyWpfDllSet = bytes.Index(content, []byte("VerifyWpfDllSet")) != -1
+	}
+
+	if useWPF {
+		log.LogDetail("Use WPF: Yes")
+	} else {
+		log.LogDetail("Use WPF: No")
+	}
+
+	if verifyWpfDllSet {
+		log.LogDetail("VerifyWpfDllSet: Yes")
+	} else {
+		log.LogDetail("VerifyWpfDllSet: No")
+	}
+
+	for _, analyzed := range allAnalyzedDeps {
+		if shouldSkip(analyzed.Name, entry) {
+			continue
+		}
+
+		allDeps = append(allDeps, Deps{
+			Name:       analyzed.Name,
+			Path:       analyzed.Path,
+			SecondPath: analyzed.SecondPath,
+			Type:       analyzed.Type,
+		})
+
+		delete(analyzed.Category, analyzed.ItemKey)
 	}
 
 	jsonBytes, _ = json.EncodePretty()
@@ -300,7 +402,6 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 	}
 
 	// additional satellite assemblies
-	dir := filepath.Dir(deps)
 	if sdir, err := util.ReadAllDir(dir); err == nil {
 		for _, d := range sdir {
 			if files, err := util.ReadAllFile(filepath.Join(dir, d)); err == nil {

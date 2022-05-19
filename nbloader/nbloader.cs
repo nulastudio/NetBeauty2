@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Loader;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -17,10 +18,31 @@ namespace NetBeauty
 {
     internal static class NBLoader
     {
-        private static readonly string CK = "NetBeautyLibsDir";
-
         public static readonly string APP_BASE = AppContext.BaseDirectory ?? "";
-        public static readonly string LIB_DIRECTORIES = AppContext.GetData(CK)?.ToString() ?? "";
+        public static readonly string LIB_DIRECTORIES = AppContext.GetData("NetBeautyLibsDir")?.ToString() ?? "";
+        // modes: ""(equals "no"), "no", "default"
+        public static readonly string SharedRuntimeMode = AppContext.GetData("NetBeautySharedRuntimeMode")?.ToString() ?? "";
+        public static readonly string SharedRuntimeAppID = AppContext.GetData("NetBeautyAppID")?.ToString() ?? "";
+        public static readonly bool IsSharedRuntimeMode = SharedRuntimeMode != "" && SharedRuntimeMode != "no";
+        private static Dictionary<string, string> _srmMapping;
+        public static Dictionary<string, string> srmMapping
+        {
+            get
+            {
+                if (_srmMapping == null) {
+                    _srmMapping = new Dictionary<string, string>();
+                    var mapping = AppContext.GetData("NetBeautySharedRuntimeMapping")?.ToString() ?? "";
+                    foreach (var v in mapping.Split('|'))
+                    {
+                        var map = v.Split(':');
+
+                        _srmMapping[map[0]] = map[1];
+                    }
+                }
+
+                return _srmMapping;
+            }
+        }
 
         public static readonly string[] probes = LIB_DIRECTORIES.Split(';');
 
@@ -34,11 +56,26 @@ namespace NetBeauty
 
                 var culture = assemblyName.CultureName ?? "";
 
-                if (culture != "") {
-                    culture = "/" + culture + "/";
+                var culturePath = culture;
+                if (culturePath != "") {
+                    culturePath = "locales/" + culturePath;
                 }
 
-                var assemblyPath = Path.GetFullPath($"{path}{culture}{assemblyName.Name}.dll");
+                var fileName = $"{assemblyName.Name}.dll";
+                var assemblyPath = "";
+
+                if (IsSharedRuntimeMode) {
+                    var srmKey = fileName;
+                    if (culture != "") {
+                        srmKey = $"{culture}/{srmKey}";
+                    }
+                    var md5 = srmMapping.GetValueOrDefault(srmKey);
+                    if (md5 == null) md5 = "";
+
+                    assemblyPath = Path.GetFullPath($"{path}/{culturePath}/{fileName}/{md5}/{fileName}");
+                } else {
+                    assemblyPath = Path.GetFullPath($"{path}/{culturePath}/{fileName}");
+                }
 
                 if (File.Exists(assemblyPath))
                 {
@@ -57,11 +94,20 @@ namespace NetBeauty
 
                 var path = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
 
-                var assemblyPath = Path.GetFullPath($"{path}/{dllname}");
+                var fileName = dllname;
+                var assemblyPath = "";
 
-                if (File.Exists(assemblyPath) && NativeLibrary.TryLoad(assemblyPath, out var handle))
+                if (IsSharedRuntimeMode) {
+                    assemblyPath = Path.GetFullPath($"{path}/srm_native/{SharedRuntimeAppID}/{fileName}");
+                } else {
+                    assemblyPath = Path.GetFullPath($"{path}/{fileName}");
+                }
+
+                if (File.Exists(assemblyPath))
                 {
-                    return handle;
+                    if (NativeLibrary.TryLoad(assemblyPath, out var handle)) {
+                        return handle;
+                    }
                 }
             }
 

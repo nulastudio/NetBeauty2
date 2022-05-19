@@ -76,7 +76,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.3" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.4" />
   </ItemGroup>
 
 </Project>

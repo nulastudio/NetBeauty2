@@ -12,6 +12,7 @@ __MACOSX
 [Bb]in/
 [Oo]bj/
 [Rr]elease/
+[Pp]ublish/
 tools/
 .nupkg/
 Build/*/

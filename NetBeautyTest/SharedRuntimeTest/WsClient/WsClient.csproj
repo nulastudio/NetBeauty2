@@ -1,14 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <PropertyGroup>
+    <PublishDir>../publish/WsClient</PublishDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BeautySharedRuntimeMode>True</BeautySharedRuntimeMode>
     <!-- beauty into sub-directory, default is libs, quote with "" if contains space  -->
-    <BeautyLibsDir>libraries</BeautyLibsDir>
+    <BeautyLibsDir Condition="$(BeautySharedRuntimeMode) == 'True'">../runtimes</BeautyLibsDir>
+    <BeautyLibsDir Condition="$(BeautySharedRuntimeMode) != 'True'">./libs</BeautyLibsDir>
     <!-- dlls that you don't want to be moved or can not be moved -->
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
     <!-- dlls that end users never needed, so hide them -->
@@ -16,13 +22,14 @@
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
-    <BeautyEnableDebugging>False</BeautyEnableDebugging>
+    <BeautyEnableDebugging>True</BeautyEnableDebugging>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="WatsonWebsocket" Version="2.3.2.5" />
     <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.4" />
   </ItemGroup>
 

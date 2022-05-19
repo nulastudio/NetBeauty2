@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -36,6 +35,7 @@ var beautyDir string
 var libsDir = "libraries"
 var excludes = ""
 var hiddens = ""
+var sharedRuntimeMode = false
 var enableDebug = false
 
 func main() {
@@ -46,6 +46,7 @@ func main() {
 	log.LogInfo("running nbeauty...")
 
 	subDirs := make([]string, 0)
+	srmMapping := make(map[string]string, 0)
 
 	// fix deps.json
 	checkedDependencies := []depsFileDetail{}
@@ -53,7 +54,7 @@ func main() {
 	if len(dependencies) != 0 {
 		for _, deps := range dependencies {
 			deps = strings.ReplaceAll(deps, "\\", "/")
-			mainProgram := strings.Replace(path.Base(deps), ".deps.json", "", -1)
+			mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
 
 			checkedDependencies = append(checkedDependencies, depsFileDetail{
 				deps: deps,
@@ -68,8 +69,16 @@ func main() {
 
 			allDeps := manager.FixDeps(deps.deps, deps.main, enableDebug)
 
-			_, _, curSubDirs := moveDeps(allDeps, deps.main)
+			if sharedRuntimeMode {
+				log.LogDetail("Shared Runtime Mode: Yes")
+				log.LogDetail("moving deps may take some time")
+			} else {
+				log.LogDetail("Shared Runtime Mode: No")
+			}
 
+			_, _, curSubDirs, _srmMapping := moveDeps(allDeps, deps.main, sharedRuntimeMode)
+
+			srmMapping = _srmMapping
 			subDirs = append(subDirs, curSubDirs...)
 
 			if success {
@@ -100,7 +109,7 @@ func main() {
 		for _, runtimeConfig := range runtimeConfigs {
 			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
 
-			success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs)
+			success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode)
 
 			if success {
 				log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
@@ -130,6 +139,7 @@ Error: Log errors only.
 Detail: Log useful infos.
 Info: Log everything.
 `)
+	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `share the runtime between apps`)
 	flag.BoolVar(&enableDebug, "enabledebug", false, `allow 3rd debuggers(like dnSpy) debugs the app`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
 
@@ -222,7 +232,7 @@ func releaseNBLoader(dir string) (string, error) {
 	return loaderPath, err
 }
 
-func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
+func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, int, []string, map[string]string) {
 	var fileMatch = func(file string, sources []string) bool {
 		match := false
 		for _, pattern := range sources {
@@ -252,7 +262,7 @@ func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
 
 	excludeFiles := strings.Split(excludes, ";")
 
-	realCount, moved, subDirs := 0, 0, make([]string, 0)
+	realCount, moved, subDirs, srmMapping := 0, 0, make([]string, 0), make(map[string]string, 0)
 
 	for _, dep := range deps {
 		var absDepsFile = ""
@@ -260,7 +270,7 @@ func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
 		var exist = false
 
 		for _, filePath := range []string{dep.SecondPath, dep.Path} {
-			absDepsFile = path.Join(beautyDir, filePath)
+			absDepsFile = filepath.Join(beautyDir, filePath)
 			if util.PathExists(absDepsFile) {
 				usingPath = filePath
 				exist = true
@@ -284,15 +294,42 @@ func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
 
 		usingPath2 := strings.ReplaceAll(usingPath, "\\", "/")
 		parts := strings.Split(usingPath2, "/")
+		fileName := parts[len(parts)-1]
 		subDir := strings.Join(parts[0:len(parts)-1], "/")
 
-		if subDir != "" && !isContains(subDirs, subDir) {
+		if dep.Type != manager.Resource && subDir != "" && !isContains(subDirs, subDir) {
 			subDirs = append(subDirs, subDir)
 		}
 
-		newAbsDepsFile := path.Join(beautyDir, libsDir, usingPath)
-		oldPath := path.Dir(absDepsFile)
-		newPath := path.Dir(newAbsDepsFile)
+		// native不能使用分层结构（多层依赖会导致加载不了dll）
+		if sharedRuntimeMode {
+			if dep.Type != manager.Native {
+				md5, _ := util.GetFileMD5(absDepsFile)
+				if md5 == "" {
+					md5 = "generic"
+				}
+				parts = append(parts, md5, fileName)
+				srmKey := fileName
+				if dep.Type == manager.Resource {
+					srmKey = parts[0] + "/" + srmKey
+				}
+				srmMapping[srmKey] = md5
+				usingPath = strings.Join(parts, "/")
+			} else {
+				appID, _ := util.GetStringMD5(entry)
+				parts = append([]string{"srm_native", appID}, parts...)
+				usingPath = strings.Join(parts, "/")
+			}
+		}
+
+		if dep.Type == manager.Resource {
+			parts = append([]string{"locales"}, parts...)
+			usingPath = strings.Join(parts, "/")
+		}
+
+		newAbsDepsFile, _ := filepath.Abs(beautyDir + "/" + libsDir + "/" + usingPath)
+		oldPath := filepath.Dir(absDepsFile)
+		newPath := filepath.Dir(newAbsDepsFile)
 
 		if !util.EnsureDirExists(newPath, 0777) {
 			log.LogError(fmt.Errorf("%s is not writeable", newPath), false)
@@ -300,13 +337,13 @@ func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
 
 		if err := os.Rename(absDepsFile, newAbsDepsFile); err == nil {
 			moved++
+		} else {
+			fmt.Println(err.Error())
 		}
 
-		fileName := strings.TrimSuffix(path.Base(usingPath), path.Ext(usingPath))
-
 		for _, extFile := range []string{".pdb", ".xml"} {
-			oldFile := path.Join(oldPath, fileName+extFile)
-			newFile := path.Join(newPath, fileName+extFile)
+			oldFile := filepath.Join(oldPath, fileName+extFile)
+			newFile := filepath.Join(newPath, fileName+extFile)
 			if util.PathExists(oldFile) {
 				os.Rename(oldFile, newFile)
 			}
@@ -327,5 +364,5 @@ func moveDeps(deps []manager.Deps, entry string) (int, int, []string) {
 		}
 	}
 
-	return realCount, moved, subDirs
+	return realCount, moved, subDirs, srmMapping
 }

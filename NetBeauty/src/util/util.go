@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -88,4 +90,37 @@ func GetAllFiles(dir string, recursive bool) []string {
 		}
 	}
 	return files
+}
+
+func GetFileMD5(file string) (string, error) {
+	hash := md5.New()
+
+	handle, error := os.Open(file)
+
+	defer handle.Close()
+
+	if error != nil {
+		return "", error
+	}
+
+	_, error = io.Copy(hash, handle)
+
+	if error != nil {
+		return "", error
+	}
+
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+func GetStringMD5(str string) (string, error) {
+	bytes := []byte(str)
+	hash := md5.New()
+
+	_, error := hash.Write(bytes)
+
+	if error != nil {
+		return "", error
+	}
+
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }

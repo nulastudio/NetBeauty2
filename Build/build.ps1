@@ -24,6 +24,25 @@ if (Test-Path -Path $cachedir) {
     Remove-Item -Recurse -Force $cachedir
 }
 
+# 编译nbloader
+cd "${rootdir}/nbloader"
+
+if (Test-Path -Path "bin/Release") {
+    Remove-Item -Recurse -Force "bin/Release"
+}
+
+dotnet build -c Release /p:OutputPath="bin/Release"
+
+# 复制nbloader
+$nbloader_dll = "${rootdir}/nbloader/bin/Release/nbloader.dll"
+if (Test-Path -Path $nbloader_dll) {
+    Copy-Item -Force $nbloader_dll "${rootdir}/NetBeauty/src/nbloader/nbloader.dll"
+}
+
+# 更新nbloader
+cd "${rootdir}/NetBeauty/src"
+go-bindata -o ./main/bindata.go ./nbloader/
+
 # 编译nbeauty
 cd "${rootdir}/NetBeauty"
 if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {

@@ -9,6 +9,8 @@
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/nbeauty2$(BeautyBinExt)"</BeautyBin>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
+    <BeautySharedRuntimeMode Condition="$(BeautySharedRuntimeMode) != 'True'"></BeautySharedRuntimeMode>
+    <BeautySharedRuntimeMode Condition="$(BeautySharedRuntimeMode) == 'True'">--srmode</BeautySharedRuntimeMode>
     <BeautyExcludes Condition="$(BeautyExcludes) != ''">"$(BeautyExcludes)"</BeautyExcludes>
     <BeautyHiddens Condition="$(BeautyHiddens) != ''">--hiddens "$(BeautyHiddens)"</BeautyHiddens>
     <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) != 'True'"></BeautyEnableDebugging>
@@ -26,6 +28,6 @@
       <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyLogLevel) $(BeautyEnableDebugging) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 </Project>
