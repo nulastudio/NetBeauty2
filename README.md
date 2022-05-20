@@ -86,3 +86,55 @@ ncbeauty2 --hiddens "hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json" /path
 dotnet tool install --global nulastudio.nbeauty
 ```
 then use it just like binary distribution.
+
+### Shared Runtime Structure
+```
+├── runtimes                    - shared runtime dlls folder(customizable name)
+│   ├── locales                 - satellite assemblies folder
+│   │   ├── en
+│   │   │   └── *.resources.dll
+│   │   │       ├── MD5_1       - this allows different runtimes between apps.
+│   │   │       │   └── *.resources.dll
+│   │   │       └── MD5_2
+│   │   │           └── *.resources.dll
+│   │   │
+│   │   ├── zh-Hans
+│   │   │       ├── MD5_1
+│   │   │       │   └── *.resources.dll
+│   │   │       └── MD5_2
+│   │   │           └── *.resources.dll
+│   │   │
+│   │   └── ...                 - others languages
+│   │
+│   ├── *.dll                   - shared dlls
+│   │   ├── MD5_1
+│   │   │   └── *.dll
+│   │   └── MD5_2
+│   │       └── *.dll
+│   │
+│   └── srm_native              - native dlls(can't be shared)
+│       ├── APPID_1
+│       │   └── *.dll
+│       └── APPID_2
+│           └── *.dll
+│
+│
+├── app1                        - the app1 base folder
+│   ├── hostfxr.dll;...         - dlls that can't be moved.
+│   ├── nbloader.dll            - NBLoader
+│   ├── app1.deps.json
+│   ├── app1.dll
+│   ├── app1.exe
+│   ├── app1.runtimeconfig.json
+│   └── ...
+│
+│
+└── app2                        - the app2 base folder
+    ├── hostfxr.dll;...
+    ├── nbloader.dll
+    ├── app2.deps.json
+    ├── app2.dll
+    ├── app2.exe
+    ├── app2.runtimeconfig.json
+    └── ...
+```
