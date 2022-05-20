@@ -250,25 +250,8 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 	}
 
 	var shouldSkip = func(fileName string, entry string) bool {
+		// clr & entry point
 		if fileName == entry+".dll" ||
-			fileName == "nbloader.dll" ||
-			fileName == "PresentationFramework.dll" || // for GUI
-			fileName == "WindowsBase.dll" || // for GUI
-			fileName == "System.Xaml.dll" || // for GUI
-			fileName == "System.Collections.dll" || // for nbloader
-			fileName == "System.Memory.dll" || // for nbloader
-			fileName == "System.Private.CoreLib.dll" || // for nbloader
-			fileName == "System.Runtime.dll" || // for nbloader
-			fileName == "System.Runtime.Extensions.dll" || // for nbloader
-			fileName == "System.Runtime.InteropServices.dll" || // for nbloader
-			fileName == "System.Runtime.Loader.dll" || // for nbloader
-			fileName == "System.IO.FileSystem.dll" || // for nbloader
-			fileName == "System.IO.Packaging.dll" || // for nbloader
-			strings.Contains(fileName, "libSystem.Native") || // for nbloader
-			strings.Contains(fileName, "aspnetcore") || // for ASP.NET Core
-			strings.Contains(fileName, "aspnetcorev2") || // for ASP.NET Core
-			(enableDebug && strings.Contains(fileName, "mscordaccore")) || // for debugging
-			(enableDebug && strings.Contains(fileName, "mscordbi")) || // for debugging
 			strings.Contains(fileName, "clrjit.") ||
 			strings.Contains(fileName, "coreclr.") ||
 			strings.Contains(fileName, "hostfxr.") ||
@@ -276,6 +259,45 @@ func FixDeps(deps string, entry string, enableDebug bool) []Deps {
 			return true
 		}
 
+		// nbloader
+		if fileName == "nbloader.dll" ||
+			fileName == "System.Collections.dll" ||
+			fileName == "System.Memory.dll" ||
+			fileName == "System.Private.CoreLib.dll" ||
+			fileName == "System.Runtime.dll" ||
+			fileName == "System.Runtime.Extensions.dll" ||
+			fileName == "System.Runtime.InteropServices.dll" ||
+			fileName == "System.Runtime.Loader.dll" ||
+			fileName == "System.IO.FileSystem.dll" ||
+			fileName == "System.IO.Packaging.dll" ||
+			strings.Contains(fileName, "libSystem.Native") {
+			return true
+		}
+
+		// debug
+		if enableDebug {
+			if strings.Contains(fileName, "mscordaccore") ||
+				strings.Contains(fileName, "mscordbi") {
+				return true
+			}
+		}
+
+		// ASP.NET Core
+		if strings.Contains(fileName, "aspnetcore") ||
+			strings.Contains(fileName, "aspnetcorev2") {
+			return true
+		}
+
+		// WPF
+		if useWPF {
+			if fileName == "PresentationFramework.dll" ||
+				fileName == "WindowsBase.dll" ||
+				fileName == "System.Xaml.dll" {
+				return true
+			}
+		}
+
+		// additional WPF
 		if verifyWpfDllSet {
 			if fileName == "PresentationCore.dll" ||
 				strings.Contains(fileName, "PresentationNative_") ||
