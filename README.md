@@ -87,7 +87,7 @@ dotnet tool install --global nulastudio.nbeauty
 ```
 then use it just like binary distribution.
 
-### Shared Runtime Structure
+## Shared Runtime Structure
 ```
 ├── runtimes                    - shared runtime dlls folder(customizable name)
 │   ├── locales                 - satellite assemblies folder
