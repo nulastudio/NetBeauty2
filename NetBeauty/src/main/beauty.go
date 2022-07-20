@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -22,8 +24,10 @@ const (
 )
 
 type depsFileDetail struct {
-	deps string
-	main string
+	deps       string
+	main       string
+	fxrVersion string
+	rid        string
 }
 
 var startupHook = "nbloader"
@@ -37,16 +41,32 @@ var excludes = ""
 var hiddens = ""
 var sharedRuntimeMode = false
 var enableDebug = false
+var usePatch = false
+
+var gitcdn string
+var gittree string = ""
 
 func main() {
 	misc.Umask()
 
+	manager.EnsureLocalPath()
+
 	initCLI()
+
+	// 设置CDN
+	manager.GitCDN = gitcdn
+	if gittree != "" {
+		manager.GitTree = gittree
+	}
 
 	log.LogInfo("running nbeauty...")
 
 	subDirs := make([]string, 0)
 	srmMapping := make(map[string]string, 0)
+
+	fxrVersion, rid := "", ""
+
+	useWPF := false
 
 	// fix deps.json
 	checkedDependencies := []depsFileDetail{}
@@ -56,18 +76,59 @@ func main() {
 			deps = strings.ReplaceAll(deps, "\\", "/")
 			mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
 
+			cfxrVersion, crid := manager.FindFXRVersion(deps)
+
+			if fxrVersion == "" || rid == "" {
+				fxrVersion, rid = cfxrVersion, crid
+			} else if cfxrVersion == fxrVersion || crid == rid {
+				log.LogError(fmt.Errorf("Multiple SCD Versions Detected:\n[%s/%s]\n[%s/%s]", fxrVersion, rid, cfxrVersion, crid), true)
+			}
+
 			checkedDependencies = append(checkedDependencies, depsFileDetail{
-				deps: deps,
-				main: mainProgram,
+				deps:       deps,
+				main:       mainProgram,
+				fxrVersion: cfxrVersion,
+				rid:        crid,
 			})
+		}
+
+		// check if pre-build artifact exists
+		if fxrVersion != "" && rid != "" {
+			// 必须检查
+			manager.CheckRunConfigJSON()
+
+			onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
+			if usePatch && onlineVersion == "" {
+				log.LogError(fmt.Errorf("Artifact does not exist. %s/%s\nYou can report the missing artifact in here: https://github.com/nulastudio/NetBeauty2/discussions/36", fxrVersion, rid), true)
+			}
 		}
 
 		for _, deps := range checkedDependencies {
 			log.LogDetail(fmt.Sprintf("fixing %s", deps.deps))
 
+			SCDMode := deps.fxrVersion != "" && deps.rid != ""
+
+			if SCDMode {
+				log.LogDetail("SCD Mode: Yes")
+				log.LogDetail(fmt.Sprintf("SCD Version: %s, %s", deps.fxrVersion, deps.rid))
+
+				if usePatch {
+					log.LogDetail("Use Patch: Yes")
+				} else {
+					log.LogDetail("Use Patch: No")
+				}
+			} else {
+				log.LogDetail("SCD Mode: No")
+				log.LogDetail("Use Patch: No")
+			}
+
 			success := manager.AddStartUpHookToDeps(deps.deps, startupHook)
 
-			allDeps := manager.FixDeps(deps.deps, deps.main, enableDebug)
+			usePatch = SCDMode && usePatch
+
+			allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, enableDebug, usePatch, sharedRuntimeMode)
+
+			useWPF = _useWPF
 
 			if sharedRuntimeMode {
 				log.LogDetail("Shared Runtime Mode: Yes")
@@ -84,6 +145,11 @@ func main() {
 			if success {
 				log.LogDetail(fmt.Sprintf("%s fixed", deps.deps))
 			}
+		}
+
+		// patch
+		if usePatch && fxrVersion != "" && rid != "" {
+			patch(fxrVersion, rid)
 		}
 	} else {
 		log.LogDetail(fmt.Sprintf("no deps.json found in %s", beautyDir))
@@ -109,7 +175,7 @@ func main() {
 		for _, runtimeConfig := range runtimeConfigs {
 			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
 
-			success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode)
+			success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF)
 
 			if success {
 				log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
@@ -122,8 +188,12 @@ func main() {
 	}
 
 	// release nbloader
+	var loaderDir = beautyDir
+	if usePatch {
+		loaderDir = filepath.Join(beautyDir, libsDir)
+	}
 	log.LogDetail("releasing nbloader.dll")
-	if releasePath, err := releaseNBLoader(beautyDir); err != nil {
+	if releasePath, err := releaseNBLoader(loaderDir); err != nil {
 		log.LogError(fmt.Errorf("release nbloader.dll failed: %s : %s", releasePath, err.Error()), true)
 	}
 
@@ -134,6 +204,13 @@ func initCLI() {
 	flag.CommandLine = flag.NewFlagSet("nbeauty", flag.ContinueOnError)
 	flag.CommandLine.Usage = usage
 	flag.CommandLine.SetOutput(os.Stdout)
+	flag.StringVar(&gitcdn, "gitcdn", "", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
+RECOMMEND https://gitee.com/liesauer/HostFXRPatcher for mainland china users.
+`)
+	flag.StringVar(&gittree, "gittree", "", `specify to a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
+default is master, means that you always use the latest artifacts.
+NOTE: please provide as longer commit hash as you can, otherwise it may can not be determined as a valid unique commit hash.
+`)
 	flag.StringVar(&loglevel, "loglevel", "Error", `log level. valid values: Error/Detail/Info
 Error: Log errors only.
 Detail: Log useful infos.
@@ -141,6 +218,7 @@ Info: Log everything.
 `)
 	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `share the runtime between apps`)
 	flag.BoolVar(&enableDebug, "enabledebug", false, `allow 3rd debuggers(like dnSpy) debugs the app`)
+	flag.BoolVar(&usePatch, "usepatch", false, `use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
 
 	flag.Parse()
@@ -175,7 +253,43 @@ Info: Log everything.
 	manager.Logger.LogLevel = log.DefaultLogger.LogLevel
 
 	switch args[0] {
+	case "setcdn":
+		checkArgumentsCount(2, argv)
+		if manager.SetCDN(strings.Trim(args[1], `"`)) {
+			fmt.Println("set default git cdn successfully")
+		} else {
+			fmt.Println("set default git cdn failed")
+		}
+		exit()
+	case "getcdn":
+		checkArgumentsCount(1, argv)
+		cdn := manager.GetCDN()
+		if cdn == "" {
+			fmt.Println("default git cdn has not been set yet")
+		} else {
+			fmt.Printf("current default git cdn: %s\n", cdn)
+		}
+		exit()
+	case "delcdn":
+		checkArgumentsCount(1, argv)
+		cdn := manager.GetCDN()
+		if cdn == "" {
+			fmt.Println("default git cdn has not been set yet")
+		} else {
+			manager.DelCDN()
+			fmt.Printf("current default git cdn has been deleted, it was: [%s] before\n", cdn)
+		}
+		exit()
 	default:
+		if gitcdn == "" {
+			cdn := manager.GetCDN()
+			if cdn == "" {
+				gitcdn = "https://github.com/nulastudio/HostFXRPatcher"
+			} else {
+				gitcdn = cdn
+			}
+		}
+
 		beautyDir = args[0]
 
 		if len(args) >= 2 {
@@ -206,6 +320,10 @@ func checkArgumentsCount(excepted int, got int) bool {
 	return false
 }
 
+func exit() {
+	os.Exit(0)
+}
+
 func usage() {
 	fmt.Println("Usage:")
 	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--hiddens=hiddenFiles] <beautyDir> [<libsDir> [<excludes>]]")
@@ -215,6 +333,47 @@ func usage() {
 	fmt.Println("")
 	fmt.Println("Options")
 	flag.PrintDefaults()
+}
+
+func patch(fxrVersion string, rid string) bool {
+	log.LogDetail("patching hostfxr...")
+
+	crid := manager.FindCompatibleRID(rid)
+	fxrName := manager.GetHostFXRNameByRID(rid)
+	if crid == "" {
+		log.LogPanic(fmt.Errorf("cannot find a compatible rid for %s", rid), 1)
+	}
+
+	log.LogDetail(fmt.Sprintf("using compatible rid %s for %s", crid, rid))
+	rid = crid
+
+	localVersion := manager.GetLocalArtifactsVersion(fxrVersion, rid)
+	onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
+	if localVersion != onlineVersion {
+		log.LogDetail(fmt.Sprintf("downloading patched hostfxr: %s/%s", fxrVersion, rid))
+
+		if !manager.DownloadArtifact(fxrVersion, rid) || !manager.WriteLocalArtifactsVersion(fxrVersion, rid, onlineVersion) {
+			log.LogPanic(errors.New("download patch failed"), 1)
+		}
+	}
+
+	absFxrName := path.Join(beautyDir, fxrName)
+	absFxrBakName := absFxrName + ".bak"
+	log.LogInfo(fmt.Sprintf("backuping fxr to %s", absFxrBakName))
+
+	if _, err := util.CopyFile(absFxrName, absFxrBakName); err != nil {
+		log.LogError(fmt.Errorf("backup failed: %s", err.Error()), false)
+		return false
+	}
+
+	success := manager.CopyArtifactTo(fxrVersion, rid, beautyDir)
+	if success {
+		log.LogInfo("patch succeeded")
+	} else {
+		fmt.Println("patch failed")
+	}
+
+	return success
 }
 
 func releaseNBLoader(dir string) (string, error) {
@@ -288,6 +447,22 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 
 		if fileMatch(dep.Name, excludeFiles) {
 			continue
+		}
+
+		/**
+		 * !usePatch + !enableDebug = !move +  delete
+		 * !usePatch +  enableDebug = !move + !delete
+		 *  usePatch + !enableDebug = !move +  delete
+		 *  usePatch +  enableDebug =  move + !delete
+		 */
+		if strings.Contains(dep.Name, "mscordaccore") ||
+			strings.Contains(dep.Name, "mscordbi") {
+			if !enableDebug {
+				os.Remove(absDepsFile)
+				continue
+			} else if !usePatch {
+				continue
+			}
 		}
 
 		realCount++

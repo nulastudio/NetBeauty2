@@ -92,7 +92,7 @@ func nbloaderNbloaderDll() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "nbloader/nbloader.dll", size: 6144, mode: os.FileMode(438), modTime: time.Unix(1652960154, 0)}
+	info := bindataFileInfo{name: "nbloader/nbloader.dll", size: 6144, mode: os.FileMode(438), modTime: time.Unix(1655972552, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

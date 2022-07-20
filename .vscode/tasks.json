@@ -5,6 +5,15 @@
     "tasks": [
         {
             "type": "shell",
+            "label": "Pre Test",
+            "command": "pwsh",
+            "args": [
+                "${workspaceFolder}/NetBeauty/pretest.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
             "label": "pack",
             "command": "pwsh",
             "args": [

@@ -22,3 +22,10 @@ Build/*/
 
 # packages
 vendor/
+
+test/
+test_data/
+test_data_debug/
+test_data_release/
+
+msbuild.binlog
