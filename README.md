@@ -27,11 +27,11 @@ see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-p
 | Shared Runtime | Yes | Possible If Using `patched libhostfxr` Alone |
 
 ## How to use?
-### Add Nuget reference into your .NET Core project.
+### Add Nuget reference to your .NET Core project.
 ```
 dotnet add package nulastudio.NetBeauty
 ```
-Your `*.csproj` should be similar to this
+Your `*.csproj` should be like:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -70,7 +70,7 @@ Your `*.csproj` should be similar to this
 
 </Project>
 ```
-When you run `dotnet publish`, everything is done automatically.
+When you run `dotnet publish`, everything will be done automatically.
 
 ### Use the binary application if your project has already been published.
 ```
@@ -84,16 +84,16 @@ ncbeauty2 --usepatch --loglevel Detail --hiddens "hostfxr;hostpolicy;*.deps.json
 ```
 
 
-**`--hiddens` option just hiding the files, not moving them, and only works under Windows!**
+**`--hiddens` option just hiding the files, not move them, and only works under Windows!**
 
 
 ### Install as a .NETCore Global Tool
 ```
 dotnet tool install --global nulastudio.nbeauty
 ```
-then use it just like binary distribution.
+then use it just like normal binary distribution.
 
-### Shared Runtime Structure
+## Shared Runtime Structure
 ```
 ├── runtimes                    - shared runtime dlls folder(customizable name)
 │   ├── locales                 - satellite assemblies folder
