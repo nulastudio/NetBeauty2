@@ -72,7 +72,8 @@
     <DisableBeauty>False</DisableBeauty>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
-    <!-- set to True if you want to disable -->
+    <!-- the patch can reduce the file count -->
+    <!-- set to False if you want to disable -->
     <!-- SCD Mode Feature Only -->
     <BeautyUsePatch>True</BeautyUsePatch>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->

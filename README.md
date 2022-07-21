@@ -26,6 +26,14 @@ see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-p
 | How It Works | [`STARTUP_HOOKS`](https://github.com/dotnet/runtime/blob/main/docs/design/features/host-startup-hook.md)<br/>[`AssemblyLoadContext.Resolving`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolving?view=netcore-3.0)<br/>[`AssemblyLoadContext.ResolvingUnmanagedDll`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolvingunmanageddll?view=netcore-3.0)<br />+<br />[`patched libhostfxr`](https://github.com/nulastudio/HostFXRPatcher)(if use patch)<br/>[`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson)(if use patch) | [`patched libhostfxr`](https://github.com/nulastudio/HostFXRPatcher)<br/>[`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson) |
 | Shared Runtime | Yes | Possible If Using `patched libhostfxr` Alone |
 
+## The patch is back!
+One of the main goals of NetBeauty2 is trying to use a customize loader to replace the patch, but in fact, the loader need to use lots of Types and APIs like `Dictionary<TKey, TValue>` `List<T>` `Path.GetFullPath` `File.Exists` `NativeLibrary` `RuntimeInformation` etc. this causes lots of assembly references and the worst thing is that those files can not be moved, otherwise CoreCLR will failed to initialize and invoke the loader. More complex logic, more files. So i have to make it back.
+
+Now they work excellently together!
+
+the loader lets us support `FDD`/`FDE` apps.<br />
+the patch reduces the file count as possible(`SCD` app only).
+
 ## How to use?
 ### Add Nuget reference to your .NET Core project.
 ```
@@ -53,7 +61,8 @@ Your `*.csproj` should be like:
     <DisableBeauty>False</DisableBeauty>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
-    <!-- set to True if you want to disable -->
+    <!-- the patch can reduce the file count -->
+    <!-- set to False if you want to disable -->
     <!-- SCD Mode Feature Only -->
     <BeautyUsePatch>True</BeautyUsePatch>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
@@ -95,16 +104,17 @@ then use it just like normal binary distribution.
 
 ## Shared Runtime Structure
 ```
-├── runtimes                    - shared runtime dlls folder(customizable name)
-│   ├── locales                 - satellite assemblies folder
+├── libraries                   - shared runtime dlls(customizable name)
+│   ├── locales                 - satellite assemblies
 │   │   ├── en
 │   │   │   └── *.resources.dll
-│   │   │       ├── MD5_1       - this allows different runtimes between apps.
+│   │   │       ├── MD5_1       - allows multiple runtimes between apps.
 │   │   │       │   └── *.resources.dll
 │   │   │       └── MD5_2
 │   │   │           └── *.resources.dll
 │   │   │
 │   │   ├── zh-Hans
+│   │   │   └── *.resources.dll
 │   │   │       ├── MD5_1
 │   │   │       │   └── *.resources.dll
 │   │   │       └── MD5_2
@@ -112,22 +122,22 @@ then use it just like normal binary distribution.
 │   │   │
 │   │   └── ...                 - others languages
 │   │
-│   ├── *.dll                   - shared dlls
+│   ├── *.dll                   - shared managed assemblies
 │   │   ├── MD5_1
 │   │   │   └── *.dll
 │   │   └── MD5_2
 │   │       └── *.dll
 │   │
-│   └── srm_native              - native dlls(can't be shared)
-│       ├── APPID_1
+│   └── srm_native              - native dlls(can't be shared, each app has a full
+│       ├── APPID_1               copy of their own native dlls)
 │       │   └── *.dll
 │       └── APPID_2
 │           └── *.dll
 │
 │
-├── app1                        - the app1 base folder
+├── app1                        - the app1 main/base folder
 │   ├── hostfxr.dll;...         - dlls that can't be moved.
-│   ├── nbloader.dll            - NBLoader
+│   ├── nbloader.dll            - NBLoader(will be moved if use patch)
 │   ├── app1.deps.json
 │   ├── app1.dll
 │   ├── app1.exe
@@ -135,7 +145,7 @@ then use it just like normal binary distribution.
 │   └── ...
 │
 │
-└── app2                        - the app2 base folder
+└── app2                        - the app2 main/base folder
     ├── hostfxr.dll;...
     ├── nbloader.dll
     ├── app2.deps.json
