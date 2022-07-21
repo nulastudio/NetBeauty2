@@ -94,24 +94,67 @@ namespace NetBeauty
 
                 var path = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
 
-                var fileName = dllname;
-                var assemblyPath = "";
-
-                if (IsSharedRuntimeMode) {
-                    assemblyPath = Path.GetFullPath($"{path}/srm_native/{SharedRuntimeAppID}/{fileName}");
-                } else {
-                    assemblyPath = Path.GetFullPath($"{path}/{fileName}");
-                }
-
-                if (File.Exists(assemblyPath))
+                foreach (var libname in DLLNameVariations(dllname))
                 {
-                    if (NativeLibrary.TryLoad(assemblyPath, out var handle)) {
-                        return handle;
+                    var assemblyPath = "";
+
+                    if (IsSharedRuntimeMode) {
+                        assemblyPath = Path.GetFullPath($"{path}/srm_native/{SharedRuntimeAppID}/{libname}");
+                    } else {
+                        assemblyPath = Path.GetFullPath($"{path}/{libname}");
+                    }
+
+                    if (File.Exists(assemblyPath))
+                    {
+                        if (NativeLibrary.TryLoad(assemblyPath, out var handle)) {
+                            return handle;
+                        }
                     }
                 }
             }
 
             return IntPtr.Zero;
+        }
+
+        // 参考：https://docs.microsoft.com/zh-cn/dotnet/standard/native-interop/cross-platform#library-name-variations
+        public static string[] DLLNameVariations(string dllname)
+        {
+            var names = new List<string>();
+
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var isOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+            if (isWindows)
+            {
+                names.Add(dllname);
+
+                if (!dllname.EndsWith(".dll") && !dllname.EndsWith(".exe")) {
+                    names.Add(dllname + ".dll");
+                    names.Add(dllname + ".exe");
+                }
+            }
+            else if (isOSX)
+            {
+                names.Add(dllname);
+                names.Add("lib" + dllname);
+
+                if (!dllname.EndsWith(".dylib")) {
+                    names.Add(dllname + ".dylib");
+                    names.Add("lib" + dllname + ".dylib");
+                }
+            }
+            else
+            {
+                names.Add(dllname);
+                names.Add("lib" + dllname);
+
+                if (!dllname.EndsWith(".so")) {
+                    names.Add(dllname + ".so");
+                    names.Add("lib" + dllname + ".so");
+                }
+            }
+
+            return names.ToArray();
         }
     }
 }

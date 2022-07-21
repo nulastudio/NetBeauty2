@@ -288,6 +288,7 @@ func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string, sr
 						fileName == "System.Runtime.dll" ||
 						fileName == "System.Runtime.Extensions.dll" ||
 						fileName == "System.Runtime.InteropServices.dll" ||
+						fileName == "System.Runtime.InteropServices.RuntimeInformation.dll" ||
 						fileName == "System.Runtime.Loader.dll" ||
 						fileName == "System.IO.FileSystem.dll" ||
 						fileName == "System.IO.Packaging.dll" {
@@ -460,6 +461,7 @@ func FixDeps(deps string, entry string, enableDebug bool, usePatch bool, sharedR
 				fileName == "System.Runtime.dll" ||
 				fileName == "System.Runtime.Extensions.dll" ||
 				fileName == "System.Runtime.InteropServices.dll" ||
+				fileName == "System.Runtime.InteropServices.RuntimeInformation.dll" ||
 				fileName == "System.Runtime.Loader.dll" ||
 				fileName == "System.IO.FileSystem.dll" ||
 				fileName == "System.IO.Packaging.dll" ||
@@ -649,6 +651,7 @@ func FixDeps(deps string, entry string, enableDebug bool, usePatch bool, sharedR
 					analyzed.Name == "System.Runtime.dll" ||
 					analyzed.Name == "System.Runtime.Extensions.dll" ||
 					analyzed.Name == "System.Runtime.InteropServices.dll" ||
+					analyzed.Name == "System.Runtime.InteropServices.RuntimeInformation.dll" ||
 					analyzed.Name == "System.Runtime.Loader.dll" ||
 					analyzed.Name == "System.IO.FileSystem.dll" ||
 					analyzed.Name == "System.IO.Packaging.dll" {
