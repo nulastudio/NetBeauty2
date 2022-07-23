@@ -197,6 +197,9 @@ func main() {
 		log.LogError(fmt.Errorf("release nbloader.dll failed: %s : %s", releasePath, err.Error()), true)
 	}
 
+	// hide files
+	hideFiles()
+
 	log.LogDetail("nbeauty done. Enjoy it!")
 }
 
@@ -391,24 +394,24 @@ func releaseNBLoader(dir string) (string, error) {
 	return loaderPath, err
 }
 
-func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, int, []string, map[string]string) {
-	var fileMatch = func(file string, sources []string) bool {
-		match := false
-		for _, pattern := range sources {
-			if pattern == "" {
-				continue
-			}
-			if regex, err := regexp.Compile(strings.ReplaceAll(pattern, "*", ".*")); err == nil {
-				match = regex.MatchString(file)
-				if match {
-					break
-				}
+func fileMatch(file string, sources []string) bool {
+	match := false
+	for _, pattern := range sources {
+		if pattern == "" {
+			continue
+		}
+		if regex, err := regexp.Compile(strings.ReplaceAll(pattern, "*", ".*")); err == nil {
+			match = regex.MatchString(file)
+			if match {
+				break
 			}
 		}
-
-		return match
 	}
 
+	return match
+}
+
+func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, int, []string, map[string]string) {
 	var isContains = func(arr []string, v string) bool {
 		for _, c := range arr {
 			if c == v {
@@ -531,13 +534,17 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 		}
 	}
 
+	return realCount, moved, subDirs, srmMapping
+}
+
+func hideFiles() {
 	hiddensFiles := strings.Split(hiddens, ";")
 	rootFiles := util.GetAllFiles(beautyDir, false)
 	for _, rootFile := range rootFiles {
 		if fileMatch(rootFile, hiddensFiles) {
-			misc.Hide(rootFile)
+			if err := misc.Hide(rootFile); err != nil {
+				log.LogError(fmt.Errorf("hide file failed: %s : %s", rootFile, err.Error()), false)
+			}
 		}
 	}
-
-	return realCount, moved, subDirs, srmMapping
 }
