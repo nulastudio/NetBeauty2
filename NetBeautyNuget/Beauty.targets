@@ -17,21 +17,84 @@
     <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) == 'True'">--enabledebug</BeautyEnableDebugging>
     <BeautyUsePatch Condition="$(BeautyUsePatch) != 'True'"></BeautyUsePatch>
     <BeautyUsePatch Condition="$(BeautyUsePatch) == 'True'">--usepatch</BeautyUsePatch>
-    <_BeautyDependsOn Condition="'$(_IsAspNetCoreProject)' == 'true'">AfterPublish;</_BeautyDependsOn>
-    <_BeautyDependsOn Condition="'$(_IsAspNetCoreProject)' != 'true'">Publish;</_BeautyDependsOn>
-    <BeautyAfterTasks>$(_BeautyDependsOn)$(BeautyAfterTasks)</BeautyAfterTasks>
+    <_BeautyDependsOnForBuild>AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild>
+    <_BeautyDependsOnForPublish Condition="'$(_IsAspNetCoreProject)' == 'true'">AfterPublish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish>
+    <_BeautyDependsOnForPublish Condition="'$(_IsAspNetCoreProject)' != 'true'">Publish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish>
     <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
     <BeautyGitCDN Condition="$(BeautyGitCDN) != ''">--gitcdn $(BeautyGitCDN)</BeautyGitCDN>
     <BeautyGitTree Condition="$(BeautyGitTree) != ''">--gittree $(BeautyGitTree)</BeautyGitTree>
   </PropertyGroup>
 
-  <Target Name="NetBeauty" AfterTargets="$(BeautyAfterTasks)" Condition="$(DisableBeauty) != 'True'">
+  <!-- https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-roslyncodetaskfactory?view=vs-2019#provide-backward-compatibility -->
+  <Choose>
+    <When Condition="'$(MSBuildVersion.Substring(0, 2))' >= 16 Or
+    ('$(MSBuildVersion.Substring(0, 2))' == 15 And '$(MSBuildVersion.Substring(3, 1))' >= 8)">
+      <PropertyGroup>
+        <TaskFactory>RoslynCodeTaskFactory</TaskFactory>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TaskFactory>CodeTaskFactory</TaskFactory>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <UsingTask
+    TaskName="_BeautyDetermineIsPublishing"
+    TaskFactory="$(TaskFactory)"
+    AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <!-- <Args ParameterType="System.String" Output="true" /> -->
+      <IsPublishing ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+<![CDATA[
+var CommandLineArgs = Environment.GetCommandLineArgs();
+if (CommandLineArgs.Length < 2) {
+  IsPublishing = false;
+} else {
+  IsPublishing = CommandLineArgs[1] == "publish";
+}
+// Args = string.Join(" ", CommandLineArgs);
+]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="_ShouldBeautyOnBuild" BeforeTargets="PrepareForBuild">
+    <_BeautyDetermineIsPublishing>
+      <Output TaskParameter="IsPublishing" PropertyName="_BeautyIsPublishing" />
+      <!-- <Output TaskParameter="Args" PropertyName="_BeautyArgs" /> -->
+    </_BeautyDetermineIsPublishing>
+
+    <!-- <Message Text="$(_BeautyArgs)" Importance="High" /> -->
+
+    <PropertyGroup Condition="'$(_BeautyIsPublishing)' == 'True'">
+      <_BeautyOnBuild>False</_BeautyOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(_BeautyIsPublishing)' == 'False' And '$(BeautyOnPublishOnly)' == 'False'">
+      <_BeautyOnBuild>True</_BeautyOnBuild>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
+    <PropertyGroup>
+      <BeautyDir>"$(TargetDir)/."</BeautyDir>
+    </PropertyGroup>
+
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+  </Target>
+
+  <Target Name="NetBeautyOnPublish" AfterTargets="$(_BeautyDependsOnForPublish)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
     <ItemGroup>
-      <PublishDir Include="$(PublishDir)" />
+      <_BeautyPublishDir Include="$(PublishDir)" />
     </ItemGroup>
 
     <PropertyGroup>
-      <BeautyDir>"%(PublishDir.FullPath)/."</BeautyDir>
+      <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
     <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />

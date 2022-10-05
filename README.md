@@ -59,6 +59,8 @@ Your `*.csproj` should be like:
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to False if you want to beauty on build -->
+    <BeautyOnPublishOnly>True</BeautyOnPublishOnly>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -74,7 +76,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.6" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.7" />
   </ItemGroup>
 
 </Project>

@@ -70,6 +70,8 @@
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
+    <!-- set to False if you want to beauty on build -->
+    <BeautyOnPublishOnly>True</BeautyOnPublishOnly>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -80,12 +82,14 @@
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
     <!-- set to a repo mirror if you have troble in connecting github -->
-    <!-- <BeautyGitCDN>https://gitee.com/liesauer/HostFXRPatcher</BeautyGitCDN> -->
+    <BeautyGitCDN>https://gitee.com/liesauer/HostFXRPatcher</BeautyGitCDN>
     <!-- <BeautyGitTree>master</BeautyGitTree> -->
+    <!-- <BeautyAfterTasks>AfterBuild;</BeautyAfterTasks> -->
+    <!-- <BeautyDir>$(OutDir)</BeautyDir> -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.6" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.7" />
   </ItemGroup>
 
 </Project>
