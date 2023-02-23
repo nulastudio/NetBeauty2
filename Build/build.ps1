@@ -11,6 +11,7 @@ if (Test-Path -Path $tooldir) {
 }
 if (Test-Path -Path $nupkgdir) {
     Remove-Item -Recurse -Force $nupkgdir
+    mkdir $nupkgdir
 }
 if (Test-Path -Path $archivedir) {
     Remove-Item -Recurse -Force $archivedir
@@ -33,9 +34,13 @@ if (Test-Path -Path "bin/Release") {
 
 dotnet build -c Release /p:OutputPath="bin/Release"
 
-# 复制nbloader
 $nbloader_dll = "${rootdir}/nbloader/bin/Release/nbloader.dll"
+
 if (Test-Path -Path $nbloader_dll) {
+    # 签名nbloader
+    pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" $nbloader_dll
+
+    # 复制nbloader
     Copy-Item -Force $nbloader_dll "${rootdir}/NetBeauty/src/nbloader/nbloader.dll"
 }
 
@@ -50,6 +55,9 @@ if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Ru
 } else {
     make
 }
+
+# 签名nbeauty
+pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" "${tooldir}/win-x86/nbeauty2.exe" "${tooldir}/win-x64/nbeauty2.exe"
 
 # 编译NetBeautyNuget
 cd "${rootdir}/NetBeautyNuget"

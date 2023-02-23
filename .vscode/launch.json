@@ -12,10 +12,11 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "--loglevel=Info",
-                "--usepatch",
+                // "--usepatch",
                 "--enabledebug",
-                "--srmode",
+                // "--srmode",
                 "--gitcdn=https://gitee.com/liesauer/HostFXRPatcher",
+                "--hiddens=\"*.runtimeconfig.json\"",
                 "./NetBeauty/test/",
                 "./libraries",
             ],
@@ -25,7 +26,8 @@
                 "maxStringLen": 1024,
                 "maxArrayValues": 1000,
                 "maxStructFields": -1
-            }
+            },
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }

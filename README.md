@@ -18,7 +18,7 @@ see [`--hiddens`](#use-the-binary-application-if-your-project-has-already-been-p
 ## What's New?
 |  | [NetBeauty 2](https://github.com/nulastudio/NetBeauty2) | [NetCoreBeauty](https://github.com/nulastudio/NetBeauty2/tree/v1) |
 | ---- | ---- | ---- |
-| Supported Framework | `.Net Framework`(not completed yet)<br/>`.Net Core 3.0+` | `.Net Core 2.0+` |
+| Supported Framework | `.Net Framework`<br/>`.Net Core 3.0+` | `.Net Core 2.0+` |
 | Supported Deployment Model | Framework-dependent deployment (`FDD`)<br/>Self-contained deployment (`SCD`)<br/>Framework-dependent executables (`FDE`) | Self-contained deployment (`SCD`) |
 | Supported System | All | `win-x64` `win-x86`<br/>`linux-x64` `linux-arm` `linux-arm64`<br/>`osx-x64` |
 | Need Patched HostFXR | No<br />Yes(if use patch) | Yes |
@@ -60,7 +60,7 @@ Your `*.csproj` should be like:
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- set to False if you want to beauty on build -->
-    <BeautyOnPublishOnly>True</BeautyOnPublishOnly>
+    <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -76,12 +76,12 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.7" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.0.0" />
   </ItemGroup>
 
 </Project>
 ```
-When you run `dotnet publish`, everything will be done automatically.
+When you run `dotnet build` or `dotnet publish`, everything will be done automatically.
 
 ### Use the binary application if your project has already been published.
 ```

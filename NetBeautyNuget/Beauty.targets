@@ -17,9 +17,10 @@
     <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) == 'True'">--enabledebug</BeautyEnableDebugging>
     <BeautyUsePatch Condition="$(BeautyUsePatch) != 'True'"></BeautyUsePatch>
     <BeautyUsePatch Condition="$(BeautyUsePatch) == 'True'">--usepatch</BeautyUsePatch>
-    <_BeautyDependsOnForBuild>AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild>
-    <_BeautyDependsOnForPublish Condition="'$(_IsAspNetCoreProject)' == 'true'">AfterPublish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish>
-    <_BeautyDependsOnForPublish Condition="'$(_IsAspNetCoreProject)' != 'true'">Publish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish>
+    <_BeautyDependsOnForBuild_NetFx Condition="'$(MSBuildRuntimeType)' == 'Full'">AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild_NetFx>
+    <_BeautyDependsOnForBuild_Core Condition="'$(MSBuildRuntimeType)' == 'Core'">AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild_Core>
+    <_BeautyDependsOnForPublish_Core Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(_IsAspNetCoreProject)' == 'true'">AfterPublish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish_Core>
+    <_BeautyDependsOnForPublish_Core Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(_IsAspNetCoreProject)' != 'true'">Publish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish_Core>
     <BeautyLogLevel Condition="$(BeautyLogLevel) != ''">--loglevel $(BeautyLogLevel)</BeautyLogLevel>
     <BeautyGitCDN Condition="$(BeautyGitCDN) != ''">--gitcdn $(BeautyGitCDN)</BeautyGitCDN>
     <BeautyGitTree Condition="$(BeautyGitTree) != ''">--gittree $(BeautyGitTree)</BeautyGitTree>
@@ -80,7 +81,19 @@ if (CommandLineArgs.Length < 2) {
     </PropertyGroup>
   </Target>
 
-  <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
+  <Target Name="NetBeautyOnBuild_Fx" AfterTargets="$(_BeautyDependsOnForBuild_NetFx)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
+    <ItemGroup>
+      <_BeautyPublishDir Include="$(TargetDir)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
+    </PropertyGroup>
+
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+  </Target>
+
+  <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
     <PropertyGroup>
       <BeautyDir>"$(TargetDir)/."</BeautyDir>
     </PropertyGroup>
@@ -88,7 +101,7 @@ if (CommandLineArgs.Length < 2) {
     <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 
-  <Target Name="NetBeautyOnPublish" AfterTargets="$(_BeautyDependsOnForPublish)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
+  <Target Name="NetBeautyOnPublish" AfterTargets="$(_BeautyDependsOnForPublish_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
     <ItemGroup>
       <_BeautyPublishDir Include="$(PublishDir)" />
     </ItemGroup>

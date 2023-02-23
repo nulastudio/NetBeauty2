@@ -42,6 +42,7 @@ var hiddens = ""
 var sharedRuntimeMode = false
 var enableDebug = false
 var usePatch = false
+var isNetFx = false
 
 var gitcdn string
 var gittree string = ""
@@ -68,97 +69,122 @@ func main() {
 
 	useWPF := false
 
+	exeConfig := manager.FindExeConfig(beautyDir)
+
+	if len(exeConfig) != 0 {
+		isNetFx = true
+	}
+
 	// fix deps.json
-	checkedDependencies := []depsFileDetail{}
-	dependencies := manager.FindDepsJSON(beautyDir)
-	if len(dependencies) != 0 {
-		for _, deps := range dependencies {
-			deps = strings.ReplaceAll(deps, "\\", "/")
-			mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
+	if !isNetFx {
+		checkedDependencies := []depsFileDetail{}
+		dependencies := manager.FindDepsJSON(beautyDir)
+		if len(dependencies) != 0 {
+			for _, deps := range dependencies {
+				deps = strings.ReplaceAll(deps, "\\", "/")
+				mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
 
-			cfxrVersion, crid := manager.FindFXRVersion(deps)
+				cfxrVersion, crid := manager.FindFXRVersion(deps)
 
-			if fxrVersion == "" || rid == "" {
-				fxrVersion, rid = cfxrVersion, crid
-			} else if cfxrVersion == fxrVersion || crid == rid {
-				log.LogError(fmt.Errorf("Multiple SCD Versions Detected:\n[%s/%s]\n[%s/%s]", fxrVersion, rid, cfxrVersion, crid), true)
+				if fxrVersion == "" || rid == "" {
+					fxrVersion, rid = cfxrVersion, crid
+				} else if cfxrVersion == fxrVersion || crid == rid {
+					log.LogError(fmt.Errorf("Multiple SCD Versions Detected:\n[%s/%s]\n[%s/%s]", fxrVersion, rid, cfxrVersion, crid), true)
+				}
+
+				checkedDependencies = append(checkedDependencies, depsFileDetail{
+					deps:       deps,
+					main:       mainProgram,
+					fxrVersion: cfxrVersion,
+					rid:        crid,
+				})
 			}
 
-			checkedDependencies = append(checkedDependencies, depsFileDetail{
-				deps:       deps,
-				main:       mainProgram,
-				fxrVersion: cfxrVersion,
-				rid:        crid,
-			})
-		}
+			// check if pre-build artifact exists
+			if fxrVersion != "" && rid != "" {
+				// 必须检查
+				manager.CheckRunConfigJSON()
 
-		// check if pre-build artifact exists
-		if fxrVersion != "" && rid != "" {
-			// 必须检查
-			manager.CheckRunConfigJSON()
-
-			onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
-			if usePatch && onlineVersion == "" {
-				log.LogError(fmt.Errorf("Artifact does not exist. %s/%s\nYou can report the missing artifact in here: https://github.com/nulastudio/NetBeauty2/discussions/36", fxrVersion, rid), true)
+				onlineVersion := manager.GetOnlineArtifactsVersion(fxrVersion, rid)
+				if usePatch && onlineVersion == "" {
+					log.LogError(fmt.Errorf("Artifact does not exist. %s/%s\nYou can report the missing artifact in here: https://github.com/nulastudio/NetBeauty2/discussions/36", fxrVersion, rid), true)
+				}
 			}
-		}
 
-		for _, deps := range checkedDependencies {
-			log.LogDetail(fmt.Sprintf("fixing %s", deps.deps))
+			for _, deps := range checkedDependencies {
+				log.LogDetail(fmt.Sprintf("fixing %s", deps.deps))
 
-			SCDMode := deps.fxrVersion != "" && deps.rid != ""
+				SCDMode := deps.fxrVersion != "" && deps.rid != ""
 
-			if SCDMode {
-				log.LogDetail("SCD Mode: Yes")
-				log.LogDetail(fmt.Sprintf("SCD Version: %s, %s", deps.fxrVersion, deps.rid))
+				if SCDMode {
+					log.LogDetail("SCD Mode: Yes")
+					log.LogDetail(fmt.Sprintf("SCD Version: %s, %s", deps.fxrVersion, deps.rid))
 
-				if usePatch {
-					log.LogDetail("Use Patch: Yes")
+					if usePatch {
+						log.LogDetail("Use Patch: Yes")
+					} else {
+						log.LogDetail("Use Patch: No")
+					}
 				} else {
+					log.LogDetail("SCD Mode: No")
 					log.LogDetail("Use Patch: No")
 				}
-			} else {
-				log.LogDetail("SCD Mode: No")
-				log.LogDetail("Use Patch: No")
+
+				success := manager.AddStartUpHookToDeps(deps.deps, startupHook)
+
+				usePatch = SCDMode && usePatch
+
+				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, enableDebug, usePatch, sharedRuntimeMode)
+
+				useWPF = _useWPF
+
+				if sharedRuntimeMode {
+					log.LogDetail("Shared Runtime Mode: Yes")
+					log.LogDetail("moving deps may take some time")
+				} else {
+					log.LogDetail("Shared Runtime Mode: No")
+				}
+
+				_, _, curSubDirs, _srmMapping := moveDeps(allDeps, deps.main, sharedRuntimeMode)
+
+				srmMapping = _srmMapping
+				subDirs = append(subDirs, curSubDirs...)
+
+				if success {
+					log.LogDetail(fmt.Sprintf("%s fixed", deps.deps))
+				}
 			}
 
-			success := manager.AddStartUpHookToDeps(deps.deps, startupHook)
-
-			usePatch = SCDMode && usePatch
-
-			allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, enableDebug, usePatch, sharedRuntimeMode)
-
-			useWPF = _useWPF
-
-			if sharedRuntimeMode {
-				log.LogDetail("Shared Runtime Mode: Yes")
-				log.LogDetail("moving deps may take some time")
-			} else {
-				log.LogDetail("Shared Runtime Mode: No")
+			// patch
+			if usePatch && fxrVersion != "" && rid != "" {
+				patch(fxrVersion, rid)
 			}
-
-			_, _, curSubDirs, _srmMapping := moveDeps(allDeps, deps.main, sharedRuntimeMode)
-
-			srmMapping = _srmMapping
-			subDirs = append(subDirs, curSubDirs...)
-
-			if success {
-				log.LogDetail(fmt.Sprintf("%s fixed", deps.deps))
-			}
-		}
-
-		// patch
-		if usePatch && fxrVersion != "" && rid != "" {
-			patch(fxrVersion, rid)
+		} else {
+			log.LogDetail(fmt.Sprintf("no deps.json found in %s", beautyDir))
+			log.LogDetail("skipping")
+			os.Exit(0)
 		}
 	} else {
-		log.LogDetail(fmt.Sprintf("no deps.json found in %s", beautyDir))
-		log.LogDetail("skipping")
-		os.Exit(0)
+		for _, appConfig := range exeConfig {
+			appConfig = strings.ReplaceAll(appConfig, "\\", "/")
+			mainProgram := strings.Replace(filepath.Base(appConfig), ".exe.config", "", -1)
+
+			log.LogDetail(fmt.Sprintf("fixing %s", appConfig))
+
+			log.LogDetail(".Net Fx: Yes")
+
+			allDeps, success := manager.FixExeConfig(appConfig, libsDir)
+
+			moveDeps(allDeps, mainProgram, false)
+
+			if success {
+				log.LogDetail(fmt.Sprintf("%s fixed", appConfig))
+			}
+		}
 	}
 
 	uniqieSubDirs := []string{}
-	{
+	if !isNetFx {
 		tmp := map[string]byte{}
 		for _, e := range subDirs {
 			l := len(tmp)
@@ -170,31 +196,35 @@ func main() {
 	}
 
 	// fix runtimeconfig.json
-	runtimeConfigs := manager.FindRuntimeConfigJSON(beautyDir)
-	if len(runtimeConfigs) != 0 {
-		for _, runtimeConfig := range runtimeConfigs {
-			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
+	if !isNetFx {
+		runtimeConfigs := manager.FindRuntimeConfigJSON(beautyDir)
+		if len(runtimeConfigs) != 0 {
+			for _, runtimeConfig := range runtimeConfigs {
+				log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
 
-			success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF)
+				success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF)
 
-			if success {
-				log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
+				if success {
+					log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
+				}
 			}
+		} else {
+			log.LogDetail(fmt.Sprintf("no runtimeconfig.json found in %s", beautyDir))
+			log.LogDetail("skipping")
+			os.Exit(0)
 		}
-	} else {
-		log.LogDetail(fmt.Sprintf("no runtimeconfig.json found in %s", beautyDir))
-		log.LogDetail("skipping")
-		os.Exit(0)
 	}
 
 	// release nbloader
-	var loaderDir = beautyDir
-	if usePatch {
-		loaderDir = filepath.Join(beautyDir, libsDir)
-	}
-	log.LogDetail("releasing nbloader.dll")
-	if releasePath, err := releaseNBLoader(loaderDir); err != nil {
-		log.LogError(fmt.Errorf("release nbloader.dll failed: %s : %s", releasePath, err.Error()), true)
+	if !isNetFx {
+		var loaderDir = beautyDir
+		if usePatch {
+			loaderDir = filepath.Join(beautyDir, libsDir)
+		}
+		log.LogDetail("releasing nbloader.dll")
+		if releasePath, err := releaseNBLoader(loaderDir); err != nil {
+			log.LogError(fmt.Errorf("release nbloader.dll failed: %s : %s", releasePath, err.Error()), true)
+		}
 	}
 
 	// hide files
@@ -207,10 +237,10 @@ func initCLI() {
 	flag.CommandLine = flag.NewFlagSet("nbeauty", flag.ContinueOnError)
 	flag.CommandLine.Usage = usage
 	flag.CommandLine.SetOutput(os.Stdout)
-	flag.StringVar(&gitcdn, "gitcdn", "", `specify a HostFXRPatcher mirror repo if you have troble in connecting github.
+	flag.StringVar(&gitcdn, "gitcdn", "", `[.NET Core App Only] specify a HostFXRPatcher mirror repo if you have troble in connecting github.
 RECOMMEND https://gitee.com/liesauer/HostFXRPatcher for mainland china users.
 `)
-	flag.StringVar(&gittree, "gittree", "", `specify to a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
+	flag.StringVar(&gittree, "gittree", "", `[.NET Core App Only] specify to a valid git branch or any bits commit hash(up to 40) to grab the specific artifacts and won't get updates any more.
 default is master, means that you always use the latest artifacts.
 NOTE: please provide as longer commit hash as you can, otherwise it may can not be determined as a valid unique commit hash.
 `)
@@ -219,9 +249,9 @@ Error: Log errors only.
 Detail: Log useful infos.
 Info: Log everything.
 `)
-	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `share the runtime between apps`)
-	flag.BoolVar(&enableDebug, "enabledebug", false, `allow 3rd debuggers(like dnSpy) debugs the app`)
-	flag.BoolVar(&usePatch, "usepatch", false, `use the patched hostfxr to reduce files`)
+	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `[.NET Core App Only] share the runtime between apps`)
+	flag.BoolVar(&enableDebug, "enabledebug", false, `[.NET Core App Only] allow 3rd debuggers(like dnSpy) debugs the app`)
+	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
 
 	flag.Parse()
@@ -452,19 +482,21 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 			continue
 		}
 
-		/**
-		 * !usePatch + !enableDebug = !move +  delete
-		 * !usePatch +  enableDebug = !move + !delete
-		 *  usePatch + !enableDebug = !move +  delete
-		 *  usePatch +  enableDebug =  move + !delete
-		 */
-		if strings.Contains(dep.Name, "mscordaccore") ||
-			strings.Contains(dep.Name, "mscordbi") {
-			if !enableDebug {
-				os.Remove(absDepsFile)
-				continue
-			} else if !usePatch {
-				continue
+		if !isNetFx {
+			/**
+			* !usePatch + !enableDebug = !move +  delete
+			* !usePatch +  enableDebug = !move + !delete
+			*  usePatch + !enableDebug = !move +  delete
+			*  usePatch +  enableDebug =  move + !delete
+			 */
+			if strings.Contains(dep.Name, "mscordaccore") ||
+				strings.Contains(dep.Name, "mscordbi") {
+				if !enableDebug {
+					os.Remove(absDepsFile)
+					continue
+				} else if !usePatch {
+					continue
+				}
 			}
 		}
 
@@ -480,7 +512,7 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 		}
 
 		// native不能使用分层结构（多层依赖会导致加载不了dll）
-		if sharedRuntimeMode {
+		if !isNetFx && sharedRuntimeMode {
 			if dep.Type != manager.Native {
 				md5, _ := util.GetFileMD5(absDepsFile)
 				if md5 == "" {
@@ -500,7 +532,7 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 			}
 		}
 
-		if dep.Type == manager.Resource {
+		if !isNetFx && dep.Type == manager.Resource {
 			parts = append([]string{"locales"}, parts...)
 			usingPath = strings.Join(parts, "/")
 		}

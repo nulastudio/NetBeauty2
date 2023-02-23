@@ -4,12 +4,14 @@
   <PropertyGroup>
     <AssemblyName>nulastudio.NetBeauty</AssemblyName>
     <PackageId>nulastudio.NetBeauty</PackageId>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
     <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="NetBeauty.targets" Pack="True" PackagePath="build/net20/nulastudio.NetBeauty.targets" />
     <None Include="NetBeauty.targets" Pack="True" PackagePath="build/netstandard2.0/nulastudio.NetBeauty.targets" />
+    <None Include="_._" Pack="True" PackagePath="lib/net20/" />
     <None Include="_._" Pack="True" PackagePath="lib/netstandard2.0/" />
     <None Include="Beauty.targets" Pack="True" PackagePath="targets/" />
     <None Include="../Build/tools/**/*" Pack="True" PackagePath="tools/" />

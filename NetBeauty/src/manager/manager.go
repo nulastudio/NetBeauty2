@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beevik/etree"
 	"github.com/bitly/go-simplejson"
 
 	log "github.com/nulastudio/NetBeauty/src/log"
@@ -90,6 +91,15 @@ func FindRuntimeConfigJSON(dir string) []string {
 	files, err := filepath.Glob(filepath.Join(dir, "*runtimeconfig*.json"))
 	if err != nil {
 		log.LogDetail(formatError("find runtimeconfig.json failed: %s", err))
+	}
+	return files
+}
+
+// FindExeConfig 寻找指定目录下的*exe.config
+func FindExeConfig(dir string) []string {
+	files, err := filepath.Glob(path.Join(dir, "*exe.config"))
+	if err != nil {
+		log.LogDetail(formatError("find exe.config failed: %s", err))
 	}
 	return files
 }
@@ -172,6 +182,140 @@ func AddStartUpHookToRuntimeConfig(runtimeConfig string, hook string) bool {
 	}
 
 	return true
+}
+
+// FixExeConfig 添加libs到exe.config
+func FixExeConfig(exeConfig string, libsDir string) ([]Deps, bool) {
+	var allDeps = make([]Deps, 0)
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromFile(exeConfig); err != nil {
+		log.LogError(fmt.Errorf("can not read exe.config: %s : %s", exeConfig, err.Error()), false)
+		return allDeps, false
+	}
+
+	assemblyBindings := doc.FindElements("./configuration/runtime/assemblyBinding")
+
+	if len(assemblyBindings) == 0 {
+		return allDeps, true
+	}
+
+	for i, assemblyBinding := range assemblyBindings {
+		assemblyIdentity := assemblyBinding.FindElement("./dependentAssembly/assemblyIdentity")
+
+		if assemblyIdentity == nil {
+			continue
+		}
+
+		dllName := assemblyIdentity.SelectAttrValue("name", "")
+
+		if dllName == "" {
+			continue
+		}
+
+		dllName += ".dll"
+
+		allDeps = append(allDeps, Deps{
+			Name:       dllName,
+			Path:       dllName,
+			SecondPath: dllName,
+			Type:       Assembly,
+			Locale:     "",
+		})
+
+		if i == 0 {
+			probing := assemblyBinding.SelectElement("probing")
+
+			if probing == nil {
+				probing = assemblyBinding.CreateElement("probing")
+			}
+
+			privatePaths := make([]string, 0)
+
+			privatePathStr := probing.SelectAttrValue("privatePath", "")
+
+			if privatePathStr != "" {
+				privatePaths = append(privatePaths, strings.Split(privatePathStr, ";")...)
+			}
+
+			hasProbing := false
+
+			libsDir = strings.TrimPrefix(libsDir, "./")
+			libsDir = strings.TrimPrefix(libsDir, ".\\")
+
+			for _, privatePath := range privatePaths {
+				if privatePath == libsDir {
+					hasProbing = true
+					break
+				}
+			}
+
+			if !hasProbing {
+				privatePaths = append(privatePaths, libsDir)
+				probing.CreateAttr("privatePath", strings.Join(privatePaths, ";"))
+			}
+		}
+
+		doc.WriteSettings.UseCRLF = true
+		bytes, _ := doc.WriteToBytes()
+
+		if err := ioutil.WriteFile(exeConfig, bytes, 0666); err != nil {
+			log.LogError(fmt.Errorf("fix exe.config failed: %s : %s", exeConfig, err.Error()), false)
+		}
+	}
+
+	dir := filepath.Dir(exeConfig)
+
+	// additional dlls
+	if files, err := util.ReadAllFile(dir); err == nil {
+		for _, file := range files {
+			if !strings.HasSuffix(file, ".dll") {
+				continue
+			}
+
+			exists := false
+
+			for _, deps := range allDeps {
+				if file == deps.Name {
+					exists = true
+					break
+				}
+			}
+
+			if exists {
+				continue
+			}
+
+			allDeps = append(allDeps, Deps{
+				Name:       file,
+				Path:       file,
+				SecondPath: file,
+				Type:       Assembly,
+				Locale:     "",
+			})
+		}
+	}
+
+	// additional satellite assemblies
+	if sdir, err := util.ReadAllDir(dir); err == nil {
+		for _, d := range sdir {
+			if files, err := util.ReadAllFile(filepath.Join(dir, d)); err == nil {
+				for _, file := range files {
+					if strings.HasSuffix(file, ".resources.dll") {
+						allDeps = append(allDeps, Deps{
+							Name:       file,
+							Path:       d + "/" + file,
+							SecondPath: d + "/" + file,
+							Type:       Resource,
+							Locale:     d,
+						})
+					}
+				}
+			}
+		}
+	}
+
+	return allDeps, true
 }
 
 // FixRuntimeConfig 添加libs到runtimeconfig.json

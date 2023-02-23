@@ -22,7 +22,7 @@
     <!-- set to True if you want to disable -->
     <DisableBeauty>False</DisableBeauty>
     <!-- set to False if you want to beauty on build -->
-    <BeautyOnPublishOnly>True</BeautyOnPublishOnly>
+    <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="WatsonWebsocket" Version="2.3.2.5" />
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.0.0.0-beta.7" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.0.0" />
   </ItemGroup>
 
 </Project>
