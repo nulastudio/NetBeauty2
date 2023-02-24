@@ -81,6 +81,12 @@ func main() {
 		dependencies := manager.FindDepsJSON(beautyDir)
 		if len(dependencies) != 0 {
 			for _, deps := range dependencies {
+				isHidden, hidErr := misc.IsHiddenFile(deps)
+
+				if isHidden && hidErr == nil {
+					misc.ShowFile(deps)
+				}
+
 				deps = strings.ReplaceAll(deps, "\\", "/")
 				mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
 
@@ -98,6 +104,10 @@ func main() {
 					fxrVersion: cfxrVersion,
 					rid:        crid,
 				})
+
+				if isHidden && hidErr == nil {
+					misc.HideFile(deps)
+				}
 			}
 
 			// check if pre-build artifact exists
@@ -112,6 +122,12 @@ func main() {
 			}
 
 			for _, deps := range checkedDependencies {
+				isHidden, hidErr := misc.IsHiddenFile(deps.deps)
+
+				if isHidden && hidErr == nil {
+					misc.ShowFile(deps.deps)
+				}
+
 				log.LogDetail(fmt.Sprintf("fixing %s", deps.deps))
 
 				SCDMode := deps.fxrVersion != "" && deps.rid != ""
@@ -153,6 +169,10 @@ func main() {
 				if success {
 					log.LogDetail(fmt.Sprintf("%s fixed", deps.deps))
 				}
+
+				if isHidden && hidErr == nil {
+					misc.HideFile(deps.deps)
+				}
 			}
 
 			// patch
@@ -166,6 +186,12 @@ func main() {
 		}
 	} else {
 		for _, appConfig := range exeConfig {
+			isHidden, hidErr := misc.IsHiddenFile(appConfig)
+
+			if isHidden && hidErr == nil {
+				misc.ShowFile(appConfig)
+			}
+
 			appConfig = strings.ReplaceAll(appConfig, "\\", "/")
 			mainProgram := strings.Replace(filepath.Base(appConfig), ".exe.config", "", -1)
 
@@ -179,6 +205,10 @@ func main() {
 
 			if success {
 				log.LogDetail(fmt.Sprintf("%s fixed", appConfig))
+			}
+
+			if isHidden && hidErr == nil {
+				misc.HideFile(appConfig)
 			}
 		}
 	}
@@ -200,12 +230,22 @@ func main() {
 		runtimeConfigs := manager.FindRuntimeConfigJSON(beautyDir)
 		if len(runtimeConfigs) != 0 {
 			for _, runtimeConfig := range runtimeConfigs {
+				isHidden, hidErr := misc.IsHiddenFile(runtimeConfig)
+
+				if isHidden && hidErr == nil {
+					misc.ShowFile(runtimeConfig)
+				}
+
 				log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
 
 				success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF)
 
 				if success {
 					log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
+				}
+
+				if isHidden && hidErr == nil {
+					misc.HideFile(runtimeConfig)
 				}
 			}
 		} else {
@@ -392,10 +432,29 @@ func patch(fxrVersion string, rid string) bool {
 
 	absFxrName := path.Join(beautyDir, fxrName)
 	absFxrBakName := absFxrName + ".bak"
+
+	isHidden1, hidErr1 := misc.IsHiddenFile(absFxrName)
+	isHidden2, hidErr2 := misc.IsHiddenFile(absFxrBakName)
+
+	if isHidden1 && hidErr1 != nil {
+		misc.ShowFile(absFxrName)
+	}
+	if isHidden2 && hidErr2 != nil {
+		misc.ShowFile(absFxrBakName)
+	}
+
 	log.LogInfo(fmt.Sprintf("backuping fxr to %s", absFxrBakName))
 
 	if _, err := util.CopyFile(absFxrName, absFxrBakName); err != nil {
 		log.LogError(fmt.Errorf("backup failed: %s", err.Error()), false)
+
+		if isHidden1 && hidErr1 != nil {
+			misc.HideFile(absFxrName)
+		}
+		if isHidden2 && hidErr2 != nil {
+			misc.HideFile(absFxrBakName)
+		}
+
 		return false
 	}
 
@@ -406,6 +465,13 @@ func patch(fxrVersion string, rid string) bool {
 		fmt.Println("patch failed")
 	}
 
+	if isHidden1 && hidErr1 != nil {
+		misc.HideFile(absFxrName)
+	}
+	if isHidden2 && hidErr2 != nil {
+		misc.HideFile(absFxrBakName)
+	}
+
 	return success
 }
 
@@ -414,8 +480,22 @@ func releaseNBLoader(dir string) (string, error) {
 	loaderPath := dir + "/nbloader.dll"
 
 	if err == nil {
+		isHidden, hidErr := misc.IsHiddenFile(loaderPath)
+
+		if isHidden && hidErr == nil {
+			misc.ShowFile(loaderPath)
+		}
+
 		if err := ioutil.WriteFile(loaderPath, nbloader, 0666); err != nil {
+			if isHidden && hidErr == nil {
+				misc.HideFile(loaderPath)
+			}
+
 			return loaderPath, err
+		}
+
+		if isHidden && hidErr == nil {
+			misc.HideFile(loaderPath)
 		}
 
 		return loaderPath, nil
@@ -574,7 +654,7 @@ func hideFiles() {
 	rootFiles := util.GetAllFiles(beautyDir, false)
 	for _, rootFile := range rootFiles {
 		if fileMatch(rootFile, hiddensFiles) {
-			if err := misc.Hide(rootFile); err != nil {
+			if err := misc.HideFile(rootFile); err != nil {
 				log.LogError(fmt.Errorf("hide file failed: %s : %s", rootFile, err.Error()), false)
 			}
 		}
