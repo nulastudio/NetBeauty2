@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
@@ -28,8 +29,9 @@ namespace WPFTest
         {
             bool resourcesResult = ResourcesTest();
             bool nativeResult = NativeDLLTest();
+            bool configResult = ConfigurationTest();
 
-            bool testResult = resourcesResult && nativeResult;
+            bool testResult = resourcesResult && nativeResult && configResult;
 
             if (testResult)
             {
@@ -114,6 +116,13 @@ namespace WPFTest
             int nativeResult = Util.Sum(a, b);
 
             return result == nativeResult;
+        }
+
+        private bool ConfigurationTest()
+        {
+            string config = ConfigurationManager.AppSettings["hello"];
+
+            return config == "你好";
         }
     }
 }

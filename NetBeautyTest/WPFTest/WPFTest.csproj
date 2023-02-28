@@ -69,7 +69,7 @@
     <!-- dlls that end users never needed, so hide them -->
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
-    <DisableBeauty>False</DisableBeauty>
+    <DisableBeauty>True</DisableBeauty>
     <!-- set to False if you want to beauty on build -->
     <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
@@ -90,6 +90,7 @@
 
   <ItemGroup>
     <PackageReference Include="nulastudio.NetBeauty" Version="2.1.1.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 
 </Project>
