@@ -18,6 +18,7 @@
     <BeautyUsePatch Condition="$(BeautyUsePatch) != 'True'"></BeautyUsePatch>
     <BeautyUsePatch Condition="$(BeautyUsePatch) == 'True'">--usepatch</BeautyUsePatch>
     <_BeautyDependsOnForBuild_NetFx Condition="'$(MSBuildRuntimeType)' == 'Full'">AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild_NetFx>
+    <_BeautyDependsOnForPublish_NetFx Condition="'$(MSBuildRuntimeType)' == 'Full'">Publish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish_NetFx>
     <_BeautyDependsOnForBuild_Core Condition="'$(MSBuildRuntimeType)' == 'Core'">AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild_Core>
     <_BeautyDependsOnForPublish_Core Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(_IsAspNetCoreProject)' == 'true'">AfterPublish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish_Core>
     <_BeautyDependsOnForPublish_Core Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(_IsAspNetCoreProject)' != 'true'">Publish;$(BeautyAfterTasks)</_BeautyDependsOnForPublish_Core>
@@ -46,7 +47,7 @@
     TaskFactory="$(TaskFactory)"
     AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll" >
     <ParameterGroup>
-      <!-- <Args ParameterType="System.String" Output="true" /> -->
+      <Args ParameterType="System.String" Output="true" />
       <IsPublishing ParameterType="System.Boolean" Output="true" />
     </ParameterGroup>
     <Task>
@@ -58,19 +59,34 @@ if (CommandLineArgs.Length < 2) {
 } else {
   IsPublishing = CommandLineArgs[1] == "publish";
 }
-// Args = string.Join(" ", CommandLineArgs);
+Args = string.Join(" ", CommandLineArgs);
 ]]>
       </Code>
     </Task>
   </UsingTask>
 
   <Target Name="_ShouldBeautyOnBuild" BeforeTargets="PrepareForBuild">
+    <PropertyGroup Condition="'$(VisualStudioEdition)' != ''">
+      <_BeautyDetermineIsInsideVS>True</_BeautyDetermineIsInsideVS>
+    </PropertyGroup>
+
     <_BeautyDetermineIsPublishing>
       <Output TaskParameter="IsPublishing" PropertyName="_BeautyIsPublishing" />
-      <!-- <Output TaskParameter="Args" PropertyName="_BeautyArgs" /> -->
+      <Output TaskParameter="Args" PropertyName="_BeautyEntryArgs" />
     </_BeautyDetermineIsPublishing>
 
-    <!-- <Message Text="$(_BeautyArgs)" Importance="High" /> -->
+    <PropertyGroup Condition="'$(_BeautyDetermineIsInsideVS)' == 'True' And '$(_BeautyIsPublishing)' != 'True' And '$(PublishProtocol)' != ''">
+      <_BeautyIsPublishing>True</_BeautyIsPublishing>
+    </PropertyGroup>
+
+    <!-- <Message Text="Running inside Visual Studio: $(_BeautyDetermineIsInsideVS)" Importance="High" /> -->
+    <!-- <Message Text="PublishProtocol: $(PublishProtocol)" Importance="High" /> -->
+    <!-- <Message Text="Running is publish task: $(_BeautyIsPublishing)" Importance="High" /> -->
+    <!-- <Message Text="Running entry cmd args: $(_BeautyEntryArgs)" Importance="High" /> -->
+    <!-- <Message Text="_BeautyDependsOnForBuild_NetFx: $(_BeautyDependsOnForBuild_NetFx)" Importance="High" /> -->
+    <!-- <Message Text="_BeautyDependsOnForPublish_NetFx: $(_BeautyDependsOnForPublish_NetFx)" Importance="High" /> -->
+    <!-- <Message Text="_BeautyDependsOnForBuild_Core: $(_BeautyDependsOnForBuild_Core)" Importance="High" /> -->
+    <!-- <Message Text="_BeautyDependsOnForPublish_Core: $(_BeautyDependsOnForPublish_Core)" Importance="High" /> -->
 
     <PropertyGroup Condition="'$(_BeautyIsPublishing)' == 'True'">
       <_BeautyOnBuild>False</_BeautyOnBuild>
@@ -91,6 +107,22 @@ if (CommandLineArgs.Length < 2) {
     </PropertyGroup>
 
     <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+  </Target>
+
+  <Target Name="NetBeautyOnPublish_Fx" AfterTargets="$(_BeautyDependsOnForPublish_NetFx)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
+    <ItemGroup>
+      <_BeautyPublishDir Include="$(PublishDir)" />
+      <_BeautyPublishDir2 Include="$(TargetDir)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
+      <BeautyDir2>"%(_BeautyPublishDir2.FullPath)/."</BeautyDir2>
+    </PropertyGroup>
+
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+
+    <Exec Condition="'$(BeautyDir2)' != '$(BeautyDir)'" Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyDir2) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 
   <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">

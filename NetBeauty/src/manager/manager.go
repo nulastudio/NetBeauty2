@@ -775,7 +775,9 @@ func FixDeps(deps string, entry string, enableDebug bool, usePatch bool, sharedR
 		if !enableDebug {
 			if strings.Contains(analyzed.Name, "mscordaccore") ||
 				strings.Contains(analyzed.Name, "mscordbi") {
-				delete(analyzed.Category, analyzed.ItemKey)
+				if !strings.HasPrefix(analyzed.ItemKey, "./") {
+					delete(analyzed.Category, analyzed.ItemKey)
+				}
 				continue
 			}
 		}
@@ -820,7 +822,9 @@ func FixDeps(deps string, entry string, enableDebug bool, usePatch bool, sharedR
 			}
 		}
 
-		delete(analyzed.Category, analyzed.ItemKey)
+		if !strings.HasPrefix(analyzed.ItemKey, "./") {
+			delete(analyzed.Category, analyzed.ItemKey)
+		}
 	}
 
 	if usePatch {
