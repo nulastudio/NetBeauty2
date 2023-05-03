@@ -257,6 +257,9 @@ func FixExeConfig(exeConfig string, libsDir string) ([]Deps, bool) {
 		}
 
 		doc.WriteSettings.UseCRLF = true
+
+		doc.Indent(2)
+
 		bytes, _ := doc.WriteToBytes()
 
 		if err := ioutil.WriteFile(exeConfig, bytes, 0666); err != nil {
