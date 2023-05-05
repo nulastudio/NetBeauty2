@@ -146,7 +146,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.2.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.3.0-beta.1" />
     <PackageReference Include="SixLabors.ImageSharp">
       <Version>2.1.3</Version>
     </PackageReference>

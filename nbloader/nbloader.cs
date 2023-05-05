@@ -46,8 +46,16 @@ namespace NetBeauty
 
         public static readonly string[] probes = LIB_DIRECTORIES.Split(';');
 
+        private static readonly AssemblyLoadContext _context = new AssemblyLoadContext("NBLoader");
+        private static readonly Dictionary<string, Assembly> _loaded = new Dictionary<string, Assembly>();
+
         public static Assembly ManagedAssemblyResolver(AssemblyLoadContext context, AssemblyName assemblyName)
         {
+            if (_loaded.ContainsKey(assemblyName.FullName))
+            {
+                return _loaded[assemblyName.FullName];
+            }
+
             foreach (var probe in probes)
             {
                 if (probe == "") continue;
@@ -79,7 +87,39 @@ namespace NetBeauty
 
                 if (File.Exists(assemblyPath))
                 {
-                    return context.LoadFromAssemblyPath(assemblyPath);
+                    var hasSameNameAssembly = false;
+
+                    if (culture == "")
+                    {
+                        foreach (var _assembly in context.Assemblies)
+                        {
+                            var _assemblyName = _assembly.FullName.Split(",")[0];
+
+                            if (_assemblyName == assemblyName.Name)
+                            {
+                                hasSameNameAssembly = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    Assembly assembly;
+
+                    if (culture != "" || !hasSameNameAssembly)
+                    {
+                        assembly = context.LoadFromAssemblyPath(assemblyPath);
+                    }
+                    else
+                    {
+                        assembly = _context.LoadFromAssemblyPath(assemblyPath);
+
+                        if (assembly != null)
+                        {
+                            _loaded[assembly.FullName] = assembly;
+                        }
+                    }
+
+                    return assembly;
                 }
             }
 
