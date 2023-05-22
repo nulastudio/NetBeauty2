@@ -1,5 +1,9 @@
 ## Change Log
 
+### v1.2.9.5
+#### 更新
+1. 向上兼容性
+
 ### v1.2.9.4
 #### 更新
 1. `--roll-forward`选项（`ncbeauty` only），请参考 [Control roll-forward behavior](https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior)

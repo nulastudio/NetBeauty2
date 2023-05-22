@@ -100,7 +100,7 @@ Your `*.csproj` should be similar to this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.4" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.5" />
   </ItemGroup>
 
 </Project>
