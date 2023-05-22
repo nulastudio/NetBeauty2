@@ -452,7 +452,7 @@ func GetAllFiles(dir string, recursive bool) []string {
 }
 
 // FixRuntimeConfig 添加additionalProbingPaths
-func FixRuntimeConfig(runtimeConfigFile string, libsDir string) bool {
+func FixRuntimeConfig(runtimeConfigFile string, libsDir string, rollForward string) bool {
 	jsonBytes, err := ioutil.ReadFile(runtimeConfigFile)
 	if err != nil {
 		log.LogError(fmt.Errorf("can not read runtimeconfig.json: %s", err.Error()), false)
@@ -487,6 +487,14 @@ func FixRuntimeConfig(runtimeConfigFile string, libsDir string) bool {
 		paths = append(paths, libsDir)
 	}
 	runtimeOptions.Set("additionalProbingPaths", paths)
+
+	if rollForward != "" {
+		json.SetPath([]string{
+			"runtimeOptions",
+			"rollForward",
+		}, rollForward)
+	}
+
 	jsonBytes, err = json.EncodePretty()
 	if err != nil {
 		log.LogPanic(fmt.Errorf("can not encode runtimeconfig.json: %s", err.Error()), 1)

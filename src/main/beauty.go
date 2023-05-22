@@ -43,6 +43,7 @@ var beautyDir string
 var libsDir = "libraries"
 var excludes = ""
 var hiddens = ""
+var rollForward = ""
 
 func main() {
 	Umask()
@@ -140,7 +141,7 @@ func main() {
 	if needFixRuntimeConfigs {
 		for _, runtimeConfig := range runtimeConfigs {
 			log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
-			manager.FixRuntimeConfig(runtimeConfig, libsDir)
+			manager.FixRuntimeConfig(runtimeConfig, libsDir, rollForward)
 			log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
 		}
 	}
@@ -193,7 +194,8 @@ DO NOT DISABLE!!!
 hostfxr patch fixes https://github.com/nulastudio/NetCoreBeauty/issues/1`)
 	flag.BoolVar(&force, "force", false, `disable beauty checking and force beauty again.`)
 	flag.BoolVar(&noflag, "noflag", false, `do not generate NetCoreBeauty flag file.`)
-	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
+	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
+	flag.StringVar(&rollForward, "roll-forward", "", `override default roll-forward behavior, see https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior for more details.`)
 
 	flag.Parse()
 

@@ -100,7 +100,7 @@ Your `*.csproj` should be similar to this
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.3" />
+    <PackageReference Include="nulastudio.NetCoreBeauty" Version="1.2.9.4" />
   </ItemGroup>
 
 </Project>
@@ -110,7 +110,7 @@ When you run `dotnet publish -r` (only works with `SCD` mode), everything is don
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] [--hiddens=<hiddenFiles>] <beautyDir> [<libsDir> [<excludes>]]
+ncbeauty [--force=(True|False)] [--gitcdn=<gitcdn>] [--gittree=<gittree>] [--loglevel=(Error|Detail|Info)] [--nopatch=(True|False)] [--noflag=(True|False)] [--hiddens=<hiddenFiles>] [--roll-forward=<rollForward>] <beautyDir> [<libsDir> [<excludes>]]
 
 Setting GitCDN:
 ncbeauty [--loglevel=(Error|Detail|Info)] setcdn <gitcdn>
