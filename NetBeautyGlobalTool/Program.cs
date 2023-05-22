@@ -12,10 +12,10 @@ namespace NetCoreBeautyGlobalTool
     class Program
     {
         private static readonly Dictionary<string, string> platform = new Dictionary<string, string> {
-            ["win-x86"]   = "/nbeauty/win-x86/nbeauty2.exe",
-            ["win-x64"]   = "/nbeauty/win-x64/nbeauty2.exe",
-            ["linux-x64"] = "/nbeauty/linux-x64/nbeauty2",
-            ["osx-x64"]   = "/nbeauty/osx-x64/nbeauty2",
+            ["win-x86"]   = "/nbeauty2/win-x86/nbeauty2.exe",
+            ["win-x64"]   = "/nbeauty2/win-x64/nbeauty2.exe",
+            ["linux-x64"] = "/nbeauty2/linux-x64/nbeauty2",
+            ["osx-x64"]   = "/nbeauty2/osx-x64/nbeauty2",
         };
 
         static void Main(string[] args)
