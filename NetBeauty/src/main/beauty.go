@@ -43,6 +43,7 @@ var sharedRuntimeMode = false
 var enableDebug = false
 var usePatch = false
 var isNetFx = false
+var rollForward = ""
 
 var gitcdn string
 var gittree string = ""
@@ -238,7 +239,7 @@ func main() {
 
 				log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
 
-				success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF)
+				success := manager.AddStartUpHookToRuntimeConfig(runtimeConfig, startupHook) && manager.FixRuntimeConfig(runtimeConfig, libsDir, uniqieSubDirs, srmMapping, sharedRuntimeMode, usePatch, useWPF, rollForward)
 
 				if success {
 					log.LogDetail(fmt.Sprintf("%s fixed", runtimeConfig))
@@ -292,7 +293,8 @@ Info: Log everything.
 	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `[.NET Core App Only] share the runtime between apps`)
 	flag.BoolVar(&enableDebug, "enabledebug", false, `[.NET Core App Only] allow 3rd debuggers(like dnSpy) debugs the app`)
 	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
-	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them`)
+	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
+	flag.StringVar(&rollForward, "roll-forward", "", `override default roll-forward behavior, see https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior for more details.`)
 
 	flag.Parse()
 
@@ -399,7 +401,7 @@ func exit() {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--hiddens=hiddenFiles] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--hiddens=hiddenFiles] [--roll-forward=<rollForward>] <beautyDir> [<libsDir> [<excludes>]]")
 	fmt.Println("")
 	fmt.Println("Arguments")
 	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")

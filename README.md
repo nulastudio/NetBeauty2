@@ -76,7 +76,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.3.0-beta.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.3.1" />
   </ItemGroup>
 
 </Project>
@@ -86,7 +86,7 @@ When you run `dotnet build` or `dotnet publish`, everything will be done automat
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-nbeauty2 [--srmode] [--usepatch] [--enabledebug] [--loglevel=(Error|Detail|Info)] [--hiddens=<HiddenFiles>] [--gitcdn=<GitCDN>] [--gittree=<GitTree>] <beautyDir> [<libsDir> [<excludes>]]
+nbeauty2 [--srmode] [--usepatch] [--enabledebug] [--loglevel=(Error|Detail|Info)] [--hiddens=<HiddenFiles>] [--roll-forward=<rollForward>] [--gitcdn=<GitCDN>] [--gittree=<GitTree>] <beautyDir> [<libsDir> [<excludes>]]
 ```
 
 for example

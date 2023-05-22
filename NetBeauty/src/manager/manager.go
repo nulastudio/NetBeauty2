@@ -322,7 +322,7 @@ func FixExeConfig(exeConfig string, libsDir string) ([]Deps, bool) {
 }
 
 // FixRuntimeConfig 添加libs到runtimeconfig.json
-func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string, srmMapping map[string]string, sharedRuntimeMode bool, usePatch bool, useWPF bool) bool {
+func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string, srmMapping map[string]string, sharedRuntimeMode bool, usePatch bool, useWPF bool, rollForward string) bool {
 	jsonBytes, err := ioutil.ReadFile(runtimeConfig)
 	if err != nil {
 		log.LogError(fmt.Errorf("can not read runtimeconfig.json: %s : %s", runtimeConfig, err.Error()), false)
@@ -484,6 +484,13 @@ func FixRuntimeConfig(runtimeConfig string, libsDir string, subDirs []string, sr
 		}
 
 		runtimeOptions.Set("additionalProbingPaths", resultPaths)
+	}
+
+	if rollForward != "" {
+		json.SetPath([]string{
+			"runtimeOptions",
+			"rollForward",
+		}, rollForward)
 	}
 
 	jsonBytes, _ = json.EncodePretty()
