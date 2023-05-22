@@ -8,6 +8,8 @@
     <PackageId>nulastudio.nbeauty</PackageId>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nbeauty2</ToolCommandName>
+
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
