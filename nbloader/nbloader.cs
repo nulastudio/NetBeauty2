@@ -5,143 +5,103 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.IO;
 
-internal class StartupHook
-{
-    public static void Initialize()
-    {
-        AssemblyLoadContext.Default.Resolving += NetBeauty.NBLoader.ManagedAssemblyResolver;
-        AssemblyLoadContext.Default.ResolvingUnmanagedDll += NetBeauty.NBLoader.UnmanagedDllResolver;
-    }
-}
-
 namespace NetBeauty
 {
-    internal static class NBLoader
+    public class NBLoader
     {
-        public static readonly string APP_BASE = AppContext.BaseDirectory ?? "";
-        public static readonly string LIB_DIRECTORIES = AppContext.GetData("NetBeautyLibsDir")?.ToString() ?? "";
-        // modes: ""(equals "no"), "no", "default"
-        public static readonly string SharedRuntimeMode = AppContext.GetData("NetBeautySharedRuntimeMode")?.ToString() ?? "";
-        public static readonly string SharedRuntimeAppID = AppContext.GetData("NetBeautyAppID")?.ToString() ?? "";
-        public static readonly bool IsSharedRuntimeMode = SharedRuntimeMode != "" && SharedRuntimeMode != "no";
-        private static Dictionary<string, string> _srmMapping;
-        public static Dictionary<string, string> srmMapping
+        public readonly string APP_BASE;
+
+        public readonly string LIB_DIRECTORIES;
+
+        // "" "no" "default"
+        public readonly string SharedRuntimeMode;
+        public readonly string SharedRuntimeAppID;
+        public readonly bool IsSharedRuntimeMode;
+        public readonly Dictionary<string, string> srmMapping;
+
+        public readonly string[] probes;
+
+        public NBLoader()
         {
-            get
+            APP_BASE = AppContext.BaseDirectory ?? "";
+            LIB_DIRECTORIES = AppContext.GetData("NetBeautyLibsDir")?.ToString() ?? "";
+            SharedRuntimeMode = AppContext.GetData("NetBeautySharedRuntimeMode")?.ToString() ?? "";
+            SharedRuntimeAppID = AppContext.GetData("NetBeautyAppID")?.ToString() ?? "";
+            IsSharedRuntimeMode = SharedRuntimeMode != "" && SharedRuntimeMode != "no";
+
+            srmMapping = new Dictionary<string, string>();
+            var mapping = AppContext.GetData("NetBeautySharedRuntimeMapping")?.ToString() ?? "";
+            foreach (var v in mapping.Split('|'))
             {
-                if (_srmMapping == null) {
-                    _srmMapping = new Dictionary<string, string>();
-                    var mapping = AppContext.GetData("NetBeautySharedRuntimeMapping")?.ToString() ?? "";
-                    foreach (var v in mapping.Split('|'))
-                    {
-                        var map = v.Split(':');
+                if (v == "") continue;
 
-                        _srmMapping[map[0]] = map[1];
-                    }
-                }
+                var map = v.Split(':');
 
-                return _srmMapping;
+                if (map.Length != 2) continue;
+
+                srmMapping[map[0]] = map[1];
             }
+
+            probes = LIB_DIRECTORIES.Split(';');
         }
 
-        public static readonly string[] probes = LIB_DIRECTORIES.Split(';');
-
-        private static readonly AssemblyLoadContext _context = new AssemblyLoadContext("NBLoader");
-        private static readonly Dictionary<string, Assembly> _loaded = new Dictionary<string, Assembly>();
-
-        public static Assembly ManagedAssemblyResolver(AssemblyLoadContext context, AssemblyName assemblyName)
+        public void RegisterALC(AssemblyLoadContext context)
         {
-            if (_loaded.ContainsKey(assemblyName.FullName))
-            {
-                return _loaded[assemblyName.FullName];
-            }
+            context.Resolving += ManagedAssemblyResolver;
+            context.ResolvingUnmanagedDll += UnmanagedDllResolver;
+        }
 
+        public Assembly ManagedAssemblyResolver(AssemblyLoadContext context, AssemblyName assemblyName)
+        {
             foreach (var probe in probes)
             {
-                if (probe == "") continue;
+                if (string.IsNullOrEmpty(probe)) continue;
 
-                var path = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
+                var absPath = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
 
                 var culture = assemblyName.CultureName ?? "";
 
-                var culturePath = culture;
-                if (culturePath != "") {
-                    culturePath = "locales/" + culturePath;
-                }
+                var culturePath = culture != "" ? $"locales/{culture}" : culture;
 
                 var fileName = $"{assemblyName.Name}.dll";
-                var assemblyPath = "";
+
+                string assemblyPath;
 
                 if (IsSharedRuntimeMode) {
-                    var srmKey = fileName;
-                    if (culture != "") {
-                        srmKey = $"{culture}/{srmKey}";
-                    }
-                    var md5 = srmMapping.GetValueOrDefault(srmKey);
-                    if (md5 == null) md5 = "";
+                    var srmKey = culture != "" ? $"{culture}/{fileName}" : fileName;
 
-                    assemblyPath = Path.GetFullPath($"{path}/{culturePath}/{fileName}/{md5}/{fileName}");
+                    var md5 = srmMapping.GetValueOrDefault(srmKey) ?? "";
+
+                    assemblyPath = Path.GetFullPath($"{absPath}/{culturePath}/{fileName}/{md5}/{fileName}");
                 } else {
-                    assemblyPath = Path.GetFullPath($"{path}/{culturePath}/{fileName}");
+                    assemblyPath = Path.GetFullPath($"{absPath}/{culturePath}/{fileName}");
                 }
 
                 if (File.Exists(assemblyPath))
                 {
-                    var hasSameNameAssembly = false;
-
-                    if (culture == "")
-                    {
-                        foreach (var _assembly in context.Assemblies)
-                        {
-                            var _assemblyName = _assembly.FullName.Split(",")[0];
-
-                            if (_assemblyName == assemblyName.Name)
-                            {
-                                hasSameNameAssembly = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    Assembly assembly;
-
-                    if (culture != "" || !hasSameNameAssembly)
-                    {
-                        assembly = context.LoadFromAssemblyPath(assemblyPath);
-                    }
-                    else
-                    {
-                        assembly = _context.LoadFromAssemblyPath(assemblyPath);
-
-                        if (assembly != null)
-                        {
-                            _loaded[assembly.FullName] = assembly;
-                        }
-                    }
-
-                    return assembly;
+                    return context.LoadFromAssemblyPath(assemblyPath);
                 }
             }
 
             return null;
         }
 
-        public static IntPtr UnmanagedDllResolver(Assembly assembly, string dllname)
+        public IntPtr UnmanagedDllResolver(Assembly assembly, string dllname)
         {
             foreach (var probe in probes)
             {
-                if (probe == "") continue;
+                if (string.IsNullOrEmpty(probe)) continue;
 
-                var path = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
+                var absPath = Path.IsPathRooted(probe) ? probe : $"{APP_BASE}/{probe}";
 
                 foreach (var libname in DLLNameVariations(dllname))
                 {
-                    var assemblyPath = "";
+                    string assemblyPath;
 
                     if (IsSharedRuntimeMode) {
-                        assemblyPath = Path.GetFullPath($"{path}/srm_native/{SharedRuntimeAppID}/{libname}");
+                        assemblyPath = Path.GetFullPath($"{absPath}/srm_native/{SharedRuntimeAppID}/{libname}");
                     } else {
-                        assemblyPath = Path.GetFullPath($"{path}/{libname}");
+                        assemblyPath = Path.GetFullPath($"{absPath}/{libname}");
                     }
 
                     if (File.Exists(assemblyPath))
