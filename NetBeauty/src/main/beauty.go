@@ -151,7 +151,7 @@ func main() {
 
 				usePatch = SCDMode && usePatch
 
-				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, enableDebug, usePatch, sharedRuntimeMode)
+				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, SCDMode, usePatch, enableDebug, sharedRuntimeMode)
 
 				useWPF = _useWPF
 
