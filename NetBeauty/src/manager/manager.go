@@ -46,6 +46,13 @@ type Deps struct {
 	Locale     string
 }
 
+type AppHost struct {
+	IsBundle bool
+	Name     string
+	Entry    string
+	Location string
+}
+
 // GitCDN git仓库镜像（默认为github）
 var GitCDN = "https://github.com/nulastudio/HostFXRPatcher"
 
@@ -76,6 +83,15 @@ var getLocalArtifactsVersionErr = "get local artifacts version failed: %s"
 var encodeJSONErr = "cannot encode json: %s"
 
 var onlineVersionCache *simplejson.Json = nil
+
+// @reference https://github1s.com/dotnet/runtime/blob/HEAD/src/installer/managed/Microsoft.NET.HostModel/AppHost/HostWriter.cs#L216-L222
+var bundleSignature = []byte{
+	// 32 bytes represent the bundle signature: SHA-256 for ".net core bundle"
+	0x8b, 0x12, 0x02, 0xb9, 0x6a, 0x61, 0x20, 0x38,
+	0x72, 0x7b, 0x93, 0x02, 0x14, 0xd7, 0xa0, 0x32,
+	0x13, 0xf5, 0xb9, 0xe6, 0xef, 0xae, 0x33, 0x18,
+	0xee, 0x3b, 0x2d, 0xce, 0x24, 0xb3, 0x6a, 0xae,
+}
 
 // EnsureLocalPath 确保本地目录存在
 func EnsureLocalPath() bool {
@@ -111,6 +127,141 @@ func FindDepsJSON(dir string) []string {
 		log.LogDetail(formatError("find deps.json failed: %s", err))
 	}
 	return files
+}
+
+// FindAppHost 寻找指定目录下的AppHost
+func FindAppHost(main string, dir string) []string {
+	names := []string{main, main + ".exe"}
+
+	files := make([]string, 0)
+
+	for _, name := range names {
+		absPath := path.Join(dir, name)
+		if !util.PathExists(absPath) {
+			continue
+		}
+
+		files = append(files, absPath)
+	}
+
+	return files
+}
+
+// AnalyzeAppHost 分析AppHost
+func AnalyzeAppHost(main string, appHost string) AppHost {
+	apphost := AppHost{
+		IsBundle: false,
+		Name:     "",
+		Entry:    "",
+		Location: "",
+	}
+
+	binBytes, err := ioutil.ReadFile(appHost)
+	if err != nil {
+		log.LogError(fmt.Errorf("can not read apphost: %s : %s", appHost, err.Error()), false)
+		return apphost
+	}
+
+	defaultEntry := main + ".dll"
+	defaultEntryBytes := make([]byte, 1025)
+
+	copy(defaultEntryBytes[1:], defaultEntry)
+
+	apphost.Location = appHost
+
+	apphost.Name = filepath.Base(appHost)
+
+	apphost.IsBundle = bytes.Contains(binBytes, bundleSignature)
+
+	if false && bytes.Contains(binBytes, defaultEntryBytes) {
+		apphost.Entry = defaultEntry
+	} else {
+		// 模糊匹配入口
+		// 1. 寻找.dll\0
+		// 2. 若找到，往前找到第一个\0
+		// 3. 从此处开始，匹配\0 + *.dll + \0+，总计1025个字节
+		// 4. 若匹配，则认为是入口dll
+
+		offset := 0
+
+		suffixBytes := []byte(".dll\x00")
+
+		for true {
+			i := bytes.Index(binBytes[offset:], suffixBytes)
+
+			realIndex := i + offset
+			// real address
+			offset = realIndex + len(suffixBytes)
+
+			if i == -1 || realIndex >= len(binBytes) {
+				break
+			}
+
+			paddingIndex := -1
+			for i := realIndex - 1; i >= 0; i-- {
+				char := binBytes[i]
+
+				if char == 0x00 {
+					paddingIndex = i
+					break
+				}
+			}
+
+			if paddingIndex == -1 || paddingIndex >= len(binBytes)-1025 {
+				continue
+			}
+
+			entryName := string(binBytes[paddingIndex+1 : offset])
+
+			entryBytes := make([]byte, 1025)
+
+			copy(entryBytes[1:], entryName)
+
+			// fmt.Printf("%d, %s\n", realIndex, entryName)
+
+			realBytes := binBytes[paddingIndex : paddingIndex+1025]
+
+			if bytes.Compare(entryBytes, realBytes) == 0 {
+				apphost.Entry = entryName
+				break
+			}
+		}
+	}
+
+	return apphost
+}
+
+// PatchAppHost 修改AppHost入口
+func PatchAppHost(apphost AppHost, entry string) bool {
+	if apphost.Entry == "" {
+		return false
+	}
+
+	binBytes, err := ioutil.ReadFile(apphost.Location)
+	if err != nil {
+		log.LogError(fmt.Errorf("can not read apphost: %s : %s", apphost.Location, err.Error()), false)
+		return false
+	}
+
+	rawEntryBytes := make([]byte, 1025)
+	copy(rawEntryBytes[1:], apphost.Entry)
+
+	if !bytes.Contains(binBytes, rawEntryBytes) {
+		log.LogError(fmt.Errorf("invalid apphost: %s", apphost.Location), false)
+		return false
+	}
+
+	newEntryBytes := make([]byte, 1025)
+	copy(newEntryBytes[1:], entry)
+
+	binBytes = bytes.Replace(binBytes, rawEntryBytes, newEntryBytes, 1)
+
+	if err := ioutil.WriteFile(apphost.Location, binBytes, 0666); err != nil {
+		log.LogError(fmt.Errorf("patch apphost failed: %s : %s", apphost.Location, err.Error()), false)
+		return false
+	}
+
+	return true
 }
 
 // AddStartUpHookToDeps 添加nbloader启动时钩子到deps.json

@@ -30,6 +30,12 @@ type depsFileDetail struct {
 	rid        string
 }
 
+type patchedAppHost struct {
+	IsPatched bool
+	AppHost   manager.AppHost
+	Location  string
+}
+
 var startupHook = "nbloader"
 
 var workingDir, _ = os.Getwd()
@@ -44,6 +50,8 @@ var enableDebug = false
 var usePatch = false
 var isNetFx = false
 var rollForward = ""
+var appHostEntry = ""
+var appHostDir = ""
 
 var gitcdn string
 var gittree string = ""
@@ -89,7 +97,7 @@ func main() {
 				}
 
 				deps = strings.ReplaceAll(deps, "\\", "/")
-				mainProgram := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
+				main := strings.Replace(filepath.Base(deps), ".deps.json", "", -1)
 
 				cfxrVersion, crid := manager.FindFXRVersion(deps)
 
@@ -101,7 +109,7 @@ func main() {
 
 				checkedDependencies = append(checkedDependencies, depsFileDetail{
 					deps:       deps,
-					main:       mainProgram,
+					main:       main,
 					fxrVersion: cfxrVersion,
 					rid:        crid,
 				})
@@ -194,7 +202,7 @@ func main() {
 			}
 
 			appConfig = strings.ReplaceAll(appConfig, "\\", "/")
-			mainProgram := strings.Replace(filepath.Base(appConfig), ".exe.config", "", -1)
+			main := strings.Replace(filepath.Base(appConfig), ".exe.config", "", -1)
 
 			log.LogDetail(fmt.Sprintf("fixing %s", appConfig))
 
@@ -202,7 +210,7 @@ func main() {
 
 			allDeps, success := manager.FixExeConfig(appConfig, libsDir)
 
-			moveDeps(allDeps, mainProgram, false)
+			moveDeps(allDeps, main, false)
 
 			if success {
 				log.LogDetail(fmt.Sprintf("%s fixed", appConfig))
@@ -230,11 +238,114 @@ func main() {
 	if !isNetFx {
 		runtimeConfigs := manager.FindRuntimeConfigJSON(beautyDir)
 		if len(runtimeConfigs) != 0 {
+			apphosts := make(map[string][]*patchedAppHost)
+
+			// check appHostEntry and appHostDir is OK
+			if appHostEntry != "" && appHostDir != "" {
+				// appHostDir + appHostEntry should be exist
+				entryDll := filepath.Join(appHostDir, appHostEntry)
+
+				if !util.PathExists(entryDll) {
+					log.LogError(fmt.Errorf("can not locate the entry dll, apphost may fail to run:\nappHostDir: %s\nappHostEntry: %s", appHostDir, appHostEntry), false)
+				}
+			}
+
+			if appHostEntry != "" {
+				for _, runtimeConfig := range runtimeConfigs {
+					fullPath := strings.ReplaceAll(runtimeConfig, "\\", "/")
+					fileName := filepath.Base(fullPath)
+					main := strings.SplitN(fileName, ".runtimeconfig", 2)[0]
+
+					if _, ok := apphosts[main]; !ok {
+						apphosts[main] = make([]*patchedAppHost, 0)
+					}
+
+					for _, _apphost := range manager.FindAppHost(main, beautyDir) {
+						var record = false
+						for _, v := range apphosts[main] {
+							if v.Location == _apphost {
+								record = true
+								break
+							}
+						}
+
+						if record {
+							continue
+						}
+
+						apphost := manager.AnalyzeAppHost(main, _apphost)
+
+						// Entry为空，那就是没识别出来
+						if apphost.Entry == "" {
+							log.LogError(fmt.Errorf("unrecognized apphost: %s", _apphost), false)
+							continue
+						}
+
+						apphosts[main] = append(apphosts[main], &patchedAppHost{
+							IsPatched: false,
+							AppHost:   apphost,
+							Location:  _apphost,
+						})
+					}
+				}
+			}
+
 			for _, runtimeConfig := range runtimeConfigs {
 				isHidden, hidErr := misc.IsHiddenFile(runtimeConfig)
 
 				if isHidden && hidErr == nil {
 					misc.ShowFile(runtimeConfig)
+				}
+
+				if appHostEntry != "" {
+					fullPath := strings.ReplaceAll(runtimeConfig, "\\", "/")
+					fileName := filepath.Base(fullPath)
+					main := strings.SplitN(fileName, ".runtimeconfig", 2)[0]
+
+					if _apphosts, ok := apphosts[main]; ok {
+						for _, _apphost := range _apphosts {
+							if _apphost.IsPatched {
+								continue
+							}
+
+							log.LogDetail(fmt.Sprintf("patching apphost: %s", _apphost.AppHost.Location))
+
+							log.LogDetail("AppHost Infos:")
+
+							if _apphost.AppHost.IsBundle {
+								log.LogDetail("IsBundle: Yes")
+							} else {
+								log.LogDetail("IsBundle: No")
+							}
+
+							log.LogDetail("Original Entry: " + _apphost.AppHost.Entry)
+
+							log.LogDetail("Patched Entry: " + appHostEntry)
+
+							_apphost.IsPatched = true
+
+							success := manager.PatchAppHost(_apphost.AppHost, appHostEntry)
+
+							if success {
+								log.LogDetail(fmt.Sprintf("%s patched", _apphost.AppHost.Location))
+							}
+
+							if appHostDir != "" {
+								newLocation := filepath.Join(appHostDir, _apphost.AppHost.Name)
+								newPath := filepath.Dir(newLocation)
+
+								if !util.EnsureDirExists(newPath, 0777) {
+									log.LogError(fmt.Errorf("%s is not writeable", newPath), false)
+								}
+
+								if err := os.Rename(_apphost.AppHost.Location, newLocation); err == nil {
+									log.LogDetail(fmt.Sprintf("AppHost: %s, moved to: %s", _apphost.AppHost.Name, newLocation))
+								} else {
+									fmt.Println(err.Error())
+								}
+							}
+						}
+					}
 				}
 
 				log.LogDetail(fmt.Sprintf("fixing %s", runtimeConfig))
@@ -295,6 +406,8 @@ Info: Log everything.
 	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
 	flag.StringVar(&rollForward, "roll-forward", "", `override default roll-forward behavior, see https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior for more details.`)
+	flag.StringVar(&appHostEntry, "apphostentry", "", `[.NET Core Non Single-File App Only] patch apphost entry location.`)
+	flag.StringVar(&appHostDir, "apphostdir", "", `[.NET Core Non Single-File App Only] relative path based on beautyDir.`)
 
 	flag.Parse()
 
@@ -384,6 +497,17 @@ Info: Log everything.
 			log.LogPanic(fmt.Errorf("invalid beautyDir: %s", err.Error()), 1)
 		}
 		beautyDir = absDir
+
+		appHostEntry = strings.Trim(appHostEntry, `"`)
+		strings.ReplaceAll(appHostEntry, "\\", "/")
+
+		appHostDir = strings.Trim(appHostDir, `"`)
+		if appHostDir != "" {
+			appHostDir, err = filepath.Abs(filepath.Join(beautyDir, appHostDir))
+			if err != nil {
+				log.LogPanic(fmt.Errorf("invalid appHostDir: %s", err.Error()), 1)
+			}
+		}
 	}
 }
 
@@ -401,7 +525,7 @@ func exit() {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--hiddens=hiddenFiles] [--roll-forward=<rollForward>] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]")
 	fmt.Println("")
 	fmt.Println("Arguments")
 	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")

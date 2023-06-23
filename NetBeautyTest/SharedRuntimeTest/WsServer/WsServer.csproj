@@ -29,6 +29,14 @@
     <!-- set to False if you want to disable -->
     <!-- SCD Mode Feature Only -->
     <BeautyUsePatch>True</BeautyUsePatch>
+    <!-- App Entry Dll = BeautyDir + BeautyAppHostDir + BeautyAppHostEntry -->
+    <!-- see https://github.com/nulastudio/NetBeauty2#customize-apphost for more details -->
+    <!-- relative path based on AppHostDir -->
+    <!-- .NET Core Non Single-File Only -->
+    <BeautyAppHostEntry>WsServer/WsServer.dll</BeautyAppHostEntry>
+    <!-- relative path based on BeautyDir -->
+    <!-- .NET Core Non Single-File Only -->
+    <BeautyAppHostDir>..</BeautyAppHostDir>
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
@@ -39,7 +47,7 @@
 
   <ItemGroup>
     <PackageReference Include="WatsonWebsocket" Version="2.3.2.5" />
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.0-beta.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.0-beta.2" />
   </ItemGroup>
 
 </Project>

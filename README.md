@@ -67,6 +67,14 @@ Your `*.csproj` should be like:
     <!-- set to False if you want to disable -->
     <!-- SCD Mode Feature Only -->
     <BeautyUsePatch>True</BeautyUsePatch>
+    <!-- App Entry Dll = BeautyDir + BeautyAppHostDir + BeautyAppHostEntry -->
+    <!-- see https://github.com/nulastudio/NetBeauty2#customize-apphost for more details -->
+    <!-- relative path based on AppHostDir -->
+    <!-- .NET Core Non Single-File Only -->
+    <!-- <BeautyAppHostEntry>bin/MyApp.dll</BeautyAppHostEntry> -->
+    <!-- relative path based on BeautyDir -->
+    <!-- .NET Core Non Single-File Only -->
+    <!-- <BeautyAppHostDir>..</BeautyAppHostDir> -->
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
     <!-- valid values: Error|Detail|Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
@@ -76,7 +84,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.0-beta.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.0-beta.2" />
   </ItemGroup>
 
 </Project>
@@ -86,7 +94,7 @@ When you run `dotnet build` or `dotnet publish`, everything will be done automat
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-nbeauty2 [--srmode] [--usepatch] [--enabledebug] [--loglevel=(Error|Detail|Info)] [--hiddens=<HiddenFiles>] [--roll-forward=<rollForward>] [--gitcdn=<GitCDN>] [--gittree=<GitTree>] <beautyDir> [<libsDir> [<excludes>]]
+nbeauty2 [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]
 ```
 
 for example
@@ -155,4 +163,45 @@ then use it just like normal binary distribution.
     ├── app2.exe
     ├── app2.runtimeconfig.json
     └── ...
+```
+
+## Customize AppHost
+Inspired by [`AppHostPatcher`](https://github.com/dnSpy/dnSpy/tree/master/Build/AppHostPatcher).
+
+More user-friendly folder structure for software suite by patching the imprinted entry path of AppHost, [Demo](https://github.com/nulastudio/NetBeauty2/tree/master/NetBeautyTest/SharedRuntimeTest).
+
+```
+├── MyApp                       - the app1 main/base folder
+│   ├── libs                    - dependencies.
+│   ├── hostfxr.dll;...         - dlls that can't be moved.
+│   ├── nbloader.dll            - NBLoader(will be moved if use patch)
+│   ├── MyApp.deps.json
+│   ├── MyApp.dll
+│   ├── MyApp.runtimeconfig.json
+│   └── ...
+│
+└── MyApp.exe                   - AppHost
+```
+
+`Shared Runtime` + `Customized AppHost`
+
+```
+├── libraries                   - shared runtime dlls(customizable name)
+│
+├── app1                        - the app1 main/base folder
+│   ├── hostfxr.dll;...         - dlls that can't be moved.
+│   ├── app1.deps.json
+│   ├── app1.dll
+│   ├── app1.runtimeconfig.json
+│   └── ...
+│
+├── app2                        - the app2 main/base folder
+│   ├── hostfxr.dll;...
+│   ├── app2.deps.json
+│   ├── app2.dll
+│   ├── app2.runtimeconfig.json
+│   └── ...
+│
+├── app1.exe
+└── app2.exe
 ```
