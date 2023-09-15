@@ -757,9 +757,11 @@ func moveDeps(deps []manager.Deps, entry string, sharedRuntimeMode bool) (int, i
 			fmt.Println(err.Error())
 		}
 
+		fileNameNoExt := fileName[:len(fileName)-len(filepath.Ext(fileName))]
+
 		for _, extFile := range []string{".pdb", ".xml"} {
-			oldFile := filepath.Join(oldPath, fileName+extFile)
-			newFile := filepath.Join(newPath, fileName+extFile)
+			oldFile := filepath.Join(oldPath, fileNameNoExt+extFile)
+			newFile := filepath.Join(newPath, fileNameNoExt+extFile)
 			if util.PathExists(oldFile) {
 				os.Rename(oldFile, newFile)
 			}

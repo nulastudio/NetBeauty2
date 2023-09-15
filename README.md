@@ -84,7 +84,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.0-beta.2" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.1" />
   </ItemGroup>
 
 </Project>
