@@ -97,7 +97,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.1" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 

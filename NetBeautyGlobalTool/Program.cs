@@ -16,6 +16,7 @@ namespace NetCoreBeautyGlobalTool
             ["win-x64"]   = "/nbeauty2/win-x64/nbeauty2.exe",
             ["linux-x64"] = "/nbeauty2/linux-x64/nbeauty2",
             ["osx-x64"]   = "/nbeauty2/osx-x64/nbeauty2",
+            ["osx-arm64"] = "/nbeauty2/osx-arm64/nbeauty2",
         };
 
         static void Main(string[] args)
@@ -32,7 +33,14 @@ namespace NetCoreBeautyGlobalTool
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                nbeautyBin = platform["osx-x64"];
+                if (RuntimeInformation.ProcessArchitecture == Architecture.X64)
+                {
+                    nbeautyBin = platform["osx-x64"];
+                }
+                else if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                {
+                    nbeautyBin = platform["osx-arm64"];
+                }
             }
             var psi = new ProcessStartInfo(rootDir + nbeautyBin)
             {

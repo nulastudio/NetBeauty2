@@ -3,9 +3,11 @@
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">True</IsWindows>
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">True</IsLinux>
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">True</IsOSX>
+    <RuntimeArch>$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)</RuntimeArch>
     <RuntimeOS Condition="$(IsWindows) == 'True'">win-x86</RuntimeOS>
     <RuntimeOS Condition="$(IsLinux) == 'True'">linux-x64</RuntimeOS>
-    <RuntimeOS Condition="$(IsOSX) == 'True'">osx-x64</RuntimeOS>
+    <RuntimeOS Condition="$(IsOSX) == 'True' And $(RuntimeArch) == 'X64'">osx-x64</RuntimeOS>
+    <RuntimeOS Condition="$(IsOSX) == 'True' And $(RuntimeArch) == 'Arm64'">osx-arm64</RuntimeOS>
     <BeautyBinExt Condition="$(IsWindows) == 'True'">.exe</BeautyBinExt>
     <BeautyBin>"$(MSBuildThisFileDirectory)../tools/$(RuntimeOS)/nbeauty2$(BeautyBinExt)"</BeautyBin>
     <BeautyLibsDir Condition="$(BeautyLibsDir) == ''">libraries</BeautyLibsDir>
@@ -81,6 +83,8 @@ Args = string.Join(" ", CommandLineArgs);
       <_BeautyIsPublishing>True</_BeautyIsPublishing>
     </PropertyGroup>
 
+    <!-- <Message Text="RuntimeOS: $(RuntimeOS)" Importance="High" /> -->
+    <!-- <Message Text="RuntimeArch: $(RuntimeArch)" Importance="High" /> -->
     <!-- <Message Text="Running inside Visual Studio: $(_BeautyDetermineIsInsideVS)" Importance="High" /> -->
     <!-- <Message Text="PublishProtocol: $(PublishProtocol)" Importance="High" /> -->
     <!-- <Message Text="Running is publish task: $(_BeautyIsPublishing)" Importance="High" /> -->

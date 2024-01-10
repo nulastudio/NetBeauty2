@@ -69,7 +69,7 @@ dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
 # 打包nbeauty
 mkdir ${archivedir}
-"win-x86", "win-x64", "linux-x64", "osx-x64" | ForEach-Object -Process {
+"win-x86", "win-x64", "linux-x64", "osx-x64", "osx-arm64" | ForEach-Object -Process {
     $rid = $_
     cd "${tooldir}/${rid}"
     Compress-Archive -Force -Path * -DestinationPath "${archivedir}/${rid}.zip"
