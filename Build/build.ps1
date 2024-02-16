@@ -57,7 +57,7 @@ if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Ru
 }
 
 # 签名nbeauty
-pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" "${tooldir}/win-x86/nbeauty2.exe" "${tooldir}/win-x64/nbeauty2.exe"
+pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" "${tooldir}/win-x86/nbeauty2.exe" "${tooldir}/win-x64/nbeauty2.exe" "${tooldir}/win-arm64/nbeauty2.exe"
 
 # 编译NetBeautyNuget
 cd "${rootdir}/NetBeautyNuget"
@@ -69,7 +69,7 @@ dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
 # 打包nbeauty
 mkdir ${archivedir}
-"win-x86", "win-x64", "linux-x64", "osx-x64", "osx-arm64" | ForEach-Object -Process {
+"win-x86", "win-x64", "win-arm64", "linux-x64", "osx-x64", "osx-arm64" | ForEach-Object -Process {
     $rid = $_
     cd "${tooldir}/${rid}"
     Compress-Archive -Force -Path * -DestinationPath "${archivedir}/${rid}.zip"

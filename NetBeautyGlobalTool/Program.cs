@@ -14,6 +14,7 @@ namespace NetCoreBeautyGlobalTool
         private static readonly Dictionary<string, string> platform = new Dictionary<string, string> {
             ["win-x86"]   = "/nbeauty2/win-x86/nbeauty2.exe",
             ["win-x64"]   = "/nbeauty2/win-x64/nbeauty2.exe",
+            ["win-arm64"] = "/nbeauty2/win-arm64/nbeauty2.exe",
             ["linux-x64"] = "/nbeauty2/linux-x64/nbeauty2",
             ["osx-x64"]   = "/nbeauty2/osx-x64/nbeauty2",
             ["osx-arm64"] = "/nbeauty2/osx-arm64/nbeauty2",
@@ -25,7 +26,12 @@ namespace NetCoreBeautyGlobalTool
             var nbeautyBin = "";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                nbeautyBin = platform["win-x86"];
+                if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                {
+                    nbeautyBin = platform["win-arm64"];
+                } else {
+                    nbeautyBin = platform["win-x86"];
+                }
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {

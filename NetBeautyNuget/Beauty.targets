@@ -4,7 +4,8 @@
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">True</IsLinux>
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">True</IsOSX>
     <RuntimeArch>$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)</RuntimeArch>
-    <RuntimeOS Condition="$(IsWindows) == 'True'">win-x86</RuntimeOS>
+    <RuntimeOS Condition="$(IsWindows) == 'True' And $(RuntimeArch) != 'Arm64'">win-x86</RuntimeOS>
+    <RuntimeOS Condition="$(IsWindows) == 'True' And $(RuntimeArch) == 'Arm64'">win-arm64</RuntimeOS>
     <RuntimeOS Condition="$(IsLinux) == 'True'">linux-x64</RuntimeOS>
     <RuntimeOS Condition="$(IsOSX) == 'True' And $(RuntimeArch) == 'X64'">osx-x64</RuntimeOS>
     <RuntimeOS Condition="$(IsOSX) == 'True' And $(RuntimeArch) == 'Arm64'">osx-arm64</RuntimeOS>
