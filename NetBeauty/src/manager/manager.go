@@ -709,7 +709,7 @@ func FindFXRVersion(deps string) (string, string) {
 }
 
 // FixDeps 分析deps.json中的依赖项
-func FixDeps(deps string, entry string, SCDMode bool, usePatch bool, enableDebug bool, sharedRuntimeMode bool) ([]Deps, bool, bool) {
+func FixDeps(deps string, entry string, SCDMode bool, noRuntimeInfo bool, usePatch bool, enableDebug bool, sharedRuntimeMode bool) ([]Deps, bool, bool) {
 	var isAspNetCore = false
 	var useWPF = false
 	var verifyWpfDllSet = false
@@ -759,7 +759,7 @@ func FixDeps(deps string, entry string, SCDMode bool, usePatch bool, enableDebug
 		}
 
 		// nbloader dependencies
-		if SCDMode && !usePatch {
+		if (SCDMode || noRuntimeInfo) && !usePatch {
 			if fileName == "System.Collections.dll" ||
 				fileName == "System.Memory.dll" ||
 				fileName == "System.Private.CoreLib.dll" ||
@@ -983,7 +983,7 @@ func FixDeps(deps string, entry string, SCDMode bool, usePatch bool, enableDebug
 			}
 		}
 
-		if SCDMode && !strings.HasPrefix(analyzed.ItemKey, "./") {
+		if (SCDMode || noRuntimeInfo) && !strings.HasPrefix(analyzed.ItemKey, "./") {
 			delete(analyzed.Category, analyzed.ItemKey)
 		}
 	}

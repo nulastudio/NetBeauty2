@@ -46,6 +46,7 @@ var libsDir = "libraries"
 var excludes = ""
 var hiddens = ""
 var sharedRuntimeMode = false
+var noRuntimeInfo = false
 var enableDebug = false
 var usePatch = false
 var isNetFx = false
@@ -159,7 +160,7 @@ func main() {
 
 				usePatch = SCDMode && usePatch
 
-				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, SCDMode, usePatch, enableDebug, sharedRuntimeMode)
+				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, SCDMode, noRuntimeInfo, usePatch, enableDebug, sharedRuntimeMode)
 
 				useWPF = _useWPF
 
@@ -402,6 +403,7 @@ Detail: Log useful infos.
 Info: Log everything.
 `)
 	flag.BoolVar(&sharedRuntimeMode, "srmode", false, `[.NET Core App Only] share the runtime between apps`)
+	flag.BoolVar(&noRuntimeInfo, "noruntimeinfo", false, `[.NET Core App Only] keep the runtime info in deps.json or not`)
 	flag.BoolVar(&enableDebug, "enabledebug", false, `[.NET Core App Only] allow 3rd debuggers(like dnSpy) debugs the app`)
 	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
@@ -525,7 +527,7 @@ func exit() {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--noruntimeinfo] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]")
 	fmt.Println("")
 	fmt.Println("Arguments")
 	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")

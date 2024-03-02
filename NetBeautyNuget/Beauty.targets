@@ -20,6 +20,8 @@
     <BeautyEnableDebugging Condition="$(BeautyEnableDebugging) == 'True'">--enabledebug</BeautyEnableDebugging>
     <BeautyUsePatch Condition="$(BeautyUsePatch) != 'True'"></BeautyUsePatch>
     <BeautyUsePatch Condition="$(BeautyUsePatch) == 'True'">--usepatch</BeautyUsePatch>
+    <BeautyNoRuntimeInfo Condition="$(BeautyNoRuntimeInfo) != 'True'"></BeautyNoRuntimeInfo>
+    <BeautyNoRuntimeInfo Condition="$(BeautyNoRuntimeInfo) == 'True'">--noruntimeinfo</BeautyNoRuntimeInfo>
     <BeautyAppHostEntry Condition="$(BeautyAppHostEntry) != ''">--apphostentry "$(BeautyAppHostEntry)"</BeautyAppHostEntry>
     <BeautyAppHostDir Condition="$(BeautyAppHostDir) != ''">--apphostdir "$(BeautyAppHostDir)"</BeautyAppHostDir>
     <_BeautyDependsOnForBuild_NetFx Condition="'$(MSBuildRuntimeType)' == 'Full'">AfterBuild;$(BeautyAfterTasks)</_BeautyDependsOnForBuild_NetFx>
@@ -113,7 +115,7 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 
   <Target Name="NetBeautyOnPublish_Fx" AfterTargets="$(_BeautyDependsOnForPublish_NetFx)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
@@ -127,9 +129,9 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir2>"%(_BeautyPublishDir2.FullPath)/."</BeautyDir2>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
 
-    <Exec Condition="'$(BeautyDir2)' != '$(BeautyDir)'" Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir2) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Condition="'$(BeautyDir2)' != '$(BeautyDir)'" Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir2) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 
   <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
@@ -137,7 +139,7 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"$(TargetDir)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 
   <Target Name="NetBeautyOnPublish" AfterTargets="$(_BeautyDependsOnForPublish_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
@@ -149,6 +151,6 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
   </Target>
 </Project>
