@@ -265,7 +265,7 @@ func PatchAppHost(apphost AppHost, entry string) bool {
 }
 
 // AddStartUpHookToDeps 添加nbloader启动时钩子到deps.json
-func AddStartUpHookToDeps(deps string, hook string) bool {
+func AddStartUpHookToDeps(deps string, hook string, version string) bool {
 	jsonBytes, err := ioutil.ReadFile(deps)
 	if err != nil {
 		log.LogError(fmt.Errorf("can not read deps.json: %s : %s", deps, err.Error()), false)
@@ -283,14 +283,14 @@ func AddStartUpHookToDeps(deps string, hook string) bool {
 	json.SetPath([]string{
 		"targets",
 		runtimeTarget,
-		hook,
+		hook + "/" + version,
 		"runtime",
 		hook + ".dll",
 	}, make(map[string]interface{}))
 
 	json.SetPath([]string{
 		"libraries",
-		hook,
+		hook + "/" + version,
 	}, map[string]interface{}{
 		"type":        "project",
 		"serviceable": false,

@@ -49,7 +49,7 @@
 
   <ItemGroup>
     <PackageReference Include="WatsonWebsocket" Version="2.3.2.5" />
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.4" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.5" />
   </ItemGroup>
 
 </Project>

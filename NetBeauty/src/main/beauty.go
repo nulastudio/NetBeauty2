@@ -37,6 +37,7 @@ type patchedAppHost struct {
 }
 
 var startupHook = "nbloader"
+var startupHookVersion = "1.3.0.0"
 
 var workingDir, _ = os.Getwd()
 
@@ -156,7 +157,7 @@ func main() {
 					log.LogDetail("Use Patch: No")
 				}
 
-				success := manager.AddStartUpHookToDeps(deps.deps, startupHook)
+				success := manager.AddStartUpHookToDeps(deps.deps, startupHook, startupHookVersion)
 
 				usePatch = SCDMode && usePatch
 
