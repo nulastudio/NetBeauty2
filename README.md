@@ -98,7 +98,7 @@ When you run `dotnet build` or `dotnet publish`, everything will be done automat
 ### Use the binary application if your project has already been published.
 ```
 Usage:
-nbeauty2 [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--noruntimeinfo] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]
+nbeauty2 [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--noruntimeinfo] [--roll-forward=<rollForward>] [--nbloaderverpolicy=(auto|with|without)] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]
 ```
 
 for example
