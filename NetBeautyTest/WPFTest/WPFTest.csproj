@@ -66,6 +66,8 @@
     <BeautyLibsDir Condition="$(BeautySharedRuntimeMode) != 'True'">./libraries</BeautyLibsDir>
     <!-- dlls that you don't want to be moved or can not be moved -->
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
+    <!-- for framework-dependent publishing -->
+    <!-- <BeautyExcludes>System.Configuration.ConfigurationManager;System.Security.Cryptography.ProtectedData;System.Security.Permissions</BeautyExcludes> -->
     <!-- dlls that end users never needed, so hide them -->
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
     <!-- set to True if you want to disable -->
