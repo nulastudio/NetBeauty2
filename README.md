@@ -63,6 +63,8 @@ Your `*.csproj` should be like:
     <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
     <!-- DO NOT TOUCH THIS OPTION -->
     <BeautyNoRuntimeInfo>False</BeautyNoRuntimeInfo>
+    <!-- valid values: auto|with|without -->
+    <BeautyNBLoaderVerPolicy>auto</BeautyNBLoaderVerPolicy>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -86,7 +88,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.5" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.6" />
   </ItemGroup>
 
 </Project>

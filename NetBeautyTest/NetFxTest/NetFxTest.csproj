@@ -50,6 +50,8 @@
     <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
     <!-- DO NOT TOUCH THIS OPTION -->
     <BeautyNoRuntimeInfo>False</BeautyNoRuntimeInfo>
+    <!-- valid values: auto|with|without -->
+    <BeautyNBLoaderVerPolicy>auto</BeautyNBLoaderVerPolicy>
     <!-- set to True if you want to allow 3rd debuggers(like dnSpy) debugs the app -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
     <!-- the patch can reduce the file count -->
@@ -156,7 +158,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.5" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.6" />
     <PackageReference Include="SixLabors.ImageSharp">
       <Version>2.1.9</Version>
     </PackageReference>

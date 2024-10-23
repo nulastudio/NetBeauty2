@@ -48,6 +48,9 @@ var excludes = ""
 var hiddens = ""
 var sharedRuntimeMode = false
 var noRuntimeInfo = false
+
+// auto with without
+var nbloaderVerPolicy = "auto"
 var enableDebug = false
 var usePatch = false
 var isNetFx = false
@@ -157,7 +160,19 @@ func main() {
 					log.LogDetail("Use Patch: No")
 				}
 
-				success := manager.AddStartUpHookToDeps(deps.deps, startupHook, startupHookVersion)
+				_startupHookVersion := ""
+
+				if nbloaderVerPolicy == "" || nbloaderVerPolicy == "auto" {
+					if manager.CheckNeedStartHookVersion(deps.deps) {
+						_startupHookVersion = startupHookVersion
+					}
+				} else if nbloaderVerPolicy == "with" {
+					_startupHookVersion = startupHookVersion
+				} else if nbloaderVerPolicy == "" {
+					_startupHookVersion = ""
+				}
+
+				success := manager.AddStartUpHookToDeps(deps.deps, startupHook, _startupHookVersion)
 
 				usePatch = SCDMode && usePatch
 
@@ -409,6 +424,8 @@ Info: Log everything.
 	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
 	flag.StringVar(&rollForward, "roll-forward", "", `override default roll-forward behavior, see https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior for more details.`)
+	flag.StringVar(&nbloaderVerPolicy, "nbloaderverpolicy", "auto", `nbloader versioning policy, see https://github.com/nulastudio/NetBeauty2/issues/65 for more details.
+`)
 	flag.StringVar(&appHostEntry, "apphostentry", "", `[.NET Core Non Single-File App Only] patch apphost entry location.`)
 	flag.StringVar(&appHostDir, "apphostdir", "", `[.NET Core Non Single-File App Only] relative path based on beautyDir.`)
 
@@ -501,6 +518,9 @@ Info: Log everything.
 		}
 		beautyDir = absDir
 
+		nbloaderVerPolicy = strings.TrimSpace(nbloaderVerPolicy)
+		nbloaderVerPolicy = strings.ToLower(nbloaderVerPolicy)
+
 		appHostEntry = strings.Trim(appHostEntry, `"`)
 		strings.ReplaceAll(appHostEntry, "\\", "/")
 
@@ -528,7 +548,7 @@ func exit() {
 
 func usage() {
 	fmt.Println("Usage:")
-	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--noruntimeinfo] [--roll-forward=<rollForward>] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]")
+	fmt.Println("nbeauty [--loglevel=(Error|Detail|Info)] [--srmode] [--enabledebug] [--usepatch] [--hiddens=hiddenFiles] [--noruntimeinfo] [--roll-forward=<rollForward>] [--nbloaderverpolicy=(auto|with|without)] [--apphostentry=<appHostEntry>] [--apphostdir=<appHostDir>] <beautyDir> [<libsDir> [<excludes>]]")
 	fmt.Println("")
 	fmt.Println("Arguments")
 	fmt.Println("  <excludes>    dlls that no need to be moved, multi-dlls separated with \";\". Example: dll1.dll;lib*;...")

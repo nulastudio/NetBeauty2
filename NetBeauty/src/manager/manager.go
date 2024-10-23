@@ -280,17 +280,27 @@ func AddStartUpHookToDeps(deps string, hook string, version string) bool {
 
 	runtimeTarget, _ := json.GetPath("runtimeTarget", "name").String()
 
+	hookEntry := hook
+
+	if version != "" {
+		hookEntry = hook + "/" + version
+
+		log.LogDetail("Need NBLoader Version: Yes")
+	} else {
+		log.LogDetail("Need NBLoader Version: No")
+	}
+
 	json.SetPath([]string{
 		"targets",
 		runtimeTarget,
-		hook + "/" + version,
+		hookEntry,
 		"runtime",
 		hook + ".dll",
 	}, make(map[string]interface{}))
 
 	json.SetPath([]string{
 		"libraries",
-		hook + "/" + version,
+		hookEntry,
 	}, map[string]interface{}{
 		"type":        "project",
 		"serviceable": false,
@@ -706,6 +716,92 @@ func FindFXRVersion(deps string) (string, string) {
 	}
 
 	return "", ""
+}
+
+// CheckNeedStartHookVersion 分析deps.json中是否需要添加starthook版本号的依赖项
+func CheckNeedStartHookVersion(deps string) bool {
+	var allAnalyzedDeps = make([]analyzedDeps, 0)
+
+	jsonBytes, err := ioutil.ReadFile(deps)
+	if err != nil {
+		return false
+	}
+
+	json, err := simplejson.NewJson(jsonBytes)
+	if err != nil {
+		return false
+	}
+
+	targets, _ := json.Get("targets").Map()
+	for _, target := range targets {
+		for _, depsObj := range target.(map[string]interface{}) {
+			runtime := depsObj.(map[string]interface{})["runtime"]
+			if runtime != nil {
+				for filePath := range runtime.(map[string]interface{}) {
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
+					fileName := parts[len(parts)-1]
+
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   runtime.(map[string]interface{}),
+						ItemKey:    filePath,
+						Name:       fileName,
+						Path:       fileName,
+						SecondPath: fileName,
+						Type:       Assembly,
+						Locale:     "",
+					})
+				}
+			}
+
+			resources := depsObj.(map[string]interface{})["resources"]
+			if resources != nil {
+				for filePath, locale := range resources.(map[string]interface{}) {
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
+					fileName := parts[len(parts)-1]
+					culture := locale.(map[string]interface{})["locale"].(string)
+
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   resources.(map[string]interface{}),
+						ItemKey:    filePath,
+						Name:       fileName,
+						Path:       culture + "/" + fileName,
+						SecondPath: culture + "/" + fileName,
+						Type:       Resource,
+						Locale:     culture,
+					})
+				}
+			}
+
+			native := depsObj.(map[string]interface{})["native"]
+			if native != nil {
+				for filePath := range native.(map[string]interface{}) {
+					filePath2 := strings.ReplaceAll(filePath, "\\", "/")
+					parts := strings.Split(filePath2, "/")
+					fileName := parts[len(parts)-1]
+
+					allAnalyzedDeps = append(allAnalyzedDeps, analyzedDeps{
+						Category:   native.(map[string]interface{}),
+						ItemKey:    filePath,
+						Name:       fileName,
+						Path:       fileName,
+						SecondPath: filePath2,
+						Type:       Native,
+						Locale:     "",
+					})
+				}
+			}
+		}
+	}
+
+	for _, analyzed := range allAnalyzedDeps {
+		if strings.Contains(analyzed.Name, "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation") {
+			return true
+		}
+	}
+
+	return false
 }
 
 // FixDeps 分析deps.json中的依赖项

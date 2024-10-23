@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31019.35
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFTest", "NetBeautyTest\WPFTest\WPFTest.csproj", "{932C8DC7-1EB0-439B-B7AA-BE719712DA82}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WsClient", "NetBeautyTest\SharedRuntimeTest\WsClient\WsClient.csproj", "{3DDE26EE-956B-4CBC-A427-C5033F667527}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetFxTest", "NetBeautyTest\NetFxTest\NetFxTest.csproj", "{B00BF1D5-D055-456E-869D-1FD75EF20A29}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RazorTest", "NetBeautyTest\RazorTest\RazorTest.csproj", "{FC735912-F38D-45A6-91AB-981BACE21FCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -183,6 +185,18 @@ Global
 		{B00BF1D5-D055-456E-869D-1FD75EF20A29}.Release|x64.Build.0 = Release|Any CPU
 		{B00BF1D5-D055-456E-869D-1FD75EF20A29}.Release|x86.ActiveCfg = Release|Any CPU
 		{B00BF1D5-D055-456E-869D-1FD75EF20A29}.Release|x86.Build.0 = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Debug|x86.Build.0 = Debug|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|x64.Build.0 = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|x86.ActiveCfg = Release|Any CPU
+		{FC735912-F38D-45A6-91AB-981BACE21FCC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -201,6 +215,7 @@ Global
 		{9B772369-9C0E-4ED6-ABE7-815D12923A83} = {3283AE43-F95A-4DF0-940B-D35F1B49DC8B}
 		{3DDE26EE-956B-4CBC-A427-C5033F667527} = {3283AE43-F95A-4DF0-940B-D35F1B49DC8B}
 		{B00BF1D5-D055-456E-869D-1FD75EF20A29} = {892E4718-267A-4854-8127-C77903D24F17}
+		{FC735912-F38D-45A6-91AB-981BACE21FCC} = {892E4718-267A-4854-8127-C77903D24F17}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E6C30250-7EA2-4421-A76A-39E93BF71486}
