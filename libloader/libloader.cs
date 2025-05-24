@@ -7,7 +7,7 @@ using System.IO;
 
 namespace NetBeauty
 {
-    public class NBLoader
+    public class LibLoader
     {
         public readonly string APP_BASE;
 
@@ -21,7 +21,7 @@ namespace NetBeauty
 
         public readonly string[] probes;
 
-        public NBLoader()
+        public LibLoader()
         {
             APP_BASE = AppContext.BaseDirectory ?? "";
             LIB_DIRECTORIES = AppContext.GetData("NetBeautyLibsDir")?.ToString() ?? "";

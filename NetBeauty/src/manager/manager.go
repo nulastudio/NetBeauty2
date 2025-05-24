@@ -264,7 +264,7 @@ func PatchAppHost(apphost AppHost, entry string) bool {
 	return true
 }
 
-// AddStartUpHookToDeps 添加nbloader启动时钩子到deps.json
+// AddStartUpHookToDeps 添加Loader启动时钩子到deps.json
 func AddStartUpHookToDeps(deps string, hook string, version string) bool {
 	jsonBytes, err := ioutil.ReadFile(deps)
 	if err != nil {
@@ -285,9 +285,9 @@ func AddStartUpHookToDeps(deps string, hook string, version string) bool {
 	if version != "" {
 		hookEntry = hook + "/" + version
 
-		log.LogDetail("Need NBLoader Version: Yes")
+		log.LogDetail("Need Loader Version: Yes")
 	} else {
-		log.LogDetail("Need NBLoader Version: No")
+		log.LogDetail("Need Loader Version: No")
 	}
 
 	json.SetPath([]string{
@@ -316,7 +316,7 @@ func AddStartUpHookToDeps(deps string, hook string, version string) bool {
 	return true
 }
 
-// AddStartUpHookToRuntimeConfig 添加nbloader启动时钩子到runtimeconfig.json
+// AddStartUpHookToRuntimeConfig 添加Loader启动时钩子到runtimeconfig.json
 func AddStartUpHookToRuntimeConfig(runtimeConfig string, hook string) bool {
 	jsonBytes, err := ioutil.ReadFile(runtimeConfig)
 	if err != nil {
@@ -805,7 +805,7 @@ func CheckNeedStartHookVersion(deps string) bool {
 }
 
 // FixDeps 分析deps.json中的依赖项
-func FixDeps(deps string, entry string, SCDMode bool, noRuntimeInfo bool, usePatch bool, enableDebug bool, sharedRuntimeMode bool) ([]Deps, bool, bool) {
+func FixDeps(deps string, entry string, SCDMode bool, noRuntimeInfo bool, usePatch bool, enableDebug bool, sharedRuntimeMode bool, loaderName string) ([]Deps, bool, bool) {
 	var isAspNetCore = false
 	var useWPF = false
 	var verifyWpfDllSet = false
@@ -847,14 +847,14 @@ func FixDeps(deps string, entry string, SCDMode bool, noRuntimeInfo bool, usePat
 			}
 		}
 
-		// nbloader
+		// Loader
 		if !usePatch {
-			if fileName == "nbloader.dll" {
+			if fileName == loaderName+".dll" {
 				return true
 			}
 		}
 
-		// nbloader dependencies
+		// Loader dependencies
 		if (SCDMode || noRuntimeInfo) && !usePatch {
 			if fileName == "System.Collections.dll" ||
 				fileName == "System.Memory.dll" ||
@@ -907,7 +907,7 @@ func FixDeps(deps string, entry string, SCDMode bool, noRuntimeInfo bool, usePat
 	targets, _ := json.Get("targets").Map()
 	for _, target := range targets {
 		for depsName, depsObj := range target.(map[string]interface{}) {
-			if depsName == "nbloader" {
+			if depsName == loaderName {
 				continue
 			}
 

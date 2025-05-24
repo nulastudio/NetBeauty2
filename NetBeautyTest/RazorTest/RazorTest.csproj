@@ -49,7 +49,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6" />
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.6" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5.0" />
   </ItemGroup>
 
   <ItemGroup>

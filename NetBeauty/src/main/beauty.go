@@ -36,7 +36,7 @@ type patchedAppHost struct {
 	Location  string
 }
 
-var startupHook = "nbloader"
+var startupHook = "libloader"
 var startupHookVersion = "1.3.0.0"
 
 var workingDir, _ = os.Getwd()
@@ -50,7 +50,7 @@ var sharedRuntimeMode = false
 var noRuntimeInfo = false
 
 // auto with without
-var nbloaderVerPolicy = "auto"
+var loaderVerPolicy = "auto"
 var enableDebug = false
 var usePatch = false
 var isNetFx = false
@@ -162,13 +162,13 @@ func main() {
 
 				_startupHookVersion := ""
 
-				if nbloaderVerPolicy == "" || nbloaderVerPolicy == "auto" {
+				if loaderVerPolicy == "" || loaderVerPolicy == "auto" {
 					if manager.CheckNeedStartHookVersion(deps.deps) {
 						_startupHookVersion = startupHookVersion
 					}
-				} else if nbloaderVerPolicy == "with" {
+				} else if loaderVerPolicy == "with" {
 					_startupHookVersion = startupHookVersion
-				} else if nbloaderVerPolicy == "" {
+				} else if loaderVerPolicy == "" {
 					_startupHookVersion = ""
 				}
 
@@ -176,7 +176,7 @@ func main() {
 
 				usePatch = SCDMode && usePatch
 
-				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, SCDMode, noRuntimeInfo, usePatch, enableDebug, sharedRuntimeMode)
+				allDeps, _useWPF, _ := manager.FixDeps(deps.deps, deps.main, SCDMode, noRuntimeInfo, usePatch, enableDebug, sharedRuntimeMode, startupHook)
 
 				useWPF = _useWPF
 
@@ -384,15 +384,15 @@ func main() {
 		}
 	}
 
-	// release nbloader
+	// release Loader
 	if !isNetFx {
 		var loaderDir = beautyDir
 		if usePatch {
 			loaderDir = filepath.Join(beautyDir, libsDir)
 		}
-		log.LogDetail("releasing nbloader.dll")
-		if releasePath, err := releaseNBLoader(loaderDir); err != nil {
-			log.LogError(fmt.Errorf("release nbloader.dll failed: %s : %s", releasePath, err.Error()), true)
+		log.LogDetail("releasing " + startupHook + ".dll")
+		if releasePath, err := releaseLoader(loaderDir, startupHook); err != nil {
+			log.LogError(fmt.Errorf("release %s.dll failed: %s : %s", startupHook, releasePath, err.Error()), true)
 		}
 	}
 
@@ -424,7 +424,7 @@ Info: Log everything.
 	flag.BoolVar(&usePatch, "usepatch", false, `[.NET Core App Only] use the patched hostfxr to reduce files`)
 	flag.StringVar(&hiddens, "hiddens", "", `dlls that end users never needed, so hide them.`)
 	flag.StringVar(&rollForward, "roll-forward", "", `override default roll-forward behavior, see https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior for more details.`)
-	flag.StringVar(&nbloaderVerPolicy, "nbloaderverpolicy", "auto", `nbloader versioning policy, see https://github.com/nulastudio/NetBeauty2/issues/65 for more details.
+	flag.StringVar(&loaderVerPolicy, "nbloaderverpolicy", "auto", `loader versioning policy, see https://github.com/nulastudio/NetBeauty2/issues/65 for more details.
 `)
 	flag.StringVar(&appHostEntry, "apphostentry", "", `[.NET Core Non Single-File App Only] patch apphost entry location.`)
 	flag.StringVar(&appHostDir, "apphostdir", "", `[.NET Core Non Single-File App Only] relative path based on beautyDir.`)
@@ -518,8 +518,8 @@ Info: Log everything.
 		}
 		beautyDir = absDir
 
-		nbloaderVerPolicy = strings.TrimSpace(nbloaderVerPolicy)
-		nbloaderVerPolicy = strings.ToLower(nbloaderVerPolicy)
+		loaderVerPolicy = strings.TrimSpace(loaderVerPolicy)
+		loaderVerPolicy = strings.ToLower(loaderVerPolicy)
 
 		appHostEntry = strings.Trim(appHostEntry, `"`)
 		strings.ReplaceAll(appHostEntry, "\\", "/")
@@ -624,9 +624,9 @@ func patch(fxrVersion string, rid string) bool {
 	return success
 }
 
-func releaseNBLoader(dir string) (string, error) {
-	nbloader, err := Asset("nbloader/nbloader.dll")
-	loaderPath := dir + "/nbloader.dll"
+func releaseLoader(dir string, loaderName string) (string, error) {
+	loader, err := Asset("libloader/libloader.dll")
+	loaderPath := dir + "/" + loaderName + ".dll"
 
 	if err == nil {
 		isHidden, hidErr := misc.IsHiddenFile(loaderPath)
@@ -635,7 +635,7 @@ func releaseNBLoader(dir string) (string, error) {
 			misc.ShowFile(loaderPath)
 		}
 
-		if err := ioutil.WriteFile(loaderPath, nbloader, 0666); err != nil {
+		if err := ioutil.WriteFile(loaderPath, loader, 0666); err != nil {
 			if isHidden && hidErr == nil {
 				misc.HideFile(loaderPath)
 			}

@@ -34,6 +34,11 @@ Now they work excellently together!
 the loader lets us support `FDD`/`FDE` apps.<br />
 the patch reduces the file count as possible(`SCD` app only).
 
+## Breaking changes in v2.1.5
+**the start hook renamed, `nbloader` -> `libloader`.**
+
+You don't need to do anything, both `BeautyNBLoaderVerPolicy`(in csproj) and `nbloaderverpolicy`(in cli) are not be renamed for maximum backward compatibility, see [#80](https://github.com/nulastudio/NetBeauty2/issues/80) for the reason of renaming.
+
 ## How to use?
 ### Add Nuget reference to your .NET Core project.
 ```
@@ -88,7 +93,7 @@ Your `*.csproj` should be like:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.4.6" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5.0" />
   </ItemGroup>
 
 </Project>
@@ -151,7 +156,7 @@ then use it just like normal binary distribution.
 │
 ├── app1                        - the app1 main/base folder
 │   ├── hostfxr.dll;...         - dlls that can't be moved.
-│   ├── nbloader.dll            - NBLoader(will be moved if use patch)
+│   ├── libloader.dll            - Loader(will be moved if use patch)
 │   ├── app1.deps.json
 │   ├── app1.dll
 │   ├── app1.exe
@@ -161,7 +166,7 @@ then use it just like normal binary distribution.
 │
 └── app2                        - the app2 main/base folder
     ├── hostfxr.dll;...
-    ├── nbloader.dll
+    ├── libloader.dll
     ├── app2.deps.json
     ├── app2.dll
     ├── app2.exe
@@ -178,7 +183,7 @@ More user-friendly folder structure for software suite by patching the imprinted
 ├── MyApp                       - the app1 main/base folder
 │   ├── libs                    - dependencies.
 │   ├── hostfxr.dll;...         - dlls that can't be moved.
-│   ├── nbloader.dll            - NBLoader(will be moved if use patch)
+│   ├── libloader.dll            - Loader(will be moved if use patch)
 │   ├── MyApp.deps.json
 │   ├── MyApp.dll
 │   ├── MyApp.runtimeconfig.json

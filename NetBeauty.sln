@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFTest", "NetBeautyTest\WP
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SumDLL", "NetBeautyTest\SumDLL\SumDLL.vcxproj", "{E1AEAE7F-D867-4700-9A5E-17F2D07BF4F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nbloader", "nbloader\nbloader.csproj", "{C0CE654E-5977-4BD7-8B57-E387AFA4A2C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libloader", "libloader\libloader.csproj", "{C0CE654E-5977-4BD7-8B57-E387AFA4A2C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetBeautyNuget", "NetBeautyNuget\NetBeautyNuget.csproj", "{9349BA9D-380E-4A17-ADF0-8808F389056B}"
 EndProject

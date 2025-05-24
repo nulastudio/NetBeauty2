@@ -25,8 +25,8 @@ if (Test-Path -Path $cachedir) {
     Remove-Item -Recurse -Force $cachedir
 }
 
-# 编译nbloader
-cd "${rootdir}/nbloader"
+# 编译Loader
+Set-Location "${rootdir}/libloader"
 
 if (Test-Path -Path "bin/Release") {
     Remove-Item -Recurse -Force "bin/Release"
@@ -34,22 +34,22 @@ if (Test-Path -Path "bin/Release") {
 
 dotnet build -c Release /p:OutputPath="bin/Release"
 
-$nbloader_dll = "${rootdir}/nbloader/bin/Release/nbloader.dll"
+$loaderdll = "${rootdir}/libloader/bin/Release/libloader.dll"
 
-if (Test-Path -Path $nbloader_dll) {
-    # 签名nbloader
-    # pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" $nbloader_dll
+if (Test-Path -Path $loaderdll) {
+    # 签名Loader
+    # pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" $loaderdll
 
-    # 复制nbloader
-    Copy-Item -Force $nbloader_dll "${rootdir}/NetBeauty/src/nbloader/nbloader.dll"
+    # 复制Loader
+    Copy-Item -Force $loaderdll "${rootdir}/NetBeauty/src/libloader/libloader.dll"
 }
 
-# 更新nbloader
-cd "${rootdir}/NetBeauty/src"
-go-bindata -o ./main/bindata.go ./nbloader/
+# 更新Loader
+Set-Location "${rootdir}/NetBeauty/src"
+go-bindata -o ./main/bindata.go ./libloader/
 
 # 编译nbeauty
-cd "${rootdir}/NetBeauty"
+Set-Location "${rootdir}/NetBeauty"
 if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
     pwsh "make.ps1"
 } else {
@@ -60,19 +60,19 @@ if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Ru
 # pwsh "${builddir}/sign.ps1" -Certificate Auto -Algorithm SHA384 -TimeStampServer "http://timestamp.sectigo.com" "${tooldir}/win-x86/nbeauty2.exe" "${tooldir}/win-x64/nbeauty2.exe" "${tooldir}/win-arm64/nbeauty2.exe"
 
 # 编译NetBeautyNuget
-cd "${rootdir}/NetBeautyNuget"
+Set-Location "${rootdir}/NetBeautyNuget"
 dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
 # 编译NetBeautyGlobalTool
-cd "${rootdir}/NetBeautyGlobalTool"
+Set-Location "${rootdir}/NetBeautyGlobalTool"
 dotnet pack -c Release /p:PackageOutputPath=${nupkgdir}
 
 # 打包nbeauty
 mkdir ${archivedir}
 "win-x86", "win-x64", "win-arm64", "linux-x64", "osx-x64", "osx-arm64" | ForEach-Object -Process {
     $rid = $_
-    cd "${tooldir}/${rid}"
+    Set-Location "${tooldir}/${rid}"
     Compress-Archive -Force -Path * -DestinationPath "${archivedir}/${rid}.zip"
 }
 
-cd $workingdir
+Set-Location $workingdir
