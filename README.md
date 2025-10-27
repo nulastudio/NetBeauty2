@@ -87,27 +87,53 @@ Your `.csproj` file should look similar to the following:
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- Disable NetBeauty (set to True to turn off all features) -->
+    <DisableBeauty>False</DisableBeauty>
+
+    <!-- Enable shared runtime mode (set to True to share libraries across apps). -->
     <BeautySharedRuntimeMode>False</BeautySharedRuntimeMode>
-    <!-- Move dependencies into a sub-directory (default: libs). Use quotes if the path contains spaces. -->
+
+    <!-- Directory for dependencies; default is 'libraries'. Use quotes if the path contains spaces. -->
     <BeautyLibsDir Condition="$(BeautySharedRuntimeMode) == 'True'">../libraries</BeautyLibsDir>
     <BeautyLibsDir Condition="$(BeautySharedRuntimeMode) != 'True'">./libraries</BeautyLibsDir>
-    <!-- Exclude specific DLLs from being moved -->
+
+    <!-- DLLs you want to exclude from being moved (e.g., critical or custom files) -->
     <!-- <BeautyExcludes>dll1.dll;lib*;...</BeautyExcludes> -->
-    <!-- Hide files not needed by end users -->
+
+    <!-- Files to hide from end users (e.g., runtime or config files). Only supported on Windows. -->
     <!-- <BeautyHiddens>hostfxr;hostpolicy;*.deps.json;*.runtimeconfig*.json</BeautyHiddens> -->
-    <DisableBeauty>False</DisableBeauty>
+
+    <!-- Only run NetBeauty on publish (set to True to skip on build) -->
     <BeautyOnPublishOnly>False</BeautyOnPublishOnly>
+
+    <!-- Internal option: do not modify -->
     <BeautyNoRuntimeInfo>False</BeautyNoRuntimeInfo>
+
+    <!-- Loader version policy: auto, with, or without -->
     <BeautyNBLoaderVerPolicy>auto</BeautyNBLoaderVerPolicy>
+
+    <!-- Enable debugging support for third-party debuggers (e.g., dnSpy) -->
     <BeautyEnableDebugging>False</BeautyEnableDebugging>
+
+    <!-- Use the patch to minimize file count (SCD mode only). Set to False to disable. -->
     <BeautyUsePatch>True</BeautyUsePatch>
-    <!-- Customize AppHost entry and directory if needed -->
+
+    <!-- Customize AppHost entry point (relative to AppHostDir). See documentation for details. -->
     <!-- <BeautyAppHostEntry>bin/MyApp.dll</BeautyAppHostEntry> -->
+
+    <!-- Customize AppHost directory (relative to BeautyDir). See documentation for details. -->
     <!-- <BeautyAppHostDir>..</BeautyAppHostDir> -->
+
+    <!-- Specify custom MSBuild tasks to run after NetBeauty completes -->
     <!-- <BeautyAfterTasks></BeautyAfterTasks> -->
+
+    <!-- Log verbosity: Error, Detail, or Info -->
     <BeautyLogLevel>Info</BeautyLogLevel>
-    <!-- Set a repository mirror if you have trouble connecting to GitHub -->
+
+    <!-- Use a mirror for GitHub resources if needed -->
     <!-- <BeautyGitCDN>https://gitee.com/liesauer/HostFXRPatcher</BeautyGitCDN> -->
+     
+    <!-- Specify a branch or tag for the patcher repository -->
     <!-- <BeautyGitTree>master</BeautyGitTree> -->
   </PropertyGroup>
 
