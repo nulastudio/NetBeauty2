@@ -16,17 +16,17 @@
 
 ### Before Applying NetBeauty
 
-![Before Beauty](screenshot/before_beauty.png)
+![Before Beauty](screenshots/before_beauty.webp)
 
 ### After Applying NetBeauty
 
-![After Beauty](screenshot/after_beauty.png)
+![After Beauty](screenshots/after_beauty.webp)
 
 **Even fewer files!**  
 
 Explore the [`--hiddens`](#using-the-binary-application-for-published-projects) option for further reduction.
 
-![After Beauty with Hiddens](screenshot/after_beauty_with_hiddens.png)
+![After Beauty with Hiddens](screenshots/after_beauty_with_hiddens.webp)
 
 ## What's New in NetBeauty 2?
 
