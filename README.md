@@ -1,7 +1,5 @@
 # NetBeauty 2
 
-## Overview
-
 **NetBeauty 2** is a tool designed to organize your .NET Framework or .NET Core application's runtime components and dependencies into a sub-directory, resulting in a cleaner and more manageable project structure.
 
 ## Key Features
@@ -16,61 +14,41 @@
 
 ### Before Applying NetBeauty
 
-![Before Beauty](screenshots/before_beauty.webp)
+![Before Beauty](./screenshots/before_beauty.webp)
 
 ### After Applying NetBeauty
 
-![After Beauty](screenshots/after_beauty.webp)
+![After Beauty](./screenshots/after_beauty.webp)
 
 **Even fewer files!**  
 
 Explore the [`--hiddens`](#using-the-binary-application-for-published-projects) option for further reduction.
 
-![After Beauty with Hiddens](screenshots/after_beauty_with_hiddens.webp)
+![After Beauty with Hiddens](./screenshots/after_beauty_with_hiddens.webp)
 
-## What's New in NetBeauty 2?
+## NetBeauty 2 vs NetCoreBeauty
 
-### NetBeauty 2 vs NetCoreBeauty
+### Features
 
-#### Supported Frameworks
+| Feature                         | NetBeauty 2                                | NetCoreBeauty                                                          |
+| ------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
+| **Supported Frameworks**        | .NET Framework, .NET Core 3.0+             | .NET Core 2.0+                                                         |
+| **Deployment Models**           | FDD, SCD, FDE                              | SCD only                                                               |
+| **Supported Platforms**         | All platforms                              | Windows (x64, x86, arm64), Linux (x64, arm, arm64), macOS (x64, arm64) |
+| **Patched HostFXR Requirement** | Not required (except when using patch)     | Required                                                               |
+| **Minimum File Structure**      | ~20 files (default), ~8 files (with patch) | ~8 files                                                               |
+| **Shared Runtime Support**      | Yes                                        | Possible (with patched libhostfxr)                                     |
 
-- **NetBeauty 2:** .NET Framework, .NET Core 3.0+
-- **NetCoreBeauty:** .NET Core 2.0+
+### Operation
 
-#### Deployment Models
+| Approach                 | NetBeauty 2                                                                                                                                                                                                                                                                                                                                                         | NetCoreBeauty                                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Startup Hook             | Utilizes [`STARTUP_HOOKS`](https://github.com/dotnet/runtime/blob/main/docs/design/features/host-startup-hook.md)                                                                                                                                                                                                                                                   | N/A                                                                                                                                                                       |
+| Assembly Resolution      | Handles assembly resolution via [`AssemblyLoadContext.Resolving`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolving?view=netcore-3.0) and [`AssemblyLoadContext.ResolvingUnmanagedDll`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolvingunmanageddll?view=netcore-3.0) | N/A                                                                                                                                                                       |
+| Patched HostFXR          | Optionally uses a [patched libhostfxr](https://github.com/nulastudio/HostFXRPatcher)                                                                                                                                                                                                                                                                                | Relies on [patched libhostfxr](https://github.com/nulastudio/HostFXRPatcher)                                                                                              |
+| Additional Probing Paths | Uses [`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson) when patching                                                                                                                                                                             | Uses [`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson) |
 
-- **NetBeauty 2:** FDD, SCD, FDE
-- **NetCoreBeauty:** SCD only
-
-#### Supported Platforms
-
-- **NetBeauty 2:** All platforms
-- **NetCoreBeauty:** Windows (x64, x86, arm64), Linux (x64, arm, arm64), macOS (x64, arm64)
-
-#### Patched HostFXR Requirement
-
-- **NetBeauty 2:** Not required (except when using patch)
-- **NetCoreBeauty:** Required
-
-#### Minimum File Structure
-
-- **NetBeauty 2:** ~20 files (default), ~8 files (with patch)
-- **NetCoreBeauty:** ~8 files
-
-#### How It Works
-
-- **NetBeauty 2:**
-  - Utilizes [`STARTUP_HOOKS`](https://github.com/dotnet/runtime/blob/main/docs/design/features/host-startup-hook.md)
-  - Handles assembly resolution via [`AssemblyLoadContext.Resolving`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolving?view=netcore-3.0) and [`AssemblyLoadContext.ResolvingUnmanagedDll`](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.loader.assemblyloadcontext.resolvingunmanageddll?view=netcore-3.0)
-  - Optionally uses a [patched libhostfxr](https://github.com/nulastudio/HostFXRPatcher) and [`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson) when patching
-- **NetCoreBeauty:**
-  - Relies on [patched libhostfxr](https://github.com/nulastudio/HostFXRPatcher)
-  - Uses [`additionalProbingPaths`](https://github.com/dotnet/toolset/blob/master/Documentation/specs/runtime-configuration-file.md#runtimeoptions-section-runtimeconfigjson)
-
-#### Shared Runtime Support
-
-- **NetBeauty 2:** Yes
-- **NetCoreBeauty:** Possible (with patched libhostfxr)
+---
 
 > [!TIP]  
 > For more details, visit the [NetBeauty 2 repository](https://github.com/nulastudio/NetBeauty2) and the [NetCoreBeauty (v1) repository](https://github.com/nulastudio/NetBeauty2/tree/v1).
