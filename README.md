@@ -34,7 +34,7 @@ Explore the [`--hiddens`](#using-the-binary-application-for-published-projects) 
 | ------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
 | **Supported Frameworks**        | .NET Framework, .NET Core 3.0+             | .NET Core 2.0+                                                         |
 | **Deployment Models**           | FDD, SCD, FDE                              | SCD only                                                               |
-| **Supported Platforms**         | All platforms                              | Windows (x64, x86, arm64), Linux (x64, arm, arm64), macOS (x64, arm64) |
+| **Supported Platforms**         | All platforms                              | Windows (x64, x86, arm64), Linux (x64, arm, arm64, loongarch64), macOS (x64, arm64) |
 | **Patched HostFXR Requirement** | Not required (except when using patch)     | Required                                                               |
 | **Minimum File Structure**      | ~20 files (default), ~8 files (with patch) | ~8 files                                                               |
 | **Shared Runtime Support**      | Yes                                        | Possible (with patched libhostfxr)                                     |
