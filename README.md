@@ -138,7 +138,7 @@ Your `.csproj` file should look similar to the following:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5.0" />
+    <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5.1" />
   </ItemGroup>
 </Project>
 ```

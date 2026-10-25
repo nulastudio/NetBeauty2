@@ -116,7 +116,7 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" StdOutEncoding="UTF-8" StdErrEncoding="UTF-8" />
   </Target>
 
   <Target Name="NetBeautyOnPublish_Fx" AfterTargets="$(_BeautyDependsOnForPublish_NetFx)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
@@ -130,9 +130,9 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir2>"%(_BeautyPublishDir2.FullPath)/."</BeautyDir2>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" StdOutEncoding="UTF-8" StdErrEncoding="UTF-8" />
 
-    <Exec Condition="'$(BeautyDir2)' != '$(BeautyDir)'" Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir2) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Condition="'$(BeautyDir2)' != '$(BeautyDir)'" Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir2) $(BeautyLibsDir) $(BeautyExcludes)" StdOutEncoding="UTF-8" StdErrEncoding="UTF-8" />
   </Target>
 
   <Target Name="NetBeautyOnBuild" AfterTargets="$(_BeautyDependsOnForBuild_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' == 'True'">
@@ -140,7 +140,7 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"$(TargetDir)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" StdOutEncoding="UTF-8" StdErrEncoding="UTF-8" />
   </Target>
 
   <Target Name="NetBeautyOnPublish" AfterTargets="$(_BeautyDependsOnForPublish_Core)" Condition="$(DisableBeauty) != 'True' And '$(_BeautyOnBuild)' != 'True'">
@@ -152,6 +152,6 @@ Args = string.Join(" ", CommandLineArgs);
       <BeautyDir>"%(_BeautyPublishDir.FullPath)/."</BeautyDir>
     </PropertyGroup>
 
-    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" />
+    <Exec Command="$(BeautyBin) $(BeautyGitCDN) $(BeautyGitTree) $(BeautyLogLevel) $(BeautySharedRuntimeMode) $(BeautyEnableDebugging) $(BeautyUsePatch) $(BeautyHiddens) $(BeautyNoRuntimeInfo) $(BeautyNBLoaderVerPolicy) $(BeautyAppHostEntry) $(BeautyAppHostDir) $(BeautyDir) $(BeautyLibsDir) $(BeautyExcludes)" StdOutEncoding="UTF-8" StdErrEncoding="UTF-8" />
   </Target>
 </Project>
